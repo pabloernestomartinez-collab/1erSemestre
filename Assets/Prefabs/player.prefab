@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2825560657502413760}
   - component: {fileID: 6886796074336584894}
   - component: {fileID: 393348509725906956}
+  - component: {fileID: 992741822386297471}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -230,3 +231,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &992741822386297471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af5b3a4d3ac43c54bbeb5d00fab8f541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerColor
+  ShowTopMostFoldoutHeaderGroup: 1
+  meshRenderer: {fileID: 538968982477672802}
