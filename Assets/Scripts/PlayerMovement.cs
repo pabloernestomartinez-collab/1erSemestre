@@ -6,7 +6,18 @@ public class PlayerMovement : NetworkBehaviour
 {
     public float speed = 5f;
     private Vector2 moveInput;
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            // Generamos un desplazamiento aleatorio
+            float randomX = Random.Range(3f, 4f);
+            float randomZ = Random.Range(3f, 4f);
 
+            // Movemos el transform
+            transform.position = new Vector3(randomX, 0.5f, randomZ);
+        }
+    }
     void Update()
     {
         if (!IsOwner) return;
