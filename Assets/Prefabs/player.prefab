@@ -17,9 +17,10 @@ GameObject:
   - component: {fileID: 6886796074336584894}
   - component: {fileID: 393348509725906956}
   - component: {fileID: 992741822386297471}
+  - component: {fileID: -2931574602520912099}
   m_Layer: 0
   m_Name: player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -245,3 +246,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerColor
   ShowTopMostFoldoutHeaderGroup: 1
   meshRenderer: {fileID: 538968982477672802}
+--- !u!114 &-2931574602520912099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf9b4294921aef46a2a9c3c725f0eff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::perdi
+  ShowTopMostFoldoutHeaderGroup: 1
+  gameOverMenu: {fileID: 0}
