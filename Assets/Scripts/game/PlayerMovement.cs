@@ -1,6 +1,6 @@
-using Unity.Netcode;
+using Unity.Netcode; // Requerido para heredar de NetworkBehaviour e identificar al dueño del objeto en red
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.InputSystem; // Requerido para el nuevo sistema de Inputs de Unity (Gamepad/Keyboard)
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -10,18 +10,22 @@ public class PlayerMovement : NetworkBehaviour
 
     private Rigidbody rb;
     private Transform mainCameraTransform;
-    private MultiplayerCamera cameraScript; // Referencia al script de tu cámara
+    private MultiplayerCamera cameraScript; // Guarda el acceso al script de rotación horizontal de la cámara
 
+    // Este método nativo de Netcode se ejecuta automáticamente cuando el objeto "nace" en la red
     public override void OnNetworkSpawn()
     {
+        // ESCUDO DE RED MÁS IMPORTANTE: El código interno solo se ejecutará en la computadora del jugador que maneja este personaje.
+        // Evita que el Host inicialice componentes o busque cámaras basándose en el personaje del Cliente, y viceversa.
         if (IsOwner)
         {
-            rb = GetComponent<Rigidbody>();
+            rb = GetComponent<Rigidbody>(); // Vincula el componente físico para aplicar velocidades más adelante
 
             if (UnityEngine.Camera.main != null)
             {
                 mainCameraTransform = UnityEngine.Camera.main.transform;
-                // Buscamos el script de la cámara que está en el juego
+
+                // Intento inicial de buscar el script de la cámara (Útil si el objeto ya existía en la escena desde el inicio)
                 cameraScript = GameObject.FindAnyObjectByType<MultiplayerCamera>();
             }
         }
@@ -29,34 +33,33 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
+        // Si este clon del personaje le pertenece a otro jugador en la red, detenemos el Update de inmediato.
+        // Sin esta línea, cuando tú muevas tu stick, TODOS los personajes de la pantalla se moverían al mismo tiempo.
         if (!IsOwner) return;
 
-        // --- CORRECCIÓN DE CÁMARA MULTIJUGADOR ---
-        // En lugar de buscar en toda la escena, nos aseguramos de agarrar la cámara local de ESTA pantalla
+        // --- PARCHE CLAVE PARA CAMBIO DE ESCENA MULTIJUGADOR ---
+        // Al saltar del Lobby a la escena de juego, las cámaras viejas se destruyen. Si este personaje se quedó sin cámara,
+        // este bloque detecta la nueva cámara principal de la escena y vuelve a enlazar su componente 'MultiplayerCamera'.
         if (mainCameraTransform == null && UnityEngine.Camera.main != null)
         {
             mainCameraTransform = UnityEngine.Camera.main.transform;
 
-            // Buscamos el script de la cámara dentro de esa cámara principal específica
+            // Busca el script pegado directamente en la cámara principal del jugador local (Evita interferencias con la cámara del rival)
             cameraScript = UnityEngine.Camera.main.GetComponent<MultiplayerCamera>();
-
-            // Si tu script de cámara no está en el mismo objeto que la cámara principal,
-            // sino en un objeto hijo de tu propio jugador, usa esta línea en su lugar:
-            // cameraScript = GetComponentInChildren<MultiplayerCamera>();
         }
-        // -----------------------------------------
 
-        // --- 1. LEER INPUTS ---
+        // --- 1. SANEAMIENTO DE INPUTS (Soporte Híbrido) ---
         float moveX = 0f;
         float moveZ = 0f;
 
+        // Si hay un joystick/mando conectado, leemos sus valores analógicos (Stick izquierdo)
         if (Gamepad.current != null)
         {
             Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
             moveX = leftStick.x;
             moveZ = leftStick.y;
         }
-        else
+        else // Si no hay mando, recurrimos al teclado tradicional como respaldo técnico
         {
             if (Keyboard.current.wKey.isPressed) moveZ = 1f;
             if (Keyboard.current.sKey.isPressed) moveZ = -1f;
@@ -64,25 +67,31 @@ public class PlayerMovement : NetworkBehaviour
             if (Keyboard.current.dKey.isPressed) moveX = 1f;
         }
 
-        // --- 2. ROTACIÓN Y MOVIMIENTO LOCAL ---
+        // --- 2. ROTACIÓN Y MOVIMIENTO FÍSICO LOCAL ---
         if (rb != null)
         {
-            // Si logramos conectar con el script de la cámara local
+            // Si el enlace con la cámara local es exitoso, alineamos el cuerpo del personaje
             if (cameraScript != null)
             {
-                // El cuerpo del personaje copia el ángulo horizontal de SU cámara
+                // Extraemos el ángulo horizontal (Y) que el mouse/stick derecho aplicó a la cámara
                 Quaternion targetRotation = Quaternion.Euler(0f, cameraScript.mouseX, 0f);
+
+                // Rotamos el cuerpo del personaje suavemente (Slerp) para que su espalda siempre mire hacia nuestra pantalla
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
 
-            // Calculamos la dirección usando el frente de nuestro propio cuerpo (que ya mira a nuestra cámara)
+            // CÁLCULO DE DIRECCIÓN RELATIVA: Multiplicamos los inputs por los vectores de dirección propios del cuerpo (forward y right).
+            // Esto asegura que al presionar "W", el personaje corra hacia donde apunta su propio pecho (que ya está mirando a su cámara).
             Vector3 moveDirection = (transform.forward * moveZ + transform.right * moveX).normalized;
 
-            // Aplicamos la velocidad física
+            // DIRECTIVA DE COMPILACIÓN: Adapta el código según la versión de Unity que compiles.
+            // Protege la gravedad manteniendo intacta la velocidad actual en el eje Y ('linearVelocity.y' o 'velocity.y').
 #if UNITY_2023_1_OR_NEWER
+            // Versiones modernas (Unity 2023 en adelante): Aplica velocidad lineal mediante físicas físicas oficiales de red
             rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
 #else
-        rb.velocity = new Vector3(moveDirection.x * speed, rb.velocity.y, moveDirection.z * speed);
+            // Versiones clásicas de Unity: Mueve el Rigidbody usando la propiedad clásica 'velocity'
+            rb.velocity = new Vector3(moveDirection.x * speed, rb.velocity.y, moveDirection.z * speed);
 #endif
         }
     }
