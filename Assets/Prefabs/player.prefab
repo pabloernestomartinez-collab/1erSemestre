@@ -159,6 +159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
   speed: 5
+  rotationSpeed: 15
 --- !u!114 &6886796074336584894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,8 +231,8 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!114 &992741822386297471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,4 +260,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::perdi
   ShowTopMostFoldoutHeaderGroup: 1
-  gameOverMenu: {fileID: 0}
