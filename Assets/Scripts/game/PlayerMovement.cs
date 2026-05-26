@@ -86,13 +86,7 @@ public class PlayerMovement : NetworkBehaviour
 
             // DIRECTIVA DE COMPILACIÓN: Adapta el código según la versión de Unity que compiles.
             // Protege la gravedad manteniendo intacta la velocidad actual en el eje Y ('linearVelocity.y' o 'velocity.y').
-#if UNITY_2023_1_OR_NEWER
-            // Versiones modernas (Unity 2023 en adelante): Aplica velocidad lineal mediante físicas físicas oficiales de red
             rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
-#else
-            // Versiones clásicas de Unity: Mueve el Rigidbody usando la propiedad clásica 'velocity'
-            rb.velocity = new Vector3(moveDirection.x * speed, rb.velocity.y, moveDirection.z * speed);
-#endif
         }
     }
 }
