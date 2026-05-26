@@ -1,57 +1,81 @@
-using System.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class MonedaFisica : NetworkBehaviour
 {
-    private Coroutine devolverAutoridadCoroutine;
+    private bool estaAgarrada = false;
 
-    // Detectamos el choque físico tradicional (Sin marcar Is Trigger)
     private void OnCollisionEnter(Collision collision)
     {
-        // Verificamos si lo que chocó la moneda es un Jugador
+        if (estaAgarrada) return;
+
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Conseguimos el componente NetworkObject del jugador para saber quién es en la red
             if (collision.gameObject.TryGetComponent<NetworkObject>(out NetworkObject playerNetObject))
             {
-                // Si el jugador que la chocó es el dueño local de esa pantalla Y NO es actualmente el dueño de la moneda
-                if (playerNetObject.IsOwner && OwnerClientId != playerNetObject.OwnerClientId)
+                // Solo el dueño local de este cuerpo puede solicitar el agarre
+                if (playerNetObject.IsOwner)
                 {
-                    // Le pedimos amablemente al servidor que nos transfiera la física de la moneda
-                    SolicitarAutoridadServerRpc(playerNetObject.OwnerClientId);
+                    AgarrarMonedaServerRpc(playerNetObject.OwnerClientId);
                 }
             }
         }
     }
 
-    // RequireOwnership = false es VITAL aquí. Permite que un cliente que NO es dueño del objeto ejecute este RPC.
-    [ServerRpc(RequireOwnership = false)]
-    private void SolicitarAutoridadServerRpc(ulong nuevoDuenoId)
+    // "SendTo.Server" reemplaza al [ServerRpc]
+    // "RpcInvokePermission.Everyone" reemplaza al RequireOwnership = false
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    private void AgarrarMonedaServerRpc(ulong jugadorQueAgarraId)
     {
-        // El Servidor procesa la orden y cambia el dueño del NetworkObject al cliente que lo chocó
-        GetComponent<NetworkObject>().ChangeOwnership(nuevoDuenoId);
+        if (estaAgarrada) return;
+        estaAgarrada = true;
 
-        // --- SISTEMA DE RETORNO DE SEGURIDAD ---
-        // Si el jugador se aleja, la moneda no debe quedarse asociada a él para siempre.
-        // Cancelamos cualquier temporizador previo y arrancamos uno nuevo.
-        if (devolverAutoridadCoroutine != null)
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(jugadorQueAgarraId, out var cliente))
         {
-            StopCoroutine(devolverAutoridadCoroutine);
+            GameObject jugadorGO = cliente.PlayerObject.gameObject;
+
+            // 1. APAGAMOS EL SCRIPT DE RED DE LA MONEDA:
+            // Al desactivar el NetworkTransform en el Servidor, este deja de forzar posiciones viejas en los clientes
+            if (TryGetComponent<NetworkTransform>(out NetworkTransform netTransform))
+            {
+                netTransform.enabled = false;
+            }
+
+            // 2. APAGAMOS LAS FÍSICAS LOCALES DEL SERVIDOR
+            if (TryGetComponent<Rigidbody>(out Rigidbody rb))
+            {
+                rb.isKinematic = true;
+                rb.detectCollisions = false;
+            }
+
+            // 3. ACTUALIZAMOS JERARQUÍA EN RED
+            GetComponent<NetworkObject>().ChangeOwnership(jugadorQueAgarraId);
+            GetComponent<NetworkObject>().TrySetParent(jugadorGO.transform, false); // 'false' ayuda a mantener la escala original del prefab
+
+            // 4. POSICIONAMOS EN EL SERVIDOR
+            transform.localPosition = new Vector3(0f, 2f, 0f);
+            transform.localRotation = Quaternion.identity;
+
+            // 5. ENVIAMOS ORDEN DIRECTA A LOS CLIENTES
+            // Forzamos visualmente a que todas las pantallas ejecuten el pegado de inmediato
+            FijarPosicionLocalClientRpc();
         }
-        devolverAutoridadCoroutine = StartCoroutine(DevolverAlServidorDespuesDeTiempo());
     }
 
-    private IEnumerator DevolverAlServidorDespuesDeTiempo()
+    [Rpc(SendTo.Everyone)]
+    private void FijarPosicionLocalClientRpc()
     {
-        // Esperamos 3 segundos después del último empujón
-        yield return new WaitForSeconds(3f);
-
-        // Si el objeto sigue vivo y estamos en el servidor, le quitamos la propiedad al cliente
-        // y la regresamos al Servidor (ID: 0 o NetworkManager.ServerClientId)
-        if (IsServer && GetComponent<NetworkObject>() != null)
+        // Doble seguridad para el Cliente: apagamos sus físicas y su NetworkTransform local
+        if (TryGetComponent<NetworkTransform>(out NetworkTransform netTransform)) netTransform.enabled = false;
+        if (TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            GetComponent<NetworkObject>().RemoveOwnership();
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
         }
+
+        // Forzamos la posición relativa en la pantalla del cliente
+        transform.localPosition = new Vector3(0f, 2f, 0f);
+        transform.localRotation = Quaternion.identity;
     }
 }
