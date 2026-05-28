@@ -1,15 +1,17 @@
-using Unity.Netcode; // Necesario para acceder a las funciones multijugador de Netcode (Host, Client, NetworkManager)
+using Unity.Netcode; 
 using UnityEngine;
-using UnityEngine.SceneManagement; // Necesario para el cambio de escenas tradicional de Unity 
+using UnityEngine.SceneManagement; 
 
 public class Lobby : MonoBehaviour
 {
-    private void OnGUI() // se ejecuta varias veces por frame para dibujar interfaces rápidas
+    private void OnGUI() 
 
     {
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)// Si no soy Servidor Y tampoco soy Cliente, significa que el juego acaba de arrancar y nadie está conectado.
         {            
-            GUILayout.BeginArea(new Rect(10, 10, 300, 300));// Creamos un área rectangular en la pantalla de 300x300 píxeles, ubicada en la esquina superior izquierda (X:10, Y:10)
+            // google.....
+            
+            GUILayout.BeginArea(new Rect(10, 10, 300, 300));//  Creamos un área rectangular en la pantalla de 300x300 píxeles, ubicada en la esquina superior izquierda (X:10, Y:10)
             if (GUILayout.Button("Crear Partida (Host)"))// if el jugador hace clic, se ejecuta el código
             {
                 NetworkManager.Singleton.StartHost();// StartHost() convierte esta computadora en el SERVIDOR y en un JUGADOR al mismo tiempo (Pantalla principal)
@@ -40,7 +42,7 @@ public class Lobby : MonoBehaviour
                     GUILayout.Box("Esperando más jugadores para poder iniciar...");// if el Host está solo se bloquea el botón
                 }
             }
-        else// if NO es el servidor, significa que somos el CLIENTE (Jugador 2)
+        else// if NO es el servidor, significa que somos el CLIENTE 
             {
                 GUILayout.Label("¡Conectado! Esperando que el Host inicie la partida..."); // le damos un texto para que espere al Host
             }

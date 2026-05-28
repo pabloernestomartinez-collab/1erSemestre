@@ -14,8 +14,8 @@ public class MonedaFisica : NetworkBehaviour
         {
             if (collision.gameObject.TryGetComponent<NetworkObject>(out NetworkObject playerNetObject))
             {
-                // Solo el dueño local de este cuerpo puede solicitar el agarre
-                if (playerNetObject.IsOwner)
+                if (playerNetObject.IsOwner)  // Solo el dueño local de este cuerpo puede solicitar el agarre
+
                 {
                     AgarrarMonedaServerRpc(playerNetObject.OwnerClientId);
                 }
@@ -23,8 +23,6 @@ public class MonedaFisica : NetworkBehaviour
         }
     }
 
-    // "SendTo.Server" reemplaza al [ServerRpc]
-    // "RpcInvokePermission.Everyone" reemplaza al RequireOwnership = false
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void AgarrarMonedaServerRpc(ulong jugadorQueAgarraId)
     {
@@ -35,31 +33,29 @@ public class MonedaFisica : NetworkBehaviour
         {
             GameObject jugadorGO = cliente.PlayerObject.gameObject;
 
-            // 1. APAGAMOS EL SCRIPT DE RED DE LA MONEDA:
-            // Al desactivar el NetworkTransform en el Servidor, este deja de forzar posiciones viejas en los clientes
-            if (TryGetComponent<NetworkTransform>(out NetworkTransform netTransform))
+            if (TryGetComponent<NetworkTransform>(out NetworkTransform netTransform))   // Al desactivar el NetworkTransform en el Servidor, este deja de forzar posiciones viejas en los clientes
+
             {
                 netTransform.enabled = false;
             }
 
-            // 2. APAGAMOS LAS FÍSICAS LOCALES DEL SERVIDOR
-            if (TryGetComponent<Rigidbody>(out Rigidbody rb))
+            if (TryGetComponent<Rigidbody>(out Rigidbody rb))  //  APAGAMOS LAS FÍSICAS LOCALES DEL SERVIDOR
+
             {
                 rb.isKinematic = true;
                 rb.detectCollisions = false;
             }
 
-            // 3. ACTUALIZAMOS JERARQUÍA EN RED
-            GetComponent<NetworkObject>().ChangeOwnership(jugadorQueAgarraId);
+            GetComponent<NetworkObject>().ChangeOwnership(jugadorQueAgarraId);            //  ACTUALIZAMOS JERARQUÍA EN RED
+
             GetComponent<NetworkObject>().TrySetParent(jugadorGO.transform, false); // 'false' ayuda a mantener la escala original del prefab
 
-            // 4. POSICIONAMOS EN EL SERVIDOR
-            transform.localPosition = new Vector3(0f, 2f, 0f);
+            transform.localPosition = new Vector3(0f, 2f, 0f);     //  POSICIONAMOS EN EL SERVIDOR
+
             transform.localRotation = Quaternion.identity;
 
-            // 5. ENVIAMOS ORDEN DIRECTA A LOS CLIENTES
-            // Forzamos visualmente a que todas las pantallas ejecuten el pegado de inmediato
-            FijarPosicionLocalClientRpc();
+            FijarPosicionLocalClientRpc();  // Forzamos visualmente a que todas las pantallas ejecuten el pegado de inmediato
+
         }
     }
 
