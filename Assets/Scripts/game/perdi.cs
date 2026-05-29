@@ -54,10 +54,5 @@ public class perdi : NetworkBehaviour
         }
     }
 
-    //public void ReiniciarPartida()
-    //{
-    //    NetworkManager.Singleton.Shutdown();
-
-    //    SceneManager.LoadScene(0);
-    //}
+  
 }

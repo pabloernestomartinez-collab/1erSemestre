@@ -38,10 +38,5 @@ public class PlayerColor : NetworkBehaviour
         }
     }
 
-    //public override void OnNetworkDespawn()
-    //{
-    //    // BUENA PRÁCTICA MULTIJUGADOR: Rompemos el enlace del evento. 
-    //    // Si no nos desuscribimos aquí, Unity intentará mandar datos a un objeto que ya no existe, provocando errores graves de rendimiento.
-    //    netColor.OnValueChanged -= OnColorChanged;
-    //}
+  
 }
