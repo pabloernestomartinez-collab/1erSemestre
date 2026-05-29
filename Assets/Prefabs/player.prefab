@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 393348509725906956}
   - component: {fileID: 992741822386297471}
   - component: {fileID: -2931574602520912099}
-  - component: {fileID: -555806057674632890}
+  - component: {fileID: 3167320951379618681}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::perdi
   ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &-555806057674632890
+--- !u!114 &3167320951379618681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -274,4 +274,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerScore
   ShowTopMostFoldoutHeaderGroup: 1
-  textoPuntajeLocal: {fileID: 0}

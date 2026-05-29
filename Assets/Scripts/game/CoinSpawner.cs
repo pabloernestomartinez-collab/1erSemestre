@@ -6,7 +6,7 @@ public class CoinSpawner : NetworkBehaviour
     [SerializeField] private GameObject monedaPrefab; // Arrastra aquí el PREFAB de tu moneda
 
     // Variables para el temporizador
-    private float tiempoPorSpawn = 1.0f; // Tiempo en segundos entre cada moneda
+    private float tiempoPorSpawn = 2.0f; // Tiempo en segundos entre cada moneda
     private float cronometro = 0f;
 
     public override void OnNetworkSpawn()

@@ -78,7 +78,7 @@ public class MonedaFisica : NetworkBehaviour
 
     public void DetenerSeguimientoYFijarEnOrigen()
     {
-        if (!IsServer) return;
+        //if (!IsServer) return;
 
         // Quitamos el dueño de la red para que vuelva a pertenecerle de forma neutral al Servidor
         GetComponent<NetworkObject>().RemoveOwnership();

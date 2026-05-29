@@ -1,24 +1,29 @@
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
-using TMPro; 
+using TMPro;
+using System.Collections; // Necesario para usar Corrutinas
 
 public class PlayerScore : NetworkBehaviour
 {
-    // Una variable de red que guarda los puntos sincronizados autom�ticamente
+    // Variable de red: Sincroniza los puntos automáticamente
     public readonly NetworkVariable<int> puntos = new NetworkVariable<int>(
         0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
 
-    // Opcional: Arrastra un texto aqu� dentro del prefab si quieres ver tus puntos individuales
-    [SerializeField] private TextMeshProUGUI textoPuntajeLocal;
+    private TextMeshProUGUI textoUI;
 
     public override void OnNetworkSpawn()
     {
-        // Nos suscribimos para actualizar el texto si los puntos cambian
         puntos.OnValueChanged += AlCambiarPuntos;
-        ActualizarUI(puntos.Value);
+
+        if (IsOwner)
+        {
+            // 🔥 LA MEJORA: En lugar de buscar el texto de inmediato, 
+            // iniciamos una corrutina que buscará el objeto de forma segura frame a frame.
+            StartCoroutine(EsperarYVincularUI());
+        }
     }
 
     public override void OnNetworkDespawn()
@@ -26,7 +31,6 @@ public class PlayerScore : NetworkBehaviour
         puntos.OnValueChanged -= AlCambiarPuntos;
     }
 
-    // Este m�todo solo lo puede llamar el Servidor (como pasa en el script de la zona de entrega)
     public void AddPoints(int cantidad)
     {
         if (!IsServer) return;
@@ -35,15 +39,53 @@ public class PlayerScore : NetworkBehaviour
 
     private void AlCambiarPuntos(int valorViejo, int valorNuevo)
     {
-        ActualizarUI(valorNuevo);
+        if (IsOwner)
+        {
+            ActualizarTextoEnPantalla(valorNuevo);
+        }
     }
 
-    private void ActualizarUI(int puntosActuales)
+    // El "motor de búsqueda inteligente" que espera a la escena
+    private IEnumerator EsperarYVincularUI()
     {
-        // Solo actualizamos el texto si eres el due�o de este personaje (tu propia pantalla)
-        if (IsOwner && textoPuntajeLocal != null)
+        // Esperamos un frame para dejar que la escena se acomode
+        yield return null;
+
+        int intentos = 0;
+        GameObject objetoTexto = null;
+
+        // Intentará buscar el objeto durante 5 segundos (por si la PC es lenta cargando la escena)
+        while (objetoTexto == null && intentos < 100)
         {
-            textoPuntajeLocal.text = "Puntos: " + puntosActuales;
+            // Buscamos por el nombre exacto que le diste en tu jerarquía
+            objetoTexto = GameObject.Find("TextoPuntajeObjeto");
+
+            if (objetoTexto == null)
+            {
+                intentos++;
+                yield return new WaitForSeconds(0.05f); // Espera un instante antes de reintentar
+            }
+        }
+
+        if (objetoTexto != null)
+        {
+            textoUI = objetoTexto.GetComponent<TextMeshProUGUI>();
+            Debug.Log("[PlayerScore] ¡Texto de puntaje vinculado exitosamente tras cargar la escena!");
+
+            // Forzamos el primer dibujo con los puntos actuales
+            ActualizarTextoEnPantalla(puntos.Value);
+        }
+        else
+        {
+            Debug.LogError("❌ [PlayerScore] Definitivamente no se encontró 'TextoPuntajeObjeto'. Revisa que el nombre en la jerarquía de la escena de juego sea idéntico.");
+        }
+    }
+
+    private void ActualizarTextoEnPantalla(int puntosActuales)
+    {
+        if (textoUI != null)
+        {
+            textoUI.text = "Puntos: " + puntosActuales;
         }
     }
 }

@@ -2931,8 +2931,8 @@ GameObject:
   - component: {fileID: 1471426782}
   - component: {fileID: 1471426781}
   m_Layer: 5
-  m_Name: score
-  m_TagString: Untagged
+  m_Name: TextoPuntajeObjeto
+  m_TagString: TextoPuntaje
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
