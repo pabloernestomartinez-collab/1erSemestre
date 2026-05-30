@@ -9,7 +9,6 @@ public class MonedaFisica : NetworkBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (estaAgarrada) return;
-
         if (!IsSpawned) return;
 
         if (collision.gameObject.CompareTag("Player"))
@@ -30,7 +29,7 @@ public class MonedaFisica : NetworkBehaviour
         if (estaAgarrada) return;
         estaAgarrada = true;
 
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(jugadorQueAgarraId, out var cliente))//Google...
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(jugadorQueAgarraId, out var cliente))
         {
             GameObject jugadorGO = cliente.PlayerObject.gameObject;
 
@@ -40,7 +39,6 @@ public class MonedaFisica : NetworkBehaviour
 
             // Cambiamos el dueño en la red
             GetComponent<NetworkObject>().ChangeOwnership(jugadorQueAgarraId);
-
 
             // Asignamos a quién seguir en el Servidor
             jugadorOBJ = jugadorGO.transform;
@@ -78,34 +76,17 @@ public class MonedaFisica : NetworkBehaviour
 
     public void DetenerSeguimientoYFijarEnOrigen()
     {
-        //if (!IsServer) return;
+        if (!IsServer) return;
 
-        // Quitamos el dueño de la red para que vuelva a pertenecerle de forma neutral al Servidor
-        GetComponent<NetworkObject>().RemoveOwnership();
-
-        // Apagamos el seguimiento en el Servidor
-        estaAgarrada = false;
-        jugadorOBJ = null; // Limpiamos la referencia del transform que seguía en el Update
-
-        // La movemos al origen global
-        transform.position = Vector3.zero;
-        transform.rotation = Quaternion.identity;
-
-        // Le avisamos a todos los clientes que la dejen fija en sus pantallas
-        DetenerSeguimientoClientRpc();
-    }
-
-    [Rpc(SendTo.Everyone)]
-    private void DetenerSeguimientoClientRpc()
-    {
-        // Apagamos el seguimiento local en todos los clientes conectados
         estaAgarrada = false;
         jugadorOBJ = null;
 
-        // Forzamos la misma coordenada exacta de forma global
-        transform.position = Vector3.zero;
-        transform.rotation = Quaternion.identity;
+        // Despawnear y destruir el objeto en red.
+        // El parámetro 'true' le dice a Unity que destruya el objeto de la jerarquía 
+        // tanto en el Host como en el Cliente al mismo tiempo de forma legal.
+        if (GetComponent<NetworkObject>().IsSpawned)
+        {
+            GetComponent<NetworkObject>().Despawn(true);
+        }
     }
-
-
 }

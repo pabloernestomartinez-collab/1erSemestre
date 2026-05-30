@@ -20,20 +20,20 @@ public class perdi : NetworkBehaviour
     [ServerRpc]
     void RequestDeathServerRpc()
     {
-        // 1. El servidor ordena a los clientes que ejecuten la UI individual de Game Over
         ShowGameOverClientRpc();
 
-        // 2. Apagamos las físicas del jugador en el servidor para que no siga cayendo
         if (TryGetComponent<Rigidbody>(out Rigidbody rb)) rb.isKinematic = true;
-
-        // Escondemos el objeto en una coordenada muerta
         transform.position = new Vector3(0, -999f, 0);
 
-        // LLAMADA AL MENÚ DE FIN DE JUEGO EN RED:
-        // El Servidor le ordena al UIManager global que despliegue los botones (Reiniciar/Salir)
+        
+        //  un texto personalizado al UIManager para que no tire error.
         if (GameUIManager.Instance != null)
         {
-            GameUIManager.Instance.MostrarBotonesFinPartidaRpc();
+            // OwnerClientId nos dice el ID del que se cayó. 
+            // Si es 0 se cayó el Host, si es 1 se cayó el Cliente.
+            string mensajeMuerte = OwnerClientId == 0 ? "💀 ¡El Host se cayó al vacío!" : "💀 ¡El Cliente se cayó al vacío!";//google...
+
+            GameUIManager.Instance.MostrarBotonesFinPartidaRpc(mensajeMuerte);
         }
     }
 

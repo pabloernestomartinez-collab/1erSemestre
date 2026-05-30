@@ -24,15 +24,46 @@ public class CoinSpawner : NetworkBehaviour
 
         tiempoRestantePartida -= Time.deltaTime;
 
+        // ... (dentro del Update de CoinSpawner.cs cuando el tiempo llega a cero) ...
         if (tiempoRestantePartida <= 0f)
         {
             tiempoRestantePartida = 0f;
             tiempoAgotado = true;
+            Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Calculando ganador...");
 
-            // El servidor le ordena al UIManager (en todas las pantallas) que muestre los botones
+            // 🏆 LÓGICA PARA CALCULAR EL GANADOR
+            string resultadoFinal = "Empate";
+            int puntosHost = 0;
+            int puntosCliente = 0;
+
+            // Buscamos los componentes PlayerScore de los jugadores conectados
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(0, out var hostNet))
+            {
+                if (hostNet.PlayerObject.TryGetComponent<PlayerScore>(out var pScoreHost)) puntosHost = pScoreHost.puntos.Value;
+            }
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(1, out var clientNet))
+            {
+                if (clientNet.PlayerObject.TryGetComponent<PlayerScore>(out var pScoreClient)) puntosCliente = pScoreClient.puntos.Value;
+            }
+
+            // Comparamos los valores para armar el mensaje
+            if (puntosHost > puntosCliente)
+            {
+                resultadoFinal = $"🏆 ¡GANÓ EL HOST! ({puntosHost} vs {puntosCliente})";
+            }
+            else if (puntosCliente > puntosHost)
+            {
+                resultadoFinal = $"🏆 ¡GANÓ EL CLIENTE! ({puntosCliente} vs {puntosHost})";
+            }
+            else
+            {
+                resultadoFinal = $"🤝 ¡EMPATE! ({puntosHost} a {puntosHost})";
+            }
+
+            // Enviamos el resultado directo al UIManager
             if (GameUIManager.Instance != null)
             {
-                GameUIManager.Instance.MostrarBotonesFinPartidaRpc();
+                GameUIManager.Instance.MostrarBotonesFinPartidaRpc(resultadoFinal);
             }
             return;
         }
