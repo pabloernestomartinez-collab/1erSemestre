@@ -1,42 +1,171 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.Netcode.Transports.UTP;// es para acceder al transporte de Netcode para cambiar la IP
+using Unity.Netcode.Transports.UTP;
+using System.Collections;
 
 public class Lobby : MonoBehaviour
 {
-    private string ipServidor = "127.0.0.1";// Variable para almacenar la IP
+    private string ipServidor = "127.0.0.1";
 
+    private bool hostDetectado = false;
+    private bool buscandoHost = false;
+    private string mensajeEstado = "Elige tu rol para comenzar.";
+
+    // 🔥 MODIFICADO: Nos aseguramos de resetear el menú COMPLETAMENTE al iniciar la escena
     private void Start()
     {
+        hostDetectado = false;
+        buscandoHost = false;
+        mensajeEstado = "Elige tu rol para comenzar.";
 
+        // Por si acaso la red quedó abierta a medias, forzamos un apagado limpio aquí también
         if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient))
         {
             NetworkManager.Singleton.Shutdown();
-            //Debug.Log("[Lobby] Red reseteada y limpiada con éxito al entrar al menú.");
         }
     }
+
+    private void OnEnable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            // 🔥 BUENA PRÁCTICA: Primero restamos el evento por si ya estaba enganchado, y luego lo sumamos.
+            // Esto evita que el evento se ejecute 2 o 3 veces seguidas en la segunda partida.
+            NetworkManager.Singleton.OnClientDisconnectCallback -= AlDesconectarseDelServidor;
+            NetworkManager.Singleton.OnClientDisconnectCallback += AlDesconectarseDelServidor;
+
+            NetworkManager.Singleton.OnClientConnectedCallback -= AlConectarseConExito;
+            NetworkManager.Singleton.OnClientConnectedCallback += AlConectarseConExito;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= AlDesconectarseDelServidor;
+            NetworkManager.Singleton.OnClientConnectedCallback -= AlConectarseConExito;
+        }
+    }
+
+    private void AlConectarseConExito(ulong id)
+    {
+        if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsServer)
+        {
+            // 🔥 CORRECCIÓN: Si conectamos con éxito, ya nos quedamos en el lobby de verdad
+            hostDetectado = true;
+            buscandoHost = false;
+            mensajeEstado = "✅ ¡Conectado exitosamente al Lobby!";
+        }
+    }
+
+    private void AlDesconectarseDelServidor(ulong idCliente)
+    {
+        if (NetworkManager.Singleton == null) return;
+        if (NetworkManager.Singleton.IsServer) return;
+
+        if (buscandoHost)
+        {
+            hostDetectado = false;
+            buscandoHost = false;
+            mensajeEstado = "❌ El Host aún no ha iniciado la partida.";
+            return;
+        }
+
+        if (SceneManager.GetActiveScene().name == "lobby") // ⚠️ Asegúrate de que aquí también esté en minúscula "lobby"
+        {
+            hostDetectado = false;
+            buscandoHost = false;
+            mensajeEstado = "Partida terminada de forma limpia. Elige tu rol.";
+            return;
+        }
+
+        NetworkManager.Singleton.Shutdown();
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
+    private IEnumerator ComprobarSiExisteHost()
+    {
+        if (NetworkManager.Singleton == null) yield break;
+
+        hostDetectado = false;
+        buscandoHost = true;
+        mensajeEstado = "🔍 Buscando Host en la red...";
+
+        ConfigurarIpTransporte(ipServidor);
+        NetworkManager.Singleton.StartClient();
+
+        // Esperamos un máximo de 4 segundos a que Netcode conecte
+        float tiempoEspera = 0f;
+        while (tiempoEspera < 4f && !hostDetectado)
+        {
+            // Si el motor nativo de Netcode confirma la conexión exitosa
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
+            {
+                hostDetectado = true;
+                buscandoHost = false;
+                mensajeEstado = "✅ ¡Host encontrado! Entrando...";
+                yield break; // 🔥 CLAVE: Salimos de la corrutina exitosamente y NO apagamos la red.
+            }
+
+            tiempoEspera += Time.deltaTime;
+            yield return null;
+        }
+
+        // Si pasaron los 4 segundos y nunca cambió 'hostDetectado' a true (el Host realmente no estaba)
+        if (!hostDetectado)
+        {
+            if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
+            buscandoHost = false;
+            mensajeEstado = "❌ El Host aún no ha iniciado la partida o la IP es incorrecta.";
+        }
+    }
+
     private void OnGUI()
     {
+        if (NetworkManager.Singleton == null) return;
+
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
         {
-            GUILayout.BeginArea(new Rect(10, 10, 300, 300));
+            GUILayout.BeginArea(new Rect(10, 10, 300, 380));
+
             GUILayout.Label("Alumno: Pablo Martinez");
-            GUILayout.Space(20); // Deja un espacio visual
+            GUILayout.Box($"Estado: {mensajeEstado}");
+            GUILayout.Space(20);
+
             if (GUILayout.Button("Crear Partida (Host)"))
             {
                 NetworkManager.Singleton.StartHost();
             }
-            
-            GUILayout.Space(20); // Deja un espacio visual
-            GUILayout.Label("Dirección IP del Servidor:");
-            ipServidor = GUILayout.TextField(ipServidor, 30);// Dibuja la casilla de texto en pantalla y actualiza la variable en tiempo real
 
-            if (GUILayout.Button("Unirse a Partida (Client)"))
+            GUILayout.Space(20);
+            GUILayout.Label("Dirección IP del Servidor:");
+            ipServidor = GUILayout.TextField(ipServidor, 30);
+
+            if (!hostDetectado && !buscandoHost)
             {
-                ConfigurarIpTransporte(ipServidor);// Antes de conectar, le inyectamos la IP escrita al componente de red
-                NetworkManager.Singleton.StartClient();
+                if (GUILayout.Button("🔎 Verificar si el Host ya entró"))
+                {
+                    StartCoroutine(ComprobarSiExisteHost());
+                }
             }
+
+            if (hostDetectado && !buscandoHost)
+            {
+                GUI.backgroundColor = Color.green;
+                if (GUILayout.Button("Unirse a Partida (Client)"))
+                {
+                    ConfigurarIpTransporte(ipServidor);
+                    NetworkManager.Singleton.StartClient();
+                }
+                GUI.backgroundColor = Color.white;
+            }
+
             GUILayout.EndArea();
         }
         else
@@ -44,6 +173,7 @@ public class Lobby : MonoBehaviour
             GUILayout.BeginArea(new Rect(10, 10, 300, 300));
             int jugadoresConectados = NetworkManager.Singleton.ConnectedClients.Count;
             GUILayout.Label($"Jugadores en el lobby: {jugadoresConectados} / 2");
+
             if (NetworkManager.Singleton.IsServer)
             {
                 GUILayout.Label("Esperando a que el cliente se conecte...");
@@ -69,13 +199,11 @@ public class Lobby : MonoBehaviour
 
     private void ConfigurarIpTransporte(string nuevaIp)
     {
-        if (NetworkManager.Singleton.gameObject.TryGetComponent<UnityTransport>(out UnityTransport transporte))        // Buscamos el componente UnityTransport que está pegado en el NetworkManager de tu escena
+        if (NetworkManager.Singleton == null) return;
+
+        if (NetworkManager.Singleton.gameObject.TryGetComponent<UnityTransport>(out UnityTransport transporte))
         {
-            transporte.ConnectionData.Address = nuevaIp.Trim(); // .Trim() borra espacios en blanco accidentales y Le asignamos la IP que el usuario escribió en la casilla
-        }
-        else
-        {
-            //Debug.LogError("No se encontró el componente UnityTransport en el NetworkManager.");
+            transporte.ConnectionData.Address = nuevaIp.Trim();
         }
     }
 }

@@ -11,6 +11,9 @@ public class GameUIManager : NetworkBehaviour
     private TextMeshProUGUI textoHost;
     private TextMeshProUGUI textoCliente;
 
+    // 🔥 NUEVA VARIABLE: Para vincular un texto exclusivo que verá el cliente al final
+    private TextMeshProUGUI textoFinCliente;
+
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
 
@@ -29,7 +32,6 @@ public class GameUIManager : NetworkBehaviour
         mostrarMenuFin = false;
         textoGanador = "";
 
-        // Arrancamos la rutina para buscar los textos en la escena actual
         StartCoroutine(EsperarYVincularUI());
     }
 
@@ -46,22 +48,27 @@ public class GameUIManager : NetworkBehaviour
 
     private IEnumerator EsperarYVincularUI()
     {
-        // Esperamos a que salgamos del Lobby y la escena real cargue
         while (SceneManager.GetActiveScene().name == "lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
         yield return new WaitForSeconds(0.2f);
 
-        // 🔥 CLAVE 1: SIN candado "if (IsServer)". 
-        // Tanto el Host como el Cliente ejecutan estas líneas para buscar los textos en sus propias pantallas locales.
+        // Buscamos los marcadores tradicionales
         GameObject objHost = GameObject.Find("TextoPuntajeHost");
         GameObject objCliente = GameObject.Find("TextoPuntajeCliente");
 
         if (objHost != null) textoHost = objHost.GetComponent<TextMeshProUGUI>();
         if (objCliente != null) textoCliente = objCliente.GetComponent<TextMeshProUGUI>();
 
-        // Solo el servidor fuerza la inicialización de los marcadores en 0 al arrancar
+        // 🔥 NUEVO: Buscamos el objeto de texto especial para el fin del cliente
+        GameObject objFinCliente = GameObject.Find("TextoFinCliente");
+        if (objFinCliente != null)
+        {
+            textoFinCliente = objFinCliente.GetComponent<TextMeshProUGUI>();
+            textoFinCliente.gameObject.SetActive(false); // Lo aseguramos apagado al inicio
+        }
+
         if (IsServer)
         {
             ActualizarMarcador(0, 0);
@@ -69,23 +76,15 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Esta función la llama tu script de puntos (el que detecta cuando entregan una moneda).
-    /// </summary>
     public void ActualizarMarcador(ulong jugadorId, int nuevosPuntos)
     {
-        // Solo el Servidor tiene permitido procesar el cambio de puntos
         if (!IsServer) return;
-
-        // 🔥 CLAVE 2: El servidor le ordena a TODO EL MUNDO (Rpc) que actualice sus textos visuales
         ActualizarMarcadorEnClientesRpc(jugadorId, nuevosPuntos);
     }
 
-    // 🔥 ESTE RPC VIAJA POR RED Y SE EJECUTA EN TODAS LAS COMPUTADORAS
     [Rpc(SendTo.Everyone)]
     private void ActualizarMarcadorEnClientesRpc(ulong jugadorId, int nuevosPuntos)
     {
-        // Aquí adentro, tanto el Host como el Cliente modifican sus componentes visuales de TextMeshPro
         if (jugadorId == 0)
         {
             if (textoHost != null) textoHost.text = "Host Puntos: " + nuevosPuntos;
@@ -96,18 +95,33 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
+    // ====================================================================
+    // 🏆 MODIFICADO: Este método lo reciben AMBOS al terminar la partida
+    // ====================================================================
     [Rpc(SendTo.Everyone)]
     public void MostrarBotonesFinPartidaRpc(string mensajeResultado)
     {
         textoGanador = mensajeResultado;
-        mostrarMenuFin = true;
+        mostrarMenuFin = true; // Activa el OnGUI del Host
+
+        // 🔥 SI SOMOS EL CLIENTE: Mostramos el cartel gigante en su pantalla
+        if (!IsServer)
+        {
+            if (textoFinCliente != null)
+            {
+                textoFinCliente.gameObject.SetActive(true);
+                // Le ponemos el mensaje que calculó el servidor (Ej: "🏆 ¡GANÓ EL HOST! (5 vs 3)")
+                textoFinCliente.text = "=== PARTIDO TERMINADO ===\n\n" + mensajeResultado;
+            }
+        }
     }
 
     private void OnGUI()
     {
         if (!mostrarMenuFin) return;
-        if (!IsServer) return; // Recuerda que el Cliente no ve este recuadro gris
+        if (!IsServer) return; // El cliente NO entra aquí, su pantalla queda limpia de botones
 
+        // --- El Host dibuja sus botones de control ---
         float xCentro = (Screen.width / 2) - 150;
         float yCentro = (Screen.height / 2) - 90;
 
@@ -130,7 +144,7 @@ public class GameUIManager : NetworkBehaviour
 
         GUILayout.Space(5);
 
-        if (GUILayout.Button("Volver a Winows"))
+        if (GUILayout.Button("Volver a Windows"))
         {
             StartCoroutine(CierreOrdenadoJuego());
         }
@@ -144,9 +158,7 @@ public class GameUIManager : NetworkBehaviour
         {
             NetworkManager.Singleton.Shutdown();
         }
-
-        yield return null; // Espera un frame para evitar errores de conexión colgada
-
+        yield return null;
         Application.Quit();
 
 #if UNITY_EDITOR
