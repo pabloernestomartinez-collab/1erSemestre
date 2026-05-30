@@ -1,15 +1,18 @@
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement; // Necesario para reiniciar la escena
 
 public class GameUIManager : NetworkBehaviour
 {
-    // Instancia p�blica para poder llamarlo desde cualquier script f�cilmente
     public static GameUIManager Instance { get; private set; }
 
     private TextMeshProUGUI textoHost;
     private TextMeshProUGUI textoCliente;
+
+    // 🔥 NUEVA VARIABLE: Controla si se deben dibujar los botones de Fin de Juego
+    private bool mostrarMenuFin = false;
 
     private void Awake()
     {
@@ -18,48 +21,81 @@ public class GameUIManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Iniciamos la corrutina para esperar de forma segura que la escena cargue la UI
+        mostrarMenuFin = false;
         StartCoroutine(EsperarYVincularUI());
     }
 
     private IEnumerator EsperarYVincularUI()
     {
-        // Esperamos a salir del men� de Lobby si es necesario
-        while (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "lobby")
+        while (SceneManager.GetActiveScene().name == "Lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
         yield return new WaitForSeconds(0.2f);
 
-        // Buscamos los dos textos en el Canvas por su nombre exacto
         GameObject objHost = GameObject.Find("TextoPuntajeHost");
         GameObject objCliente = GameObject.Find("TextoPuntajeCliente");
 
         if (objHost != null) textoHost = objHost.GetComponent<TextMeshProUGUI>();
         if (objCliente != null) textoCliente = objCliente.GetComponent<TextMeshProUGUI>();
 
-        // Dibujo inicial
         ActualizarMarcador(0, 0);
         ActualizarMarcador(1, 0);
     }
 
-    /// <summary>
-    /// M�todo p�blico para actualizar el texto de cualquier jugador en todas las pantallas.
-    /// </summary>
     public void ActualizarMarcador(ulong jugadorId, int nuevosPuntos)
     {
-        // Si el ID es 0, asumimos que es el Host/Servidor
-
         if (jugadorId == 0)
         {
             if (textoHost != null) textoHost.text = "Host Puntos: " + nuevosPuntos;
-            Debug.Log(jugadorId);
         }
-        // Si el ID es mayor a 0, es un Cliente (Jugador 1, 2, etc.)
         else
         {
             if (textoCliente != null) textoCliente.text = "Cliente Puntos: " + nuevosPuntos;
-            //Debug.Log(jugadorId);
         }
+    }
+
+    // ====================================================================
+    // NUEVA FUNCIONALIDAD: MENÚ DE FIN DE JUEGO EN RED
+    // ====================================================================
+
+    [Rpc(SendTo.Server)] // El Servidor llama a esto y se ejecuta en Host 
+    public void MostrarBotonesFinPartidaRpc()
+    {
+        mostrarMenuFin = true;
+    }
+
+    private void OnGUI()
+    {
+        if (!mostrarMenuFin) return;
+        if (!IsServer) return; // Solo el Host lo ve y lo opera
+
+        float xCentro = (Screen.width / 2) - 150;
+        float yCentro = (Screen.height / 2) - 75;
+
+        GUILayout.BeginArea(new Rect(xCentro, yCentro, 300, 150), GUI.skin.box);
+
+        GUILayout.Label("=== ¡TIEMPO AGOTADO! ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("¿Jugar otra partida?"))
+        {
+            // 🔥 REINICIO CORRECTO EN RED: 
+            // El Host recarga la escena de juego. Esto vacía automáticamente las puntuaciones 
+            // y mantiene al cliente pegado en la partida sin tener que reconectarse de cero.
+            NetworkManager.Singleton.SceneManager.LoadScene("lobby", LoadSceneMode.Single);
+        }
+
+        GUILayout.Space(5);
+
+        if (GUILayout.Button("Salir del juego"))
+        {
+            // 🔥 APAGADO TOTAL: El Host apaga el servidor. 
+            // Esto desconectará forzosamente al Cliente también.
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("Lobby");
+        }
+
+        GUILayout.EndArea();
     }
 }

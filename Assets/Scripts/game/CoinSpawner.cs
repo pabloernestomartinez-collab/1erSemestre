@@ -3,56 +3,60 @@ using UnityEngine;
 
 public class CoinSpawner : NetworkBehaviour
 {
-    [SerializeField] private GameObject monedaPrefab; // Arrastra aquí el PREFAB de tu moneda
+    [SerializeField] private GameObject monedaPrefab;
 
-    // Variables para el temporizador
-    private float tiempoPorSpawn = 2.0f; // Tiempo en segundos entre cada moneda
-    private float cronometro = 0f;
+    private float tiempoPorSpawn = 2.0f;
+    private float cronometroSpawn = 0f;
+
+    [SerializeField] private float tiempoRestantePartida = 60f; // Reduje a 10 para que lo pruebes rápido
+    private bool tiempoAgotado = false;
 
     public override void OnNetworkSpawn()
     {
-        // Al iniciar en la red, reseteamos el cronómetro
-        cronometro = 0f;
+        cronometroSpawn = 0f;
+        tiempoAgotado = false;
     }
 
     void Update()
     {
-        // REGLA DE ORO: Solo el servidor calcula el tiempo y spawnea objetos.
-        // Si no somos el servidor, este Update no hace nada.
         if (!IsServer) return;
+        if (tiempoAgotado) return;
 
-        // Sumamos el tiempo que pasó desde el último frame
-        cronometro += Time.deltaTime;
+        tiempoRestantePartida -= Time.deltaTime;
 
-        // Si el cronómetro llega o supera 1 segundo...
-        if (cronometro >= tiempoPorSpawn)
+        if (tiempoRestantePartida <= 0f)
+        {
+            tiempoRestantePartida = 0f;
+            tiempoAgotado = true;
+            Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Fábrica de monedas DETENIDA.");
+
+            // 🔥 NUEVO: El servidor le ordena al UIManager (en todas las pantallas) que muestre los botones
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.MostrarBotonesFinPartidaRpc();
+            }
+            return;
+        }
+
+        cronometroSpawn += Time.deltaTime;
+        if (cronometroSpawn >= tiempoPorSpawn)
         {
             GenerarMonedaAleatoria();
-            cronometro = 0f; // Reiniciamos el cronómetro para el siguiente segundo
+            cronometroSpawn = 0f;
         }
     }
 
     private void GenerarMonedaAleatoria()
     {
-        if (monedaPrefab == null)
-        {
-            //Debug.LogError("❌ [CoinSpawner] ¡Falta asignar el Prefab de la Moneda!");
-            return;
-        }
+        if (monedaPrefab == null) return;
 
-        // Tus rangos de posición personalizados
         float xAleatorio = Random.Range(-4f, 4f);
         float zAleatorio = Random.Range(-4f, 4f);
         float yPosicion = 10f;
 
         Vector3 posicionAleatoria = new Vector3(xAleatorio, yPosicion, zAleatorio);
 
-        // 1. Instanciamos en la memoria del Servidor
         GameObject nuevaMoneda = Instantiate(monedaPrefab, posicionAleatoria, Quaternion.identity);
-
-        // 2. Le pedimos a Netcode que la duplique en las pantallas de todos los jugadores
         nuevaMoneda.GetComponent<NetworkObject>().Spawn();
-
-        //Debug.Log($"[Servidor] Moneda automática creada en: {posicionAleatoria}");
     }
 }

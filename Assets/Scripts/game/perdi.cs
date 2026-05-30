@@ -1,58 +1,65 @@
-using Unity.Netcode; 
+ï»¿using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
 
 public class perdi : NetworkBehaviour
 {
+    private bool yaMurio = false; // Evita que se envÃ­en mÃºltiples peticiones mientras cae
+
     void Update()
     {
         if (!IsOwner) return;
+        if (yaMurio) return;
 
-        if (transform.position.y < -10f)        // Si la posición en el eje Y cae por debajo de -10 (caer al vacío)
-
+        // Si la posiciÃ³n en el eje Y cae por debajo de -10 (caer al vacÃ­o)
+        if (transform.position.y < -10f)
         {
-            RequestDeathServerRpc();     // LLAMADA EN RED: El cliente local le envía una petición urgente al servidor para procesar su muerte.
-
+            yaMurio = true; // Bloqueamos el Update local
+            RequestDeathServerRpc(); // LLAMADA EN RED: El cliente local le envÃ­a una peticiÃ³n al servidor
         }
     }
 
-    [ServerRpc]    // help: SERVER RPC: Esta función se sintoniza desde el cliente pero se ejecuta SÓLO con la autoridad del Servidor.
-
+    [ServerRpc]
     void RequestDeathServerRpc()
     {
-        ShowGameOverClientRpc();        // El servidor ordena a todos los clientes que ejecuten la UI
+        // 1. El servidor ordena a los clientes que ejecuten la UI individual de Game Over
+        ShowGameOverClientRpc();
 
+        // 2. Apagamos las fÃ­sicas del jugador en el servidor para que no siga cayendo
+        if (TryGetComponent<Rigidbody>(out Rigidbody rb)) rb.isKinematic = true;
 
-        if (TryGetComponent<Rigidbody>(out Rigidbody rb)) rb.isKinematic = true;        // Apagamos las físicas del jugador para que no siga cayendo
+        // Escondemos el objeto en una coordenada muerta
+        transform.position = new Vector3(0, -999f, 0);
 
-
-        transform.position = new Vector3(0, -999f, 0);        // consejo de google: el servidor lo esconde en una coordenada "muerta" invisible para los demás jugadores.
-
+        // ðŸ”¥ NUEVO - LLAMADA AL MENÃš DE FIN DE JUEGO EN RED:
+        // El Servidor le ordena al UIManager global que despliegue los botones (Reiniciar/Salir)
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.MostrarBotonesFinPartidaRpc();
+        }
     }
 
     [ClientRpc]
     void ShowGameOverClientRpc()
     {
-        if (IsOwner)    // Evita que al Jugador 1 le aparezca el cartel de derrota cuando el que se cayó fue el Jugador 2
-
+        // El cartel de "Game Over" solo debe verlo el dueÃ±o de este personaje especÃ­fico
+        if (IsOwner)
         {
             GameObject canvas = GameObject.Find("Canvas");
             if (canvas != null)
             {
-                Transform goMenu = canvas.transform.Find("gameover");   // Busca al hijo llamado "gameover" (incluso si estaba desactivado de antemano)
-
+                Transform goMenu = canvas.transform.Find("gameover"); // Busca al hijo llamado "gameover"
                 if (goMenu != null)
                 {
-                    goMenu.gameObject.SetActive(true);  // Muestra el menú visual en la pantalla del jugador afectado
-
+                    goMenu.gameObject.SetActive(true); // Muestra el menÃº visual local
                 }
             }
 
-            if (TryGetComponent(out PlayerMovement moveScript))  // consejo de google: Esto congela los inputs del teclado/mando para que el jugador no pueda seguir moviéndose tras morir
-
+            // Congela los inputs del teclado/mando
+            if (TryGetComponent(out PlayerMovement moveScript))
+            {
                 moveScript.enabled = false;
+            }
         }
     }
-
-  
 }

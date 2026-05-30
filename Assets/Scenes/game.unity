@@ -1913,6 +1913,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CoinSpawner
   ShowTopMostFoldoutHeaderGroup: 1
   monedaPrefab: {fileID: 6770960437401172555, guid: 8fad3c230502ba74eac54c8d8d5731cc, type: 3}
+  tiempoRestantePartida: 60
 --- !u!4 &774225522
 Transform:
   m_ObjectHideFlags: 0

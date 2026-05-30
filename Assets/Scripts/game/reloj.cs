@@ -95,23 +95,6 @@ public class reloj : NetworkBehaviour
             }
         }
         
-        GameObject canvas = GameObject.Find("Canvas");// Buscamos el Canvas local para activar el cartel de finalización
-        if (canvas != null)
-        {
-            
-            Transform finMenu = canvas.transform.Find("gameover");// instrucciones de google.........
-            if (finMenu != null)
-            {
-                finMenu.gameObject.SetActive(true);
 
-                
-                TextMeshProUGUI textoFin = finMenu.GetComponentInChildren<TextMeshProUGUI>();
-
-                if (textoFin != null)
-                {
-                    textoFin.text = "¡TIEMPO AGOTADO!";
-                }
-            }
-        }
     }
 }

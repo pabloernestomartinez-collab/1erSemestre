@@ -1,52 +1,102 @@
-using Unity.Netcode; 
+Ôªøusing Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
+// Necesitamos acceder al transporte de Netcode para cambiar la IP
+using Unity.Netcode.Transports.UTP;
 
 public class Lobby : MonoBehaviour
 {
-    private void OnGUI() 
+    // Variable para almacenar la IP. Por defecto tiene el bucle local (t√∫ mismo)
+    private string ipServidor = "127.0.0.1";
 
+    private void Start()
     {
-        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)// Si no soy Servidor Y tampoco soy Cliente, significa que el juego acaba de arrancar y nadie est· conectado.
-        {            
-            // google.....
-            
-            GUILayout.BeginArea(new Rect(10, 10, 300, 300));//  Creamos un ·rea rectangular en la pantalla de 300x300 pÌxeles, ubicada en la esquina superior izquierda (X:10, Y:10)
-            if (GUILayout.Button("Crear Partida (Host)"))// if el jugador hace clic, se ejecuta el cÛdigo
-            {
-                NetworkManager.Singleton.StartHost();// StartHost() convierte esta computadora en el SERVIDOR y en un JUGADOR al mismo tiempo (Pantalla principal)
-            }
-            if (GUILayout.Button("Unirse a Partida (Client)"))// Dibujamos un segundo botÛn para los invitados
-            {
-                NetworkManager.Singleton.StartClient();// StartClient() busca una partida existente en la red local/IP y se conecta como un jugador invitado
-            }
-            GUILayout.EndArea();// Cerramos el ·rea de dibujo de botones para no alterar el resto de la interfaz
-        }
-        else// Si el cÛdigo entra aquÌ (else), significa que ya le dimos a Host o a Client y ya estamos dentro de la red.
+        // üßº LIMPIEZA DE EMERGENCIA: 
+        // Si por alg√∫n motivo entramos a la escena del Lobby y el NetworkManager se qued√≥ 
+        // encendido o colgado de una sesi√≥n anterior, lo obligamos a apagarse de inmediato.
+        if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient))
         {
-            GUILayout.BeginArea(new Rect(10, 10, 300, 300));// Volvemos a delimitar el ·rea de dibujo en el mismo espacio (10, 10)
-            int jugadoresConectados = NetworkManager.Singleton.ConnectedClients.Count;// Preguntamos al NetworkManager cu·ntas computadoras est·n conectadas actualmente al servidor
-            GUILayout.Label($"Jugadores en el lobby: {jugadoresConectados} / 2");// Mostramos un texto en pantalla que se actualiza en tiempo real: "Jugadores en el lobby: X / 2"
-        if (NetworkManager.Singleton.IsServer)// En Netcode, solo el Servidor/Host tiene permitido decidir cu·ndo inicia la partida o cambiar de mapa
+            NetworkManager.Singleton.Shutdown();
+            Debug.Log("[Lobby] Red reseteada y limpiada con √©xito al entrar al men√∫.");
+        }
+    }
+
+
+
+
+    private void OnGUI()
+    {
+        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
+        {
+            GUILayout.BeginArea(new Rect(10, 10, 300, 300));
+
+            if (GUILayout.Button("Crear Partida (Host)"))
             {
-                GUILayout.Label("Esperando a que el cliente se conecte...");// Le mostramos un mensaje de estado al Host
-                if (jugadoresConectados >= 2)// REGLA DE INICIO: Solo dejamos empezar si hay 2 o m·s personas en la sala
+                NetworkManager.Singleton.StartHost();
+            }
+
+            // --- NUEVO: ESPACIO Y CAMPO DE TEXTO PARA LA IP ---
+            GUILayout.Space(20); // Deja un espacio visual
+            GUILayout.Label("Direcci√≥n IP del Servidor:");
+
+            // Dibuja la casilla de texto en pantalla y actualiza la variable en tiempo real
+            ipServidor = GUILayout.TextField(ipServidor, 30);
+            // --------------------------------------------------
+
+            if (GUILayout.Button("Unirse a Partida (Client)"))
+            {
+                // Antes de conectar, le inyectamos la IP escrita al componente de red
+                ConfigurarIpTransporte(ipServidor);
+
+                NetworkManager.Singleton.StartClient();
+            }
+
+            GUILayout.EndArea();
+        }
+        else
+        {
+            GUILayout.BeginArea(new Rect(10, 10, 300, 300));
+            int jugadoresConectados = NetworkManager.Singleton.ConnectedClients.Count;
+            GUILayout.Label($"Jugadores en el lobby: {jugadoresConectados} / 2");
+
+            if (NetworkManager.Singleton.IsServer)
+            {
+                GUILayout.Label("Esperando a que el cliente se conecte...");
+                if (jugadoresConectados >= 2)
                 {
-                    if (GUILayout.Button("°EMPEZAR JUEGO!"))// if ya entrÛ el Cliente, al Host le aparece el botÛn definitivo para jugar
+                    if (GUILayout.Button("¬°EMPEZAR JUEGO!"))
                     {
-                        NetworkManager.Singleton.SceneManager.LoadScene("game", LoadSceneMode.Single);// Le ordena al Servidor cargar la escena "game"
+                        NetworkManager.Singleton.SceneManager.LoadScene("game", LoadSceneMode.Single);
                     }
                 }
                 else
                 {
-                    GUILayout.Box("Esperando m·s jugadores para poder iniciar...");// if el Host est· solo se bloquea el botÛn
+                    GUILayout.Box("Esperando m√°s jugadores para poder iniciar...");
                 }
             }
-        else// if NO es el servidor, significa que somos el CLIENTE 
+            else
             {
-                GUILayout.Label("°Conectado! Esperando que el Host inicie la partida..."); // le damos un texto para que espere al Host
+                GUILayout.Label("¬°Conectado! Esperando que el Host inicie la partida...");
             }
-            GUILayout.EndArea();// Cerramos el ·rea de dibujo
+            GUILayout.EndArea();
+        }
+    }
+
+    /// <summary>
+    /// Busca el componente de transporte de Unity Netcode y le cambia la IP de destino.
+    /// </summary>
+    private void ConfigurarIpTransporte(string nuevaIp)
+    {
+        // Buscamos el componente UnityTransport que est√° pegado en el NetworkManager de tu escena
+        if (NetworkManager.Singleton.gameObject.TryGetComponent<UnityTransport>(out UnityTransport transporte))
+        {
+            // Le asignamos la IP que el usuario escribi√≥ en la casilla
+            transporte.ConnectionData.Address = nuevaIp.Trim(); // .Trim() borra espacios en blanco accidentales
+            Debug.Log($"[Lobby] Configurando IP de conexi√≥n a: {nuevaIp.Trim()}");
+        }
+        else
+        {
+            Debug.LogError("‚ùå [Lobby] No se encontr√≥ el componente UnityTransport en el NetworkManager.");
         }
     }
 }
