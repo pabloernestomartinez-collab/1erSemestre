@@ -12,14 +12,13 @@ public class Lobby : MonoBehaviour
     private bool buscandoHost = false;
     private string mensajeEstado = "Elige tu rol para comenzar.";
 
-    // 🔥 MODIFICADO: Nos aseguramos de resetear el menú COMPLETAMENTE al iniciar la escena
     private void Start()
     {
         hostDetectado = false;
         buscandoHost = false;
         mensajeEstado = "Elige tu rol para comenzar.";
 
-        // Por si acaso la red quedó abierta a medias, forzamos un apagado limpio aquí también
+        // if la red quedó abierta a medias, forzamos un apagado limpio aquí también
         if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient))
         {
             NetworkManager.Singleton.Shutdown();
@@ -30,7 +29,6 @@ public class Lobby : MonoBehaviour
     {
         if (NetworkManager.Singleton != null)
         {
-            // 🔥 BUENA PRÁCTICA: Primero restamos el evento por si ya estaba enganchado, y luego lo sumamos.
             // Esto evita que el evento se ejecute 2 o 3 veces seguidas en la segunda partida.
             NetworkManager.Singleton.OnClientDisconnectCallback -= AlDesconectarseDelServidor;
             NetworkManager.Singleton.OnClientDisconnectCallback += AlDesconectarseDelServidor;
@@ -53,7 +51,6 @@ public class Lobby : MonoBehaviour
     {
         if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsServer)
         {
-            // 🔥 CORRECCIÓN: Si conectamos con éxito, ya nos quedamos en el lobby de verdad
             hostDetectado = true;
             buscandoHost = false;
             mensajeEstado = "✅ ¡Conectado exitosamente al Lobby!";
@@ -73,7 +70,7 @@ public class Lobby : MonoBehaviour
             return;
         }
 
-        if (SceneManager.GetActiveScene().name == "lobby") // ⚠️ Asegúrate de que aquí también esté en minúscula "lobby"
+        if (SceneManager.GetActiveScene().name == "lobby") 
         {
             hostDetectado = false;
             buscandoHost = false;
@@ -104,13 +101,13 @@ public class Lobby : MonoBehaviour
         float tiempoEspera = 0f;
         while (tiempoEspera < 4f && !hostDetectado)
         {
-            // Si el motor nativo de Netcode confirma la conexión exitosa
+            // if el motor nativo de Netcode confirma la conexión exitosa
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
             {
                 hostDetectado = true;
                 buscandoHost = false;
                 mensajeEstado = "✅ ¡Host encontrado! Entrando...";
-                yield break; // 🔥 CLAVE: Salimos de la corrutina exitosamente y NO apagamos la red.
+                yield break; //  Salimos de la corrutina exitosamente y NO apagamos la red.
             }
 
             tiempoEspera += Time.deltaTime;
@@ -134,7 +131,7 @@ public class Lobby : MonoBehaviour
         {
             GUILayout.BeginArea(new Rect(10, 10, 300, 380));
 
-            GUILayout.Label("Alumno: Pablo Martinez");
+            GUILayout.Label("Alumno: Pablito Martinez");
             GUILayout.Box($"Estado: {mensajeEstado}");
             GUILayout.Space(20);
 
@@ -200,7 +197,6 @@ public class Lobby : MonoBehaviour
     private void ConfigurarIpTransporte(string nuevaIp)
     {
         if (NetworkManager.Singleton == null) return;
-
         if (NetworkManager.Singleton.gameObject.TryGetComponent<UnityTransport>(out UnityTransport transporte))
         {
             transporte.ConnectionData.Address = nuevaIp.Trim();

@@ -7,13 +7,9 @@ using UnityEngine.SceneManagement;
 public class GameUIManager : NetworkBehaviour
 {
     public static GameUIManager Instance { get; private set; }
-
     private TextMeshProUGUI textoHost;
     private TextMeshProUGUI textoCliente;
-
-    // 🔥 NUEVA VARIABLE: Para vincular un texto exclusivo que verá el cliente al final
     private TextMeshProUGUI textoFinCliente;
-
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
 
@@ -31,7 +27,6 @@ public class GameUIManager : NetworkBehaviour
     {
         mostrarMenuFin = false;
         textoGanador = "";
-
         StartCoroutine(EsperarYVincularUI());
     }
 
@@ -61,7 +56,6 @@ public class GameUIManager : NetworkBehaviour
         if (objHost != null) textoHost = objHost.GetComponent<TextMeshProUGUI>();
         if (objCliente != null) textoCliente = objCliente.GetComponent<TextMeshProUGUI>();
 
-        // 🔥 NUEVO: Buscamos el objeto de texto especial para el fin del cliente
         GameObject objFinCliente = GameObject.Find("TextoFinCliente");
         if (objFinCliente != null)
         {
@@ -95,16 +89,13 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
-    // ====================================================================
-    // 🏆 MODIFICADO: Este método lo reciben AMBOS al terminar la partida
-    // ====================================================================
+
     [Rpc(SendTo.Everyone)]
     public void MostrarBotonesFinPartidaRpc(string mensajeResultado)
     {
         textoGanador = mensajeResultado;
         mostrarMenuFin = true; // Activa el OnGUI del Host
 
-        // 🔥 SI SOMOS EL CLIENTE: Mostramos el cartel gigante en su pantalla
         if (!IsServer)
         {
             if (textoFinCliente != null)
