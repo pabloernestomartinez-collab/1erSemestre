@@ -53,13 +53,13 @@ public class reloj : NetworkBehaviour
     {
         if (textoReloj == null) return;
         if (tiempoEnSegundos < 0) tiempoEnSegundos = 0;
-        int minutos = Mathf.FloorToInt(tiempoEnSegundos / 60f);
+        int minutos = Mathf.FloorToInt(tiempoEnSegundos / 60f);// google...
         int segundos = Mathf.FloorToInt(tiempoEnSegundos % 60f);
         textoReloj.text = string.Format("{0:00}:{1:00}", minutos, segundos);
     }
     private void TerminarPartidaPorTiempo()
     {
-        Debug.Log("¡El tiempo se ha agotado en el Servidor! Congelando jugadores...");
+        //Debug.Log("¡El tiempo se ha agotado en el Servidor! Congelando jugadores...");
         CongelarTodosLosJugadoresRpc();// El servidor da una orden masiva que viajará a las pantallas de TODOS los jugadores
     }
     [Rpc(SendTo.Everyone)]

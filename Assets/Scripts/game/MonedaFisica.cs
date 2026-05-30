@@ -82,7 +82,7 @@ public class MonedaFisica : NetworkBehaviour
         jugadorOBJ = null;
 
         // Despawnear y destruir el objeto en red.
-        // El parámetro 'true' le dice a Unity que destruya el objeto de la jerarquía 
+        // El parámetro 'true' le dice a Unity que destruya el objeto de la jerarquía :google....
         // tanto en el Host como en el Cliente al mismo tiempo de forma legal.
         if (GetComponent<NetworkObject>().IsSpawned)
         {

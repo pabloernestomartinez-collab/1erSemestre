@@ -121,7 +121,7 @@ public class GameUIManager : NetworkBehaviour
         GUILayout.Label("=== ¡TIEMPO AGOTADO! ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
         GUILayout.Space(5);
 
-        //  DIBUJAMOS EL CARTEL DEL GANADOR EN LA PANTALLA::::: google
+        //   EL CARTEL DEL GANADOR EN LA PANTALLA::::: google
         GUIStyle estiloGanador = new GUIStyle(GUI.skin.box);
         estiloGanador.alignment = TextAnchor.MiddleCenter;
         estiloGanador.normal.textColor = Color.yellow; // Resalta el texto en amarillo

@@ -29,9 +29,9 @@ public class CoinSpawner : NetworkBehaviour
         {
             tiempoRestantePartida = 0f;
             tiempoAgotado = true;
-            Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Calculando ganador...");
+            //Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Calculando ganador...");
 
-            // 🏆 LÓGICA PARA CALCULAR EL GANADOR
+            // pARA CALCULAR EL GANADOR
             string resultadoFinal = "Empate";
             int puntosHost = 0;
             int puntosCliente = 0;

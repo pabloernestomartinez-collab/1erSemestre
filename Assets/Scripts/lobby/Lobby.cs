@@ -1,7 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.Netcode.Transports.UTP;// Necesitamos acceder al transporte de Netcode para cambiar la IP
+using Unity.Netcode.Transports.UTP;// es para acceder al transporte de Netcode para cambiar la IP
 
 public class Lobby : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class Lobby : MonoBehaviour
         if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient))
         {
             NetworkManager.Singleton.Shutdown();
-            Debug.Log("[Lobby] Red reseteada y limpiada con éxito al entrar al menú.");
+            //Debug.Log("[Lobby] Red reseteada y limpiada con éxito al entrar al menú.");
         }
     }
     private void OnGUI()
@@ -75,7 +75,7 @@ public class Lobby : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No se encontró el componente UnityTransport en el NetworkManager.");
+            //Debug.LogError("No se encontró el componente UnityTransport en el NetworkManager.");
         }
     }
 }

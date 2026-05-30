@@ -44,12 +44,12 @@ public class ZonaEntrega : MonoBehaviour
                 {
                     // El Servidor modifica la NetworkVariable legalmente
                     puntosJugador.AddPoints(1);
-                    Debug.Log($"[SERVIDOR REAL] Punto otorgado legalmente al jugador {jugadorId}");
+                    //Debug.Log($"[SERVIDOR REAL] Punto otorgado legalmente al jugador {jugadorId}");
                 }
             }
             else
             {
-                Debug.LogError($"[SERVIDOR REAL] No se encontró al cliente {jugadorId}");//google...
+                //Debug.LogError($"[SERVIDOR REAL] No se encontró al cliente {jugadorId}");//google...
             }
 
             // El servidor congela la moneda en el origen

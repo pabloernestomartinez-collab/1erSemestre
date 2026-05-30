@@ -41,7 +41,7 @@ public class PlayerMovement : NetworkBehaviour
         float moveX = 0f;
         float moveZ = 0f;
 
-        if (Gamepad.current != null)        // google: Si hay un joystick/mando conectado, leemos sus valores analógicos (Stick izquierdo)
+        if (Gamepad.current != null)        // google: Si hay un joystick conectado, leemos sus valores 
 
         {
             Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
@@ -57,7 +57,7 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         
-        if (rb != null)// analizar la correccion de google... ROTACIÓN Y MOVIMIENTO FÍSICO LOCAL ---
+        if (rb != null)// para analizar la correccion de google... ROTACIÓN Y MOVIMIENTO FÍSICO LOCAL ---
         {
             if (cameraScript != null)
             {
