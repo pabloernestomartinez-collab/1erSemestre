@@ -7,12 +7,10 @@ using UnityEngine.SceneManagement; // Necesario para reiniciar la escena
 public class GameUIManager : NetworkBehaviour
 {
     public static GameUIManager Instance { get; private set; }
-
     private TextMeshProUGUI textoHost;
     private TextMeshProUGUI textoCliente;
+    private bool mostrarMenuFin = false;    // Controla si se deben dibujar los botones de Fin de Juego
 
-    // 🔥 NUEVA VARIABLE: Controla si se deben dibujar los botones de Fin de Juego
-    private bool mostrarMenuFin = false;
 
     private void Awake()
     {
@@ -56,7 +54,7 @@ public class GameUIManager : NetworkBehaviour
     }
 
     // ====================================================================
-    // NUEVA FUNCIONALIDAD: MENÚ DE FIN DE JUEGO EN RED
+    //                MENÚ DE FIN DE JUEGO EN RED
     // ====================================================================
 
     [Rpc(SendTo.Server)] // El Servidor llama a esto y se ejecuta en Host 
@@ -80,18 +78,14 @@ public class GameUIManager : NetworkBehaviour
 
         if (GUILayout.Button("¿Jugar otra partida?"))
         {
-            // 🔥 REINICIO CORRECTO EN RED: 
-            // El Host recarga la escena de juego. Esto vacía automáticamente las puntuaciones 
-            // y mantiene al cliente pegado en la partida sin tener que reconectarse de cero.
+                 // El Host recarga la escena de juego. Esto vacía automáticamente las puntuaciones y mantiene al cliente pegado en la partida sin tener que reconectarse de cero.
             NetworkManager.Singleton.SceneManager.LoadScene("lobby", LoadSceneMode.Single);
         }
 
         GUILayout.Space(5);
 
-        if (GUILayout.Button("Salir del juego"))
+        if (GUILayout.Button("Salir del juego"))// APAGADO TOTAL
         {
-            // 🔥 APAGADO TOTAL: El Host apaga el servidor. 
-            // Esto desconectará forzosamente al Cliente también.
             NetworkManager.Singleton.Shutdown();
             SceneManager.LoadScene("Lobby");
         }

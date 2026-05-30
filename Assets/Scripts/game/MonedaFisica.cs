@@ -4,7 +4,7 @@ using UnityEngine;
 public class MonedaFisica : NetworkBehaviour
 {
     public Transform jugadorOBJ; // Guardará al jugador que debemos seguir
-    public bool estaAgarrada = false; // Ahora la meta puede revisar este dato
+    public bool estaAgarrada = false; // la zona de entrega puede revisar este dato
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -30,7 +30,7 @@ public class MonedaFisica : NetworkBehaviour
         if (estaAgarrada) return;
         estaAgarrada = true;
 
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(jugadorQueAgarraId, out var cliente))
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(jugadorQueAgarraId, out var cliente))//Google...
         {
             GameObject jugadorGO = cliente.PlayerObject.gameObject;
 

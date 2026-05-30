@@ -7,12 +7,10 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Movimiento")]
     public float speed = 5f;
     public float rotationSpeed = 15f;
-
     private Rigidbody rb;
     private Transform mainCameraTransform;
     private MultiplayerCamera cameraScript; // Guarda el acceso al script de rotación horizontal de la cámara
 
-    
     public override void OnNetworkSpawn()// Este método nativo de Netcode se ejecuta automáticamente cuando el objeto "nace" en la red
     {
         if (IsOwner)
@@ -50,7 +48,7 @@ public class PlayerMovement : NetworkBehaviour
             moveX = leftStick.x;
             moveZ = leftStick.y;
         }
-        else // Si no hay mando, recurrimos al teclado tradicional como respaldo técnico
+        else // Si no hay mando, recurrimos al teclado tradicional como respaldo técnico consejo de google
         {
             if (Keyboard.current.wKey.isPressed) moveZ = 1f;
             if (Keyboard.current.sKey.isPressed) moveZ = -1f;

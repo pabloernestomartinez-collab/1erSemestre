@@ -7,13 +7,13 @@ public class ZonaEntrega : MonoBehaviour
     {
         if (other.TryGetComponent<MonedaFisica>(out MonedaFisica moneda))
         {
-            // Si NO está agarrada, ignoramos el choque por completo
-            if (!moneda.estaAgarrada) return;
+            
+            if (!moneda.estaAgarrada) return;// Si NO está agarrada, ignoramos el choque por completo
 
             if (moneda.TryGetComponent<NetworkObject>(out NetworkObject monedaNetObj))
             {
-                // Identificamos quién es el jugador que tiene la pantalla de esta PC
-                ulong idDelJugadorReal = NetworkManager.Singleton.LocalClientId;
+                
+                ulong idDelJugadorReal = NetworkManager.Singleton.LocalClientId;// Identificamos quién es el jugador que tiene la pantalla de esta PC
 
                 // Si la moneda tiene guardado al jugador que la lleva, usamos ese ID por seguridad
                 if (moneda.jugadorOBJ != null && moneda.jugadorOBJ.TryGetComponent<NetworkObject>(out NetworkObject pNet))
@@ -21,9 +21,7 @@ public class ZonaEntrega : MonoBehaviour
                     idDelJugadorReal = pNet.OwnerClientId;
                 }
 
-                // 🔥 LA CORRECCIÓN CRÍTICA: 
-                // Quitamos el filtro "IsOwner". Si la moneda entró a la meta y está agarrada, 
-                // obligamos a que se ejecute el ServerRpc. 
+
                 // Al ser un ServerRpc con permission "Everyone", el Cliente tiene permitido enviar este mensaje.
                 EntregarMonedaServerRpc(idDelJugadorReal, monedaNetObj.NetworkObjectId);
             }
@@ -34,7 +32,7 @@ public class ZonaEntrega : MonoBehaviour
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void EntregarMonedaServerRpc(ulong jugadorId, ulong monedaNetworkId)
     {
-        // 🔒 EL CANDADO SE QUEDA: Solo el servidor procesa puntos y mueve objetos
+        // Solo el servidor procesa puntos y mueve objetos
         if (!NetworkManager.Singleton.IsServer) return;
 
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(monedaNetworkId, out NetworkObject monedaNetObj))
@@ -51,7 +49,7 @@ public class ZonaEntrega : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[SERVIDOR REAL] No se encontró al cliente {jugadorId}");
+                Debug.LogError($"[SERVIDOR REAL] No se encontró al cliente {jugadorId}");//google...
             }
 
             // El servidor congela la moneda en el origen

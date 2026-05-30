@@ -12,31 +12,24 @@ public class PlayerScore : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Escuchamos el cambio de puntos
-        puntos.OnValueChanged += AlCambiarPuntos;
-
-        // Forzamos actualización inicial en la UI
-        if (GameUIManager.Instance != null)
+        puntos.OnValueChanged += AlCambiarPuntos;// Escuchamos el cambio de puntos
+        if (GameUIManager.Instance != null)// Forzamos actualización inicial en la UI
         {
             GameUIManager.Instance.ActualizarMarcador(OwnerClientId, puntos.Value);
         }
     }
-
     public override void OnNetworkDespawn()
     {
         puntos.OnValueChanged -= AlCambiarPuntos;
     }
-
     public void AddPoints(int cantidad)
     {
         if (!IsServer) return;
         puntos.Value += cantidad;
     }
-
     private void AlCambiarPuntos(int valorViejo, int valorNuevo)
     {
-        // En cuanto la red avisa que cambiaron los puntos, actualizamos el administrador global
-        if (GameUIManager.Instance != null)
+        if (GameUIManager.Instance != null)// En cuanto la red avisa que cambiaron los puntos, actualizamos el administrador global
         {
             GameUIManager.Instance.ActualizarMarcador(OwnerClientId, valorNuevo);
         }

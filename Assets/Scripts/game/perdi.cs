@@ -1,6 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+//using UnityEngine.SceneManagement;
 
 public class perdi : NetworkBehaviour
 {
@@ -10,9 +10,7 @@ public class perdi : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (yaMurio) return;
-
-        // Si la posición en el eje Y cae por debajo de -10 (caer al vacío)
-        if (transform.position.y < -10f)
+        if (transform.position.y < -10f)// Si la posición en el eje Y cae por debajo de -10 (caer al vacío)
         {
             yaMurio = true; // Bloqueamos el Update local
             RequestDeathServerRpc(); // LLAMADA EN RED: El cliente local le envía una petición al servidor
@@ -31,7 +29,7 @@ public class perdi : NetworkBehaviour
         // Escondemos el objeto en una coordenada muerta
         transform.position = new Vector3(0, -999f, 0);
 
-        // 🔥 NUEVO - LLAMADA AL MENÚ DE FIN DE JUEGO EN RED:
+        // LLAMADA AL MENÚ DE FIN DE JUEGO EN RED:
         // El Servidor le ordena al UIManager global que despliegue los botones (Reiniciar/Salir)
         if (GameUIManager.Instance != null)
         {
@@ -42,8 +40,7 @@ public class perdi : NetworkBehaviour
     [ClientRpc]
     void ShowGameOverClientRpc()
     {
-        // El cartel de "Game Over" solo debe verlo el dueño de este personaje específico
-        if (IsOwner)
+        if (IsOwner)// El cartel de "Game Over" solo debe verlo el dueño de este personaje específico
         {
             GameObject canvas = GameObject.Find("Canvas");
             if (canvas != null)
@@ -54,7 +51,6 @@ public class perdi : NetworkBehaviour
                     goMenu.gameObject.SetActive(true); // Muestra el menú visual local
                 }
             }
-
             // Congela los inputs del teclado/mando
             if (TryGetComponent(out PlayerMovement moveScript))
             {

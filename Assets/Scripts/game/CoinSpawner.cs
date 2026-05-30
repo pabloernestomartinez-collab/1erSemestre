@@ -28,9 +28,8 @@ public class CoinSpawner : NetworkBehaviour
         {
             tiempoRestantePartida = 0f;
             tiempoAgotado = true;
-            Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Fábrica de monedas DETENIDA.");
 
-            // 🔥 NUEVO: El servidor le ordena al UIManager (en todas las pantallas) que muestre los botones
+            // El servidor le ordena al UIManager (en todas las pantallas) que muestre los botones
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.MostrarBotonesFinPartidaRpc();
