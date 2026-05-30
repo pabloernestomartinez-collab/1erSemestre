@@ -36,7 +36,7 @@ public class CoinSpawner : NetworkBehaviour
     {
         if (monedaPrefab == null)
         {
-            Debug.LogError("❌ [CoinSpawner] ¡Falta asignar el Prefab de la Moneda!");
+            //Debug.LogError("❌ [CoinSpawner] ¡Falta asignar el Prefab de la Moneda!");
             return;
         }
 
@@ -53,6 +53,6 @@ public class CoinSpawner : NetworkBehaviour
         // 2. Le pedimos a Netcode que la duplique en las pantallas de todos los jugadores
         nuevaMoneda.GetComponent<NetworkObject>().Spawn();
 
-        Debug.Log($"[Servidor] Moneda automática creada en: {posicionAleatoria}");
+        //Debug.Log($"[Servidor] Moneda automática creada en: {posicionAleatoria}");
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MonedaFisica : NetworkBehaviour
 {
-    private Transform jugadorOBJ; // Guardará al jugador que debemos seguir
+    public Transform jugadorOBJ; // Guardará al jugador que debemos seguir
     public bool estaAgarrada = false; // Ahora la meta puede revisar este dato
 
     private void OnCollisionEnter(Collision collision)
