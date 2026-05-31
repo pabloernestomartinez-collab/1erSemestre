@@ -13,6 +13,8 @@ public class GameUIManager : NetworkBehaviour
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
 
+    private bool regresandoAlLobby = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -27,6 +29,7 @@ public class GameUIManager : NetworkBehaviour
     {
         mostrarMenuFin = false;
         textoGanador = "";
+        regresandoAlLobby = false; // Reiniciamos el candado al empezar
         StartCoroutine(EsperarYVincularUI());
     }
 
@@ -101,10 +104,37 @@ public class GameUIManager : NetworkBehaviour
             if (textoFinCliente != null)
             {
                 textoFinCliente.gameObject.SetActive(true);
-                // Le ponemos el mensaje que calculó el servidor (Ej: "🏆 ¡GANÓ EL HOST! (5 vs 3)")
+                // Le ponemos el mensaje que calculó el servidor
                 textoFinCliente.text = "=== PARTIDO TERMINADO ===\n\n" + mensajeResultado;
             }
+
+            // if somos el cliente, iniciamos la cuenta regresiva automática de 5 segundos
+            if (!regresandoAlLobby)
+            {
+                regresandoAlLobby = true;
+                StartCoroutine(EsperarYVolverAlLobby());
+            }
         }
+    }
+
+    private IEnumerator EsperarYVolverAlLobby()
+    {
+        // Esperamos los 5 segundos con el texto de ganador en pantalla
+        yield return new WaitForSeconds(5f);
+
+        Debug.Log("[Cliente] 5 segundos cumplidos. Regresando ordenadamente al menú...");
+
+        // Desconectamos la red de Netcode de forma prolija para este cliente
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        // Esperamos un frame para que los sockets se liberen correctamente
+        yield return null;
+
+        // Regresamos a la escena del menú usando el nombre correcto en minúsculas
+        SceneManager.LoadScene("lobby");
     }
 
     private void OnGUI()
@@ -130,7 +160,8 @@ public class GameUIManager : NetworkBehaviour
 
         if (GUILayout.Button("¿Jugar otra partida?"))
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("lobby", LoadSceneMode.Single);
+            // Corregido también con el sistema de apagado limpio que diseñamos antes
+            StartCoroutine(ReiniciarPartidaHost());
         }
 
         GUILayout.Space(5);
@@ -141,6 +172,16 @@ public class GameUIManager : NetworkBehaviour
         }
 
         GUILayout.EndArea();
+    }
+
+    private IEnumerator ReiniciarPartidaHost()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+        yield return null;
+        SceneManager.LoadScene("lobby");
     }
 
     private IEnumerator CierreOrdenadoJuego()
