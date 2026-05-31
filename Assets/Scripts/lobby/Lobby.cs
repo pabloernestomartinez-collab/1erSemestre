@@ -70,7 +70,7 @@ public class Lobby : MonoBehaviour
             return;
         }
 
-        if (SceneManager.GetActiveScene().name == "lobby") 
+        if (SceneManager.GetActiveScene().name == "lobby")
         {
             hostDetectado = false;
             buscandoHost = false;
@@ -101,13 +101,13 @@ public class Lobby : MonoBehaviour
         float tiempoEspera = 0f;
         while (tiempoEspera < 4f && !hostDetectado)
         {
-            // if el motor nativo de Netcode confirma la conexión exitosa
+            // if el motor nativo de Netcode confirms la conexión exitosa
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
             {
                 hostDetectado = true;
                 buscandoHost = false;
                 mensajeEstado = "✅ ¡Host encontrado! Entrando...";
-                yield break; //  Salimos de la corrutina exitosamente y NO apagamos la red.
+                yield break; // Salimos de la corrutina exitosamente y NO apagamos la red.
             }
 
             tiempoEspera += Time.deltaTime;
@@ -129,7 +129,7 @@ public class Lobby : MonoBehaviour
 
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
         {
-            GUILayout.BeginArea(new Rect(10, 10, 300, 380));
+            GUILayout.BeginArea(new Rect(10, 10, 300, 420));
 
             GUILayout.Label("Alumno: Pablito Martinez");
             GUILayout.Box($"Estado: {mensajeEstado}");
@@ -163,6 +163,14 @@ public class Lobby : MonoBehaviour
                 GUI.backgroundColor = Color.white;
             }
 
+            GUILayout.Space(20);
+            GUI.backgroundColor = Color.red;
+            if (GUILayout.Button("Volver a Windows"))
+            {
+                StartCoroutine(CierreOrdenadoMenu());
+            }
+            GUI.backgroundColor = Color.white;
+
             GUILayout.EndArea();
         }
         else
@@ -192,6 +200,24 @@ public class Lobby : MonoBehaviour
             }
             GUILayout.EndArea();
         }
+    }
+
+    private IEnumerator CierreOrdenadoMenu()
+    {
+        mensajeEstado = "Cerrando aplicación...";
+
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        yield return null; // Esperamos un frame para liberar sockets antes de matar el proceso
+
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
     private void ConfigurarIpTransporte(string nuevaIp)
