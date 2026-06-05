@@ -131,7 +131,8 @@ public class Lobby : MonoBehaviour
         {
             GUILayout.BeginArea(new Rect(10, 10, 300, 420));
 
-            GUILayout.Label("Alumno: Pablo Martinez");
+            GUILayout.Label("Grupo: Promo Team");
+            GUILayout.Label("Juego: Lux  Umbra");
             GUILayout.Box($"Estado: {mensajeEstado}");
             GUILayout.Space(20);
 
