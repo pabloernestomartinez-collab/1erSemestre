@@ -1,70 +1,98 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement; // Requerido para detectar el cambio de escenas
 
 public class MultiplayerCamera : NetworkBehaviour
 {
     [Header("Configuración de Seguimiento")]
-    private Transform camaraPrincipal; // Referencia a la cámara física de la escena
-    public Vector3 offset = new Vector3(0f, 2f, -4f); // Distancia detrás y arriba del jugador
-    public float suavizado = 5f; // Qué tan suave sigue la cámara al jugador
+    private Transform camaraPrincipal;
+    public Vector3 offset = new Vector3(0f, 2f, -4f);
+    public float suavizado = 5f;
 
-    [Header("Configuración de Rotación (Mouse)")]
-    public float sensibilidadMouse = 100f;
+    [Header("Configuración de Rotación (Joystick Mando)")]
+    public float sensibilidadJoystick = 150f;
+
     [HideInInspector] public float mouseX = 0f;
     private float rotacionY = 0f;
 
     private void Start()
     {
-        // 🔍 CANDADO SUPREMO MULTI-JUGADOR:
-        // Si este clon del jugador NO es el que yo controlo con mi teclado/mouse,
-        // desactivamos este script por completo. Solo el jugador local mueve la cámara.
-        if (!IsOwner)
-        {
-            this.enabled = false;
-            return;
-        }
+        if (!IsOwner) return;
 
-        // Buscamos la cámara principal que ya existe en la escena de Unity
+        BuscarCamaraActual();
+        Cursor.visible = false;
+    }
+
+    // NUEVO: Nos suscribimos a los eventos de Unity para saber cuándo se carga una escena nueva
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += AlCargarEscena;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= AlCargarEscena;
+    }
+
+    // NUEVO: Este método se ejecuta automáticamente CADA VEZ que Unity cambia de escena
+    private void AlCargarEscena(Scene escena, LoadSceneMode modo)
+    {
+        if (!IsOwner) return;
+
+        // Forzamos a buscar la nueva cámara de la escena "game"
+        BuscarCamaraActual();
+    }
+
+    // NUEVO: Método centralizado para encontrar la cámara activa
+    private void BuscarCamaraActual()
+    {
         if (Camera.main != null)
         {
             camaraPrincipal = Camera.main.transform;
+            rotacionY = transform.eulerAngles.y;
+            Debug.Log($"📸 [Cámara] Vinculada con éxito en la escena: {SceneManager.GetActiveScene().name}");
         }
         else
         {
-            Debug.LogError("🚨 [Cámara] ¡No se encontró ninguna cámara con el Tag 'MainCamera' en la escena!");
+            Debug.LogWarning("🚨 [Cámara] No se encontró 'MainCamera'. Si estás en el Lobby transicionando, es normal por un frame.");
         }
-
-        // Opcional: Bloquea el cursor en el centro de la pantalla para que no se salga al girar
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Usamos LateUpdate para el seguimiento de cámaras. 
-    // Corre justo después de que el jugador se movió en el Update, evitando tirones (jittering).
     private void LateUpdate()
     {
-        // Doble seguridad por si la cámara no se vinculó correctamente
-        if (camaraPrincipal == null) return;
+        if (!IsOwner) return;
 
-        // 1. ROTACIÓN CON EL MOUSE
-        // Leemos el movimiento horizontal del mouse
-        mouseX = Input.GetAxis("Mouse X") * sensibilidadMouse * Time.deltaTime;
+        // Si por alguna razón la cámara se perdió (cambio de escena brusco), intentamos buscarla en caliente
+        if (camaraPrincipal == null)
+        {
+            BuscarCamaraActual();
+            return; // Esperamos al siguiente frame para no tirar error
+        }
+
+        // Resetear el valor por frame
+        mouseX = 0f;
+
+        // LEER JOYSTICK DERECHO
+        if (Gamepad.current != null)
+        {
+            float joystickX = Gamepad.current.rightStick.x.ReadValue();
+
+            if (Mathf.Abs(joystickX) > 0.1f)
+            {
+                mouseX = joystickX * sensibilidadJoystick * Time.deltaTime;
+            }
+        }
+
+        // Aplicamos la rotación
         rotacionY += mouseX;
-
-        // Rotamos el cuerpo del jugador sobre el eje Y (izquierda/derecha)
         transform.rotation = Quaternion.Euler(0f, rotacionY, 0f);
 
-
-        // 2. SEGUIMIENTO SUAVE DE POSICIÓN
-        // Calculamos la posición ideal en base a dónde mira el jugador aplicando el offset
+        // SEGUIMIENTO SUAVE DE POSICIÓN
         Vector3 posicionDeseada = transform.position + (transform.rotation * offset);
-
-        // Interpolamos (Lerp) de la posición actual de la cámara a la deseada para que sea fluido
         Vector3 posicionSuave = Vector3.Lerp(camaraPrincipal.position, posicionDeseada, suavizado * Time.deltaTime);
 
-        // Aplicamos la posición final a la cámara
         camaraPrincipal.position = posicionSuave;
-
-        // Hacemos que la cámara mire fijamente hacia el centro del jugador
         camaraPrincipal.LookAt(transform.position + Vector3.up * (offset.y * 0.5f));
     }
 }
