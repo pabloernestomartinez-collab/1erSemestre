@@ -8,13 +8,18 @@ public class CoinSpawner : NetworkBehaviour
     private float tiempoPorSpawn = 2.0f;
     private float cronometroSpawn = 0f;
 
-    [SerializeField] private float tiempoRestantePartida = 600f; // 10 minutos para darle un fin al juego
+    // Seteamos los 600 segundos por código
+    private float tiempoRestantePartida = 600f;
     private bool tiempoAgotado = false;
 
     public override void OnNetworkSpawn()
     {
         cronometroSpawn = 0f;
         tiempoAgotado = false;
+
+        // 🔥 CORRECCIÓN CLAVE: Forzamos los 10 minutos reales al iniciar la red, 
+        // obligando a Unity a ignorar cualquier número viejo del Inspector.
+        tiempoRestantePartida = 600f;
     }
 
     void Update()
@@ -24,19 +29,15 @@ public class CoinSpawner : NetworkBehaviour
 
         tiempoRestantePartida -= Time.deltaTime;
 
-        // ... (dentro del Update de CoinSpawner.cs cuando el tiempo llega a cero) ...
         if (tiempoRestantePartida <= 0f)
         {
             tiempoRestantePartida = 0f;
             tiempoAgotado = true;
-            //Debug.Log("⏱️ [Servidor] ¡El tiempo llegó a CERO! Calculando ganador...");
 
-            // pARA CALCULAR EL GANADOR
             string resultadoFinal = "Empate";
             int puntosHost = 0;
             int puntosCliente = 0;
 
-            // Buscamos los componentes PlayerScore de los jugadores conectados
             if (NetworkManager.Singleton.ConnectedClients.TryGetValue(0, out var hostNet))
             {
                 if (hostNet.PlayerObject.TryGetComponent<PlayerScore>(out var pScoreHost)) puntosHost = pScoreHost.puntos.Value;
@@ -46,7 +47,6 @@ public class CoinSpawner : NetworkBehaviour
                 if (clientNet.PlayerObject.TryGetComponent<PlayerScore>(out var pScoreClient)) puntosCliente = pScoreClient.puntos.Value;
             }
 
-            // Comparamos los valores para armar el mensaje
             if (puntosHost > puntosCliente)
             {
                 resultadoFinal = $"🏆 ¡GANÓ EL HOST! ({puntosHost} vs {puntosCliente})";
@@ -60,9 +60,9 @@ public class CoinSpawner : NetworkBehaviour
                 resultadoFinal = $"🤝 ¡EMPATE! ({puntosHost} a {puntosHost})";
             }
 
-            // Enviamos el resultado directo al UIManager
             if (GameUIManager.Instance != null)
             {
+                // NOTA: Asegúrate de que este método en tu GameUIManager termine con el sufijo 'Rpc'
                 GameUIManager.Instance.MostrarBotonesFinPartidaRpc(resultadoFinal);
             }
             return;

@@ -1,36 +1,37 @@
-using TMPro;
+ï»¿using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 public class reloj : NetworkBehaviour
 {
-    [Header("Configuración del Tiempo")]
-    // 1. Cambiamos el valor por defecto a 600f (10 minutos)
-    [SerializeField] private float tiempoInicialSegundos = 600f;
-
-    [Header("Componentes de UI")]
     [SerializeField] private TextMeshProUGUI textoReloj;
 
-    // 2. Cambiamos también el valor inicial de la NetworkVariable a 600f
+    // Seteamos los 600 segundos (10 minutos) directo en el cÃ³digo para evitar el inspector
     private readonly NetworkVariable<float> tiempoRestante = new NetworkVariable<float>(
         600f,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
+
     private bool juegoTerminado = false;
+
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            tiempoRestante.Value = tiempoInicialSegundos;
+            tiempoRestante.Value = 600f;
         }
+
+        // Mostramos el formato correcto desde el primer segundo
         ActualizarTextoVisual(tiempoRestante.Value);
         tiempoRestante.OnValueChanged += AlCambiarTiempo;
     }
+
     public override void OnNetworkDespawn()
     {
         tiempoRestante.OnValueChanged -= AlCambiarTiempo;
     }
+
     void Update()
     {
         if (!IsServer) return;
@@ -44,41 +45,46 @@ public class reloj : NetworkBehaviour
         {
             tiempoRestante.Value = 0f;
             juegoTerminado = true;
-            TerminarPartidaPorTiempo(); // <- Se ejecuta solo en el Servidor
+
+            // Llama a la funciÃ³n con el sufijo Rpc obligatorio
+            EjecutarFinPartidaRpc();
         }
     }
+
     private void AlCambiarTiempo(float valorViejo, float valorNuevo)
     {
         ActualizarTextoVisual(valorNuevo);
     }
+
+    // ðŸ”¥ LA FUNCIÃ“N DE CONVERSIÃ“N VOLVIÃ“ (Totalmente limpia y segura)
     private void ActualizarTextoVisual(float tiempoEnSegundos)
     {
         if (textoReloj == null) return;
         if (tiempoEnSegundos < 0) tiempoEnSegundos = 0;
-        int minutos = Mathf.FloorToInt(tiempoEnSegundos / 60f);// google...
+
+        // Pasamos los segundos brutos a Minutos y Segundos enteros
+        int minutos = Mathf.FloorToInt(tiempoEnSegundos / 60f);
         int segundos = Mathf.FloorToInt(tiempoEnSegundos % 60f);
+
+        // Formateamos el texto para que siempre muestre dos dÃ­gitos (ej: 09:05 en vez de 9:5)
         textoReloj.text = string.Format("{0:00}:{1:00}", minutos, segundos);
     }
-    private void TerminarPartidaPorTiempo()
-    {
-        //Debug.Log("¡El tiempo se ha agotado en el Servidor! Congelando jugadores...");
-        CongelarTodosLosJugadoresRpc();// El servidor da una orden masiva que viajará a las pantallas de TODOS los jugadores
-    }
+
     [Rpc(SendTo.Everyone)]
-    private void CongelarTodosLosJugadoresRpc()
+    private void EjecutarFinPartidaRpc()
     {
-        GameObject[] jugadores = GameObject.FindGameObjectsWithTag("Player");// Buscamos en la escena local a TODOS los objetos que tengan la etiqueta "Player"
+        GameObject[] jugadores = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject jugador in jugadores)
         {
-            if (jugador.TryGetComponent<PlayerMovement>(out PlayerMovement movimiento))//  Apagamos su script de movimiento para bloquear el teclado/mando
+            if (jugador.TryGetComponent<PlayerMovement>(out PlayerMovement movimiento))
             {
                 movimiento.enabled = false;
             }
-            if (jugador.TryGetComponent<Rigidbody>(out Rigidbody rb))// Frenamos en seco sus físicas para que no se sigan deslizando por inercia
+            if (jugador.TryGetComponent<Rigidbody>(out Rigidbody rb))
             {
-                rb.linearVelocity = Vector3.zero; // google
-                rb.angularVelocity = Vector3.zero; // Evita que se quede rotando sobre sí mismo
-                rb.isKinematic = true; // Lo vuelve una "estatua" para que la gravedad no lo mueva
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
             }
         }
     }
