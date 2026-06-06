@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     [Header("Movimiento")]
-    public float speed = 5f;
+    public float speed = 10f;
     public float rotationSpeed = 15f;
     private Rigidbody rb;
     private Transform mainCameraTransform;

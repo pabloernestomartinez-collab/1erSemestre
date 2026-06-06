@@ -5,13 +5,15 @@ using UnityEngine;
 public class reloj : NetworkBehaviour
 {
     [Header("Configuración del Tiempo")]
-    [SerializeField] private float tiempoInicialSegundos = 60f;
+    // 1. Cambiamos el valor por defecto a 600f (10 minutos)
+    [SerializeField] private float tiempoInicialSegundos = 600f;
 
     [Header("Componentes de UI")]
     [SerializeField] private TextMeshProUGUI textoReloj;
 
+    // 2. Cambiamos también el valor inicial de la NetworkVariable a 600f
     private readonly NetworkVariable<float> tiempoRestante = new NetworkVariable<float>(
-        60f,
+        600f,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
