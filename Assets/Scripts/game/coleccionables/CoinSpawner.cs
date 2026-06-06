@@ -8,7 +8,7 @@ public class CoinSpawner : NetworkBehaviour
     private float tiempoPorSpawn = 2.0f;
     private float cronometroSpawn = 0f;
 
-    [SerializeField] private float tiempoRestantePartida = 60f; // Reduje a 10 para que lo pruebes rápido
+    [SerializeField] private float tiempoRestantePartida = 600f; // 10 minutos para darle un fin al juego
     private bool tiempoAgotado = false;
 
     public override void OnNetworkSpawn()
@@ -80,8 +80,8 @@ public class CoinSpawner : NetworkBehaviour
     {
         if (monedaPrefab == null) return;
 
-        float xAleatorio = Random.Range(-4f, 4f);
-        float zAleatorio = Random.Range(-4f, 4f);
+        float xAleatorio = Random.Range(-400f, 400f);
+        float zAleatorio = Random.Range(-400f, 400f);
         float yPosicion = 10f;
 
         Vector3 posicionAleatoria = new Vector3(xAleatorio, yPosicion, zAleatorio);
