@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd982bc2766ec774b8855a9443197e8f, type: 3}
+  m_Name: Enemigo1
+  m_EditorClassIdentifier: Assembly-CSharp::enemigosData
+  _EnemigoNombre: rata
+  _EnemigoDescripcion: "enemigo de mucha cantidad pero bajo da\xF1o"
+  _efe3: 
+  _efe4: 
+  _EnemigoVelocidad: 5
+  _EnemigoAtaque: 1
+  _EnemigoDefensa: 1
+  _EnemmigoCantidad: 50
+  _GreenFlag: 0
+  _YellowFlag: 0
+  _RedFlag: 0
