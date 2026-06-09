@@ -56,7 +56,7 @@ public class reloj : NetworkBehaviour
         ActualizarTextoVisual(valorNuevo);
     }
 
-    // 🔥 LA FUNCIÓN DE CONVERSIÓN VOLVIÓ (Totalmente limpia y segura)
+    // LA FUNCIÓN DE CONVERSIÓN VOLVIÓ (Totalmente limpia y segura)
     private void ActualizarTextoVisual(float tiempoEnSegundos)
     {
         if (textoReloj == null) return;

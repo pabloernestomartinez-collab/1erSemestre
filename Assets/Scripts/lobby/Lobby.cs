@@ -53,7 +53,7 @@ public class Lobby : MonoBehaviour
         {
             hostDetectado = true;
             buscandoHost = false;
-            mensajeEstado = "✅ ¡Conectado exitosamente al Lobby!";
+            mensajeEstado = "¡Conectado exitosamente al Lobby!";
         }
     }
 
@@ -66,7 +66,7 @@ public class Lobby : MonoBehaviour
         {
             hostDetectado = false;
             buscandoHost = false;
-            mensajeEstado = "❌ El Host aún no ha iniciado la partida.";
+            mensajeEstado = "El Host aún no ha iniciado la partida.";
             return;
         }
 
@@ -92,7 +92,7 @@ public class Lobby : MonoBehaviour
 
         hostDetectado = false;
         buscandoHost = true;
-        mensajeEstado = "🔍 Buscando Host en la red...";
+        mensajeEstado = "Buscando Host en la red...";
 
         ConfigurarIpTransporte(ipServidor);
         NetworkManager.Singleton.StartClient();
@@ -106,7 +106,7 @@ public class Lobby : MonoBehaviour
             {
                 hostDetectado = true;
                 buscandoHost = false;
-                mensajeEstado = "✅ ¡Host encontrado! Entrando...";
+                mensajeEstado = "¡Host encontrado! Entrando...";
                 yield break; // Salimos de la corrutina exitosamente y NO apagamos la red.
             }
 
@@ -119,7 +119,7 @@ public class Lobby : MonoBehaviour
         {
             if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
             buscandoHost = false;
-            mensajeEstado = "❌ El Host aún no ha iniciado la partida o la IP es incorrecta.";
+            mensajeEstado = "El Host aún no ha iniciado la partida o la IP es incorrecta.";
         }
     }
 
@@ -147,7 +147,7 @@ public class Lobby : MonoBehaviour
 
             if (!hostDetectado && !buscandoHost)
             {
-                if (GUILayout.Button("🔎 Verificar si el Host ya entró"))
+                if (GUILayout.Button("Verificar si el Host ya entró"))
                 {
                     StartCoroutine(ComprobarSiExisteHost());
                 }

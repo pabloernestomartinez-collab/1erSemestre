@@ -51,11 +51,11 @@ public class MultiplayerCamera : NetworkBehaviour
         {
             camaraPrincipal = Camera.main.transform;
             rotacionY = transform.eulerAngles.y;
-            Debug.Log($"📸 [Cámara] Vinculada con éxito en la escena: {SceneManager.GetActiveScene().name}");
+            //Debug.Log($"[Cámara] Vinculada con éxito en la escena: {SceneManager.GetActiveScene().name}");
         }
         else
         {
-            Debug.LogWarning("🚨 [Cámara] No se encontró 'MainCamera'. Si estás en el Lobby transicionando, es normal por un frame.");
+            //Debug.LogWarning("[Cámara] No se encontró 'MainCamera'. Si estás en el Lobby transicionando, es normal por un frame.");
         }
     }
 

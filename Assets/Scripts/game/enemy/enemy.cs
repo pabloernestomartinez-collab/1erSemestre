@@ -52,7 +52,7 @@ public class enemy : NetworkBehaviour
 
             if (other.TryGetComponent<NetworkObject>(out var netObj))
             {
-                Debug.Log($"👾 [{enemigosData.EnemigoNombre}] ¡Fijando objetivo! Persiguiendo al Jugador {netObj.OwnerClientId}");
+                //Debug.Log($"[{enemigosData.EnemigoNombre}] ¡Fijando objetivo! Persiguiendo al Jugador {netObj.OwnerClientId}");
             }
         }
     }
@@ -64,7 +64,7 @@ public class enemy : NetworkBehaviour
         // Si el jugador que estábamos persiguiendo sale del rango, el enemigo se frena
         if (other.CompareTag("Player") && other.transform == jugadorObjetivo)
         {
-            Debug.Log($"👾 [{enemigosData.EnemigoNombre}] El objetivo escapó. Volviendo a estado de alerta.");
+            //Debug.Log($"[{enemigosData.EnemigoNombre}] El objetivo escapó. Volviendo a estado de alerta.");
             jugadorObjetivo = null;
 
             if (agente != null && agente.enabled)

@@ -17,7 +17,6 @@ public class CoinSpawner : NetworkBehaviour
         cronometroSpawn = 0f;
         tiempoAgotado = false;
 
-        // 🔥 CORRECCIÓN CLAVE: Forzamos los 10 minutos reales al iniciar la red, 
         // obligando a Unity a ignorar cualquier número viejo del Inspector.
         tiempoRestantePartida = 600f;
     }
@@ -49,15 +48,15 @@ public class CoinSpawner : NetworkBehaviour
 
             if (puntosHost > puntosCliente)
             {
-                resultadoFinal = $"🏆 ¡GANÓ EL HOST! ({puntosHost} vs {puntosCliente})";
+                resultadoFinal = $"¡GANÓ EL HOST! ({puntosHost} vs {puntosCliente})";
             }
             else if (puntosCliente > puntosHost)
             {
-                resultadoFinal = $"🏆 ¡GANÓ EL CLIENTE! ({puntosCliente} vs {puntosHost})";
+                resultadoFinal = $"¡GANÓ EL CLIENTE! ({puntosCliente} vs {puntosHost})";
             }
             else
             {
-                resultadoFinal = $"🤝 ¡EMPATE! ({puntosHost} a {puntosHost})";
+                resultadoFinal = $"¡EMPATE! ({puntosHost} a {puntosHost})";
             }
 
             if (GameUIManager.Instance != null)
