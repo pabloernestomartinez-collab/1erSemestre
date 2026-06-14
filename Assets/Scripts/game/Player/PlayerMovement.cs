@@ -68,4 +68,16 @@ public class PlayerMovement : NetworkBehaviour
             rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
         }
     }
+
+    [Header("Puntuación")]
+    private int puntosTotales = 0;
+
+    // Función pública: permite que otros scripts (como el coleccionable) le den puntos
+    public void SumarPuntos(int cantidad)
+    {
+        puntosTotales += cantidad;
+        Debug.Log($"Puntos actuales del jugador: {puntosTotales}");
+
+        // Aquí más adelante podrás actualizar el texto de tu UI/Canvas
+    }
 }
