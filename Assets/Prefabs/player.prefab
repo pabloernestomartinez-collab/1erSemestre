@@ -125,13 +125,12 @@ GameObject:
   - component: {fileID: 538968982477672802}
   - component: {fileID: 8401897746139964497}
   - component: {fileID: 8364103912973687248}
-  - component: {fileID: 2825560657502413760}
   - component: {fileID: 6886796074336584894}
   - component: {fileID: 393348509725906956}
   - component: {fileID: 992741822386297471}
-  - component: {fileID: -2931574602520912099}
-  - component: {fileID: 3167320951379618681}
   - component: {fileID: 6260276935807392875}
+  - component: {fileID: 8705253362401567396}
+  - component: {fileID: 1870372764184254060}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -261,21 +260,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &2825560657502413760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6051726233588507955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a2d6379efc3e60478d22cebe44b2365, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  ShowTopMostFoldoutHeaderGroup: 1
-  speed: 10
-  rotationSpeed: 15
 --- !u!114 &6886796074336584894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,32 +349,6 @@ MonoBehaviour:
   colorParaHost: {r: 0, g: 0, b: 1, a: 1}
   colorParaCliente: {r: 1, g: 0, b: 0, a: 1}
   meshRenderer: {fileID: 538968982477672802}
---- !u!114 &-2931574602520912099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6051726233588507955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbf9b4294921aef46a2a9c3c725f0eff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::perdi
-  ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &3167320951379618681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6051726233588507955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3ad0a67919bd694db41b1fa2ce210e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerScore
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &6260276935807392875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,6 +366,34 @@ MonoBehaviour:
   suavizado: 5
   sensibilidadJoystick: 150
   mouseX: 0
+--- !u!114 &8705253362401567396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a2d6379efc3e60478d22cebe44b2365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovimientoPlayer
+  ShowTopMostFoldoutHeaderGroup: 1
+  speed: 10
+  rotationSpeed: 15
+--- !u!114 &1870372764184254060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ad0a67919bd694db41b1fa2ce210e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerScore
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &7011243251402558791
 GameObject:
   m_ObjectHideFlags: 0

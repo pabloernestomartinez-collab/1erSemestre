@@ -7,12 +7,18 @@ using UnityEngine.SceneManagement;
 public class GameUIManager : NetworkBehaviour
 {
     public static GameUIManager Instance { get; private set; }
+
+    [Header("Marcadores Globales")]
     private TextMeshProUGUI textoHost;
     private TextMeshProUGUI textoCliente;
     private TextMeshProUGUI textoFinCliente;
+
+    [Header("Coleccionables Locales (¡NUEVO!)")]
+    [SerializeField] private TextMeshProUGUI textoEspadas;
+    [SerializeField] private TextMeshProUGUI textoEscudos;
+
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
-
     private bool regresandoAlLobby = false;
 
     private void Awake()
@@ -29,7 +35,7 @@ public class GameUIManager : NetworkBehaviour
     {
         mostrarMenuFin = false;
         textoGanador = "";
-        regresandoAlLobby = false; // Reiniciamos el candado al empezar
+        regresandoAlLobby = false;
         StartCoroutine(EsperarYVincularUI());
     }
 
@@ -46,13 +52,14 @@ public class GameUIManager : NetworkBehaviour
 
     private IEnumerator EsperarYVincularUI()
     {
+        // Esperamos a salir del lobby de forma segura
         while (SceneManager.GetActiveScene().name == "lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
         yield return new WaitForSeconds(0.2f);
 
-        // Buscamos los marcadores tradicionales
+        // Buscamos los marcadores tradicionales en la jerarquía
         GameObject objHost = GameObject.Find("TextoPuntajeHost");
         GameObject objCliente = GameObject.Find("TextoPuntajeCliente");
 
@@ -63,7 +70,34 @@ public class GameUIManager : NetworkBehaviour
         if (objFinCliente != null)
         {
             textoFinCliente = objFinCliente.GetComponent<TextMeshProUGUI>();
-            textoFinCliente.gameObject.SetActive(false); // Lo aseguramos apagado al inicio
+            textoFinCliente.gameObject.SetActive(false);
+        }
+
+        // 🔥 LOGICA UNIFICADA: Buscamos al jugador local y le inyectamos los textos
+        // Hacemos un bucle hasta que el Player aparezca físicamente en la escena
+        PlayerScore scoreJugadorLocal = null;
+        while (scoreJugadorLocal == null)
+        {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
+            {
+                var jugadorObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
+                if (jugadorObj != null)
+                {
+                    scoreJugadorLocal = jugadorObj.GetComponent<PlayerScore>();
+                }
+            }
+            yield return new WaitForSeconds(0.1f); // Esperamos un frame de red
+        }
+
+        // Le entregamos las referencias de las variables que arrastraste en el Inspector
+        if (scoreJugadorLocal != null)
+        {
+            scoreJugadorLocal.textoEspadasUI = textoEspadas;
+            scoreJugadorLocal.textoEscudosUI = textoEscudos;
+
+            // Forzamos al jugador a actualizar la pantalla con su valor inicial actual
+            // (Llamamos a los métodos públicos que le agregamos a PlayerScore en el paso extra de abajo)
+            scoreJugadorLocal.ForzarActualizacionVisual();
         }
 
         if (IsServer)
@@ -92,23 +126,20 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
-
     [Rpc(SendTo.Everyone)]
     public void MostrarBotonesFinPartidaRpc(string mensajeResultado)
     {
         textoGanador = mensajeResultado;
-        mostrarMenuFin = true; // Activa el OnGUI del Host
+        mostrarMenuFin = true;
 
         if (!IsServer)
         {
             if (textoFinCliente != null)
             {
                 textoFinCliente.gameObject.SetActive(true);
-                // Le ponemos el mensaje que calculó el servidor
                 textoFinCliente.text = "=== PARTIDO TERMINADO ===\n\n" + mensajeResultado;
             }
 
-            // if somos el cliente, iniciamos la cuenta regresiva automática de 5 segundos
             if (!regresandoAlLobby)
             {
                 regresandoAlLobby = true;
@@ -119,35 +150,22 @@ public class GameUIManager : NetworkBehaviour
 
     private IEnumerator EsperarYVolverAlLobby()
     {
-        // Esperamos los 5 segundos con el texto de ganador en pantalla
         yield return new WaitForSeconds(5f);
-
         Debug.Log("[Cliente] 5 segundos cumplidos. Regresando ordenadamente al menú...");
-
-        // Desconectamos la red de Netcode de forma prolija para este cliente
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.Shutdown();
-        }
-
-        // Esperamos un frame para que los sockets se liberen correctamente
+        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         yield return null;
-
-        // Regresamos a la escena del menú usando el nombre correcto en minúsculas
         SceneManager.LoadScene("lobby");
     }
 
     private void OnGUI()
     {
         if (!mostrarMenuFin) return;
-        if (!IsServer) return; // El cliente NO entra aquí, su pantalla queda limpia de botones
+        if (!IsServer) return;
 
-        // --- El Host dibuja sus botones de control ---
         float xCentro = (Screen.width / 2) - 150;
         float yCentro = (Screen.height / 2) - 90;
 
         GUILayout.BeginArea(new Rect(xCentro, yCentro, 300, 180), GUI.skin.box);
-
         GUILayout.Label("=== ¡TIEMPO AGOTADO! ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
         GUILayout.Space(5);
 
@@ -158,41 +176,25 @@ public class GameUIManager : NetworkBehaviour
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("¿Jugar otra partida?"))
-        {
-            // Corregido también con el sistema de apagado limpio que diseñamos antes
-            StartCoroutine(ReiniciarPartidaHost());
-        }
-
+        if (GUILayout.Button("¿Jugar otra partida?")) StartCoroutine(ReiniciarPartidaHost());
         GUILayout.Space(5);
-
-        if (GUILayout.Button("Volver a Windows"))
-        {
-            StartCoroutine(CierreOrdenadoJuego());
-        }
+        if (GUILayout.Button("Volver a Windows")) StartCoroutine(CierreOrdenadoJuego());
 
         GUILayout.EndArea();
     }
 
     private IEnumerator ReiniciarPartidaHost()
     {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.Shutdown();
-        }
+        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         yield return null;
         SceneManager.LoadScene("lobby");
     }
 
     private IEnumerator CierreOrdenadoJuego()
     {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.Shutdown();
-        }
+        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         yield return null;
         Application.Quit();
-
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
