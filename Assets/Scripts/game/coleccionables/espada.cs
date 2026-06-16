@@ -8,18 +8,30 @@ public class espada : MonoBehaviour
 
     void Update()
     {
+        // 1. Rotación visual continua
         transform.Rotate(Vector3.up * velocidadRotacion * Time.deltaTime);
+
+        // 2. 🔥 CONDICIONAL DE SEGURIDAD: Si cae al vacío (Y menor a -10)
+        if (transform.position.y < -10f)
+        {
+            // Solo el servidor tiene permiso para destruir objetos en red
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogWarning($"[Seguridad] {gameObject.name} se cayó del mapa (Y < -10) y fue destruido.");
+                Destroy(gameObject);
+            }
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    // Tu detección de colisión física (Collider sólido)
+    private void OnCollisionEnter(Collision collision)
     {
         if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsServer) return;
 
-        if (other.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
-            if (other.TryGetComponent<PlayerScore>(out PlayerScore scoreJugador))
+            if (collision.gameObject.TryGetComponent<PlayerScore>(out PlayerScore scoreJugador))
             {
-                // 🔥 Llama a la función específica de espadas
                 scoreJugador.SumarEspada(cantidadAumentar);
                 Destroy(gameObject);
             }
