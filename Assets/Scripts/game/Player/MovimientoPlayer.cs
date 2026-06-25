@@ -10,37 +10,37 @@ public class MovimientoPlayer : NetworkBehaviour
 
     private Rigidbody rb;
     private Transform mainCameraTransform;
-    private MultiplayerCamera cameraScript;
 
     public override void OnNetworkSpawn()
     {
-        // Vinculamos el Rigidbody para que funcione tanto en el Servidor como en los Clientes
+        // Vinculamos el Rigidbody para que funcione en Servidor y Clientes
         rb = GetComponent<Rigidbody>();
 
         if (IsOwner)
         {
-            // Solo el dueño busca su cámara local y el script de rotación
-            if (UnityEngine.Camera.main != null)
-            {
-                mainCameraTransform = UnityEngine.Camera.main.transform;
-                cameraScript = GameObject.FindAnyObjectByType<MultiplayerCamera>();
-            }
+            BuscarCamara();
+        }
+    }
+
+    private void BuscarCamara()
+    {
+        if (UnityEngine.Camera.main != null)
+        {
+            mainCameraTransform = UnityEngine.Camera.main.transform;
         }
     }
 
     void Update()
     {
-        // Candado de Red: Solo el jugador dueño de este personaje puede controlarlo
-        if (!IsOwner) return;
+        if (!IsOwner) return; // Candado de red[cite: 2]
 
-        // Protección por si la cámara cambia o se destruye al cambiar de escena
+        // Re-capturar la cámara de Unity automáticamente si cambiamos de escena
         if (mainCameraTransform == null && UnityEngine.Camera.main != null)
         {
-            mainCameraTransform = UnityEngine.Camera.main.transform;
-            cameraScript = UnityEngine.Camera.main.GetComponent<MultiplayerCamera>();
+            BuscarCamara();
         }
 
-        // 1. LEER INPUTS (Controles)
+        // 1. LEER INPUTS[cite: 2]
         float moveX = 0f;
         float moveZ = 0f;
 
@@ -52,25 +52,33 @@ public class MovimientoPlayer : NetworkBehaviour
         }
         else
         {
-            if (Keyboard.current.wKey.isPressed) moveZ = 1f;
-            if (Keyboard.current.sKey.isPressed) moveZ = -1f;
-            if (Keyboard.current.aKey.isPressed) moveX = -1f;
-            if (Keyboard.current.dKey.isPressed) moveX = 1f;
+            if (Keyboard.current.wKey.isPressed) moveZ = 1f; //[cite: 2]
+            if (Keyboard.current.sKey.isPressed) moveZ = -1f; //[cite: 2]
+            if (Keyboard.current.aKey.isPressed) moveX = -1f; //[cite: 2]
+            if (Keyboard.current.dKey.isPressed) moveX = 1f; //[cite: 2]
         }
 
-        // 2. APLICAR ROTACIÓN Y MOVIMIENTO FÍSICO
-        if (rb != null)
+        if (rb == null || mainCameraTransform == null) return;
+
+        // 2. CALCULAR VECTORES RESPECTO A LA PERSPECTIVA DE LA CÁMARA
+        Vector3 camForward = mainCameraTransform.forward;
+        camForward.y = 0f; // Aplanamos el vector al suelo
+        camForward = camForward.normalized;
+
+        Vector3 camRight = mainCameraTransform.right;
+        camRight.y = 0f;
+        camRight = camRight.normalized;
+
+        Vector3 moveDirection = (camForward * moveZ + camRight * moveX).normalized;
+
+        // 3. ROTACIÓN SUAVE INDEPENDIENTE 
+        if (moveDirection.magnitude >= 0.1f)
         {
-            // Rotar el cuerpo del jugador hacia donde mira la cámara horizontalmente
-            if (cameraScript != null)
-            {
-                Quaternion targetRotation = Quaternion.Euler(0f, cameraScript.mouseX, 0f);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            }
-
-            // Calcular dirección y aplicar velocidad manteniendo la gravedad física del Rigidbody (Y)
-            Vector3 moveDirection = (transform.forward * moveZ + transform.right * moveX).normalized;
-            rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
+
+        // 4. APLICAR VELOCIDAD FÍSICA[cite: 2]
+        rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed); //[cite: 2]
     }
 }
