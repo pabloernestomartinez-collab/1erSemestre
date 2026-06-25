@@ -1,30 +1,37 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement; // Requerido para detectar el cambio de escenas
+using UnityEngine.SceneManagement;
 
 public class MultiplayerCamera : NetworkBehaviour
 {
     [Header("Configuración de Seguimiento")]
     private Transform camaraPrincipal;
-    public Vector3 offset = new Vector3(0f, 2f, -4f);
-    public float suavizado = 5f;
+    public Vector3 offset = new Vector3(0f, 1.5f, -4f); // offset.y es la altura del pivote (pecho/hombros)
+    public float suavizado = 12f; // Aumentado ligeramente para mayor respuesta en combate
 
-    [Header("Configuración de Rotación (Joystick Mando)")]
+    [Header("Sensibilidad de Entrada")]
+    public float sensibilidadMouse = 0.15f;
     public float sensibilidadJoystick = 150f;
 
-    [HideInInspector] public float mouseX = 0f;
-    private float rotacionY = 0f;
+    [Header("Límites Verticales (Pitch)")]
+    public float minAnguloVertical = -25f; // Cuánto puedes mirar hacia arriba
+    public float maxAnguloVertical = 60f;  // Cuánto puedes mirar hacia abajo
+
+    [HideInInspector] public float mouseX = 0f; // Mantiene compatibilidad directa con MovimientoPlayer.cs
+    
+    private float rotacionY = 0f; // Yaw (Giro Horizontal)
+    private float rotacionX = 15f; // Pitch (Giro Vertical inicializado mirando levemente hacia abajo)
+
 
     private void Start()
     {
         if (!IsOwner) return;
 
         BuscarCamaraActual();
-        Cursor.visible = false;
+        EvaluarEstadoDelCursor(); // <-- Evaluamos el ratón al nacer
     }
 
-    // NUEVO: Nos suscribimos a los eventos de Unity para saber cuándo se carga una escena nueva
     private void OnEnable()
     {
         SceneManager.sceneLoaded += AlCargarEscena;
@@ -35,27 +42,37 @@ public class MultiplayerCamera : NetworkBehaviour
         SceneManager.sceneLoaded -= AlCargarEscena;
     }
 
-    // NUEVO: Este método se ejecuta automáticamente CADA VEZ que Unity cambia de escena
+
     private void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
         if (!IsOwner) return;
 
-        // Forzamos a buscar la nueva cámara de la escena "game"
         BuscarCamaraActual();
+        EvaluarEstadoDelCursor(); // <-- Volvemos a evaluar cada vez que Unity cambie de mapa
     }
 
-    // NUEVO: Método centralizado para encontrar la cámara activa
     private void BuscarCamaraActual()
     {
         if (Camera.main != null)
         {
             camaraPrincipal = Camera.main.transform;
             rotacionY = transform.eulerAngles.y;
-            //Debug.Log($"[Cámara] Vinculada con éxito en la escena: {SceneManager.GetActiveScene().name}");
+        }
+    }
+
+    private void EvaluarEstadoDelCursor()
+    {
+        // Si la escena activa se llama exactamente "game" (o el nombre que tenga tu mapa de juego)
+        if (SceneManager.GetActiveScene().name == "game")
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         else
         {
-            //Debug.LogWarning("[Cámara] No se encontró 'MainCamera'. Si estás en el Lobby transicionando, es normal por un frame.");
+            // En el Lobby, pantalla de victoria/derrota, o cualquier otro menú: LIBERAR RATÓN.
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
@@ -63,36 +80,54 @@ public class MultiplayerCamera : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        // Si por alguna razón la cámara se perdió (cambio de escena brusco), intentamos buscarla en caliente
         if (camaraPrincipal == null)
         {
             BuscarCamaraActual();
-            return; // Esperamos al siguiente frame para no tirar error
+            return; 
         }
 
-        // Resetear el valor por frame
-        mouseX = 0f;
+        // 1. LEER INPUTS HÍBRIDOS (Soporta Mouse y Mando de forma simultánea)
+        float inputHorizontal = 0f;
+        float inputVertical = 0f;
 
-        // LEER JOYSTICK DERECHO
+        // Lectura de Mouse
+        if (Mouse.current != null)
+        {
+            Vector2 deltaMouse = Mouse.current.delta.ReadValue();
+            inputHorizontal += deltaMouse.x * sensibilidadMouse;
+            inputVertical -= deltaMouse.y * sensibilidadMouse; // Invertido para sensación natural de Look
+        }
+
+        // Lectura de Gamepad
         if (Gamepad.current != null)
         {
-            float joystickX = Gamepad.current.rightStick.x.ReadValue();
-
-            if (Mathf.Abs(joystickX) > 0.1f)
+            Vector2 deltaStick = Gamepad.current.rightStick.ReadValue();
+            if (deltaStick.magnitude > 0.1f)
             {
-                mouseX = joystickX * sensibilidadJoystick * Time.deltaTime;
+                inputHorizontal += deltaStick.x * sensibilidadJoystick * Time.deltaTime;
+                inputVertical -= deltaStick.y * sensibilidadJoystick * Time.deltaTime;
             }
         }
 
-        // Aplicamos la rotación
-        rotacionY += mouseX;
-        transform.rotation = Quaternion.Euler(0f, rotacionY, 0f);
+        // 2. ACUMULAR Y CLAMPAR ÁNGULOS
+        rotacionY += inputHorizontal;
+        rotacionX = Mathf.Clamp(rotacionX + inputVertical, minAnguloVertical, maxAnguloVertical);
 
-        // SEGUIMIENTO SUAVE DE POSICIÓN
-        Vector3 posicionDeseada = transform.position + (transform.rotation * offset);
-        Vector3 posicionSuave = Vector3.Lerp(camaraPrincipal.position, posicionDeseada, suavizado * Time.deltaTime);
+        // Le pasamos el ángulo absoluto de la cámara (rotacionY) en lugar del delta por frame.
+        // Ahora tu personaje siempre rotará fluidamente hacia donde mire la cámara.
+        mouseX = rotacionY;
 
-        camaraPrincipal.position = posicionSuave;
-        camaraPrincipal.LookAt(transform.position + Vector3.up * (offset.y * 0.5f));
+        // 3. CÁLCULO DE ÓRBITA ESFÉRICA (Estilo Action-RPG)
+        Quaternion rotacionDeseada = Quaternion.Euler(rotacionX, rotacionY, 0f);
+
+        // El pivote se coloca a la altura del pecho/hombros usando offset.y (evita orbitar los pies)
+        Vector3 puntoPivote = transform.position + Vector3.up * offset.y;
+
+        // Calculamos la posición final empujando la cámara hacia atrás (offset.z) y lateralmente (offset.x)
+        Vector3 posicionDeseada = puntoPivote + (rotacionDeseada * new Vector3(offset.x, 0f, offset.z));
+
+        // 4. APLICAR INTERPOLACIÓN SUAVE (Lerp de posición + Slerp de rotación)
+        camaraPrincipal.position = Vector3.Lerp(camaraPrincipal.position, posicionDeseada, suavizado * Time.deltaTime);
+        camaraPrincipal.rotation = Quaternion.Slerp(camaraPrincipal.rotation, rotacionDeseada, suavizado * Time.deltaTime);
     }
 }
