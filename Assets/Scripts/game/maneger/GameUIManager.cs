@@ -74,7 +74,7 @@ public class GameUIManager : NetworkBehaviour
         }
 
         // Buscamos al jugador local y le inyectamos los textos
-        PlayerScore scoreJugadorLocal = null;
+        ArmasPlayer scoreJugadorLocal = null;
         while (scoreJugadorLocal == null)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
@@ -82,7 +82,7 @@ public class GameUIManager : NetworkBehaviour
                 var jugadorObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
                 if (jugadorObj != null)
                 {
-                    scoreJugadorLocal = jugadorObj.GetComponent<PlayerScore>();
+                    scoreJugadorLocal = jugadorObj.GetComponent<ArmasPlayer>();
                 }
             }
             yield return new WaitForSeconds(0.1f);

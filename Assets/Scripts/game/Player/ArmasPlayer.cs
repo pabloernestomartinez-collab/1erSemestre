@@ -2,7 +2,7 @@
 using UnityEngine;
 using TMPro;
 
-public class PlayerScore : NetworkBehaviour
+public class ArmasPlayer : NetworkBehaviour
 {
     [Header("UI Textos")]
     // Los hacemos públicos para poder asignarlos de forma segura
@@ -56,11 +56,11 @@ public class PlayerScore : NetworkBehaviour
 
     private void ActualizarEspadasVisual(int valor)
     {
-        if (textoEspadasUI != null) textoEspadasUI.text = "⚔️ Espadas: " + valor.ToString();
+        if (textoEspadasUI != null) textoEspadasUI.text = "Espadas: " + valor.ToString();
     }
 
     private void ActualizarEscudosVisual(int valor)
     {
-        if (textoEscudosUI != null) textoEscudosUI.text = "🛡️ Escudos: " + valor.ToString();
+        if (textoEscudosUI != null) textoEscudosUI.text = "Escudos: " + valor.ToString();
     }
 }

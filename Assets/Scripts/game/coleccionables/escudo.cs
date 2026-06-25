@@ -32,7 +32,7 @@ public class escudo : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             // 3. Buscamos el componente PlayerScore en el objeto que nos chocó
-            if (collision.gameObject.TryGetComponent<PlayerScore>(out PlayerScore scoreJugador))
+            if (collision.gameObject.TryGetComponent<ArmasPlayer>(out ArmasPlayer scoreJugador))
             {
                 // 🔥 Llama a la función específica de escudos
                 scoreJugador.SumarEscudo(cantidadAumentar);

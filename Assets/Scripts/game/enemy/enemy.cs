@@ -1,6 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.AI; //Para usar el NavMesh 
+using UnityEngine.AI; 
 
 public class enemy : NetworkBehaviour
 {
