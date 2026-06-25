@@ -13,9 +13,13 @@ public class GameUIManager : NetworkBehaviour
     private TextMeshProUGUI textoCliente;
     private TextMeshProUGUI textoFinCliente;
 
-    [Header("Coleccionables Locales")]
+    [Header("Armas Locales")]
     [SerializeField] private TextMeshProUGUI textoEspadas;
     [SerializeField] private TextMeshProUGUI textoEscudos;
+
+    [Header("Coleccionables Locales")]
+    [SerializeField] private TextMeshProUGUI texto222;
+    [SerializeField] private TextMeshProUGUI texto224;
 
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
@@ -73,26 +77,42 @@ public class GameUIManager : NetworkBehaviour
             textoFinCliente.gameObject.SetActive(false);
         }
 
-        // Buscamos al jugador local y le inyectamos los textos
-        ArmasPlayer scoreJugadorLocal = null;
-        while (scoreJugadorLocal == null)
+        //  Buscamos ambos scripts en el objeto del jugador
+        ArmasPlayer scriptArmas = null;
+        coleccionables scriptColeccionables = null;
+
+        while (scriptArmas == null || scriptColeccionables == null)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
             {
                 var jugadorObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
+
                 if (jugadorObj != null)
                 {
-                    scoreJugadorLocal = jugadorObj.GetComponent<ArmasPlayer>();
+                    // Intentamos obtener el script de armas si aún no lo tenemos
+                    if (scriptArmas == null) scriptArmas = jugadorObj.GetComponent<ArmasPlayer>();
+
+                    // Intentamos obtener el script de coleccionables si aún no lo tenemos
+                    if (scriptColeccionables == null) scriptColeccionables = jugadorObj.GetComponent<coleccionables>();
                 }
             }
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.1f); // Esperamos un frame de red
         }
 
-        if (scoreJugadorLocal != null)
+        //  Vinculamos la UI de Armas
+        if (scriptArmas != null)
         {
-            scoreJugadorLocal.textoEspadasUI = textoEspadas;
-            scoreJugadorLocal.textoEscudosUI = textoEscudos;
-            scoreJugadorLocal.ForzarActualizacionVisual();
+            scriptArmas.textoEspadasUI = textoEspadas;
+            scriptArmas.textoEscudosUI = textoEscudos;
+            scriptArmas.ForzarActualizacionVisual();
+        }
+
+        //  Vinculamos la UI de Coleccionables en su respectivo script
+        if (scriptColeccionables != null)
+        {
+            scriptColeccionables.texto222UI = texto222;
+            scriptColeccionables.texto224UI = texto224;
+            scriptColeccionables.ForzarActualizacionVisual(); 
         }
 
         if (IsServer)
@@ -121,7 +141,6 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
-    // Puedes llamar a esta función manualmente desde el servidor cuando un jugador gane
     [Rpc(SendTo.Everyone)]
     public void MostrarBotonesFinPartidaRpc(string mensajeResultado)
     {
@@ -147,7 +166,6 @@ public class GameUIManager : NetworkBehaviour
     private IEnumerator EsperarYVolverAlLobby()
     {
         yield return new WaitForSeconds(5f);
-        Debug.Log("[Cliente] Regresando ordenadamente al menú...");
         if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         yield return null;
         SceneManager.LoadScene("lobby");
