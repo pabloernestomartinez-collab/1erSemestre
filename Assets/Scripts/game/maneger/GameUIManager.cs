@@ -13,7 +13,7 @@ public class GameUIManager : NetworkBehaviour
     private TextMeshProUGUI textoCliente;
     private TextMeshProUGUI textoFinCliente;
 
-    [Header("Coleccionables Locales (¡NUEVO!)")]
+    [Header("Coleccionables Locales")]
     [SerializeField] private TextMeshProUGUI textoEspadas;
     [SerializeField] private TextMeshProUGUI textoEscudos;
 
@@ -73,8 +73,7 @@ public class GameUIManager : NetworkBehaviour
             textoFinCliente.gameObject.SetActive(false);
         }
 
-        // 🔥 LOGICA UNIFICADA: Buscamos al jugador local y le inyectamos los textos
-        // Hacemos un bucle hasta que el Player aparezca físicamente en la escena
+        // Buscamos al jugador local y le inyectamos los textos
         PlayerScore scoreJugadorLocal = null;
         while (scoreJugadorLocal == null)
         {
@@ -86,17 +85,13 @@ public class GameUIManager : NetworkBehaviour
                     scoreJugadorLocal = jugadorObj.GetComponent<PlayerScore>();
                 }
             }
-            yield return new WaitForSeconds(0.1f); // Esperamos un frame de red
+            yield return new WaitForSeconds(0.1f);
         }
 
-        // Le entregamos las referencias de las variables que arrastraste en el Inspector
         if (scoreJugadorLocal != null)
         {
             scoreJugadorLocal.textoEspadasUI = textoEspadas;
             scoreJugadorLocal.textoEscudosUI = textoEscudos;
-
-            // Forzamos al jugador a actualizar la pantalla con su valor inicial actual
-            // (Llamamos a los métodos públicos que le agregamos a PlayerScore en el paso extra de abajo)
             scoreJugadorLocal.ForzarActualizacionVisual();
         }
 
@@ -126,6 +121,7 @@ public class GameUIManager : NetworkBehaviour
         }
     }
 
+    // Puedes llamar a esta función manualmente desde el servidor cuando un jugador gane
     [Rpc(SendTo.Everyone)]
     public void MostrarBotonesFinPartidaRpc(string mensajeResultado)
     {
@@ -151,7 +147,7 @@ public class GameUIManager : NetworkBehaviour
     private IEnumerator EsperarYVolverAlLobby()
     {
         yield return new WaitForSeconds(5f);
-        Debug.Log("[Cliente] 5 segundos cumplidos. Regresando ordenadamente al menú...");
+        Debug.Log("[Cliente] Regresando ordenadamente al menú...");
         if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         yield return null;
         SceneManager.LoadScene("lobby");
@@ -165,8 +161,8 @@ public class GameUIManager : NetworkBehaviour
         float xCentro = (Screen.width / 2) - 150;
         float yCentro = (Screen.height / 2) - 90;
 
-        GUILayout.BeginArea(new Rect(xCentro, yCentro, 300, 180), GUI.skin.box);
-        GUILayout.Label("=== ¡TIEMPO AGOTADO! ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
+        GUILayout.BeginArea(new Rect(xCentro, yCentro, 300, 150), GUI.skin.box);
+        GUILayout.Label("=== PARTIDO TERMINADO ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
         GUILayout.Space(5);
 
         GUIStyle estiloGanador = new GUIStyle(GUI.skin.box);
