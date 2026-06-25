@@ -176,7 +176,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   colorParaHost: {r: 0, g: 0, b: 1, a: 1}
   colorParaCliente: {r: 1, g: 0, b: 0, a: 1}
-  meshRenderer: {fileID: 0}
+  meshRenderer: {fileID: 4437866803047167648}
 --- !u!114 &6260276935807392875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -284,6 +284,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de5beff0da81a3a4cb09c06cb646939c, type: 3}
+--- !u!23 &4437866803047167648 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1461304994638716399, guid: de5beff0da81a3a4cb09c06cb646939c, type: 3}
+  m_PrefabInstance: {fileID: 6209934478577620145}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5883011717460177754 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: de5beff0da81a3a4cb09c06cb646939c, type: 3}
