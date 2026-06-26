@@ -10,16 +10,12 @@ public class NetworkSpawner : NetworkBehaviour
     [SerializeField] private GameObject prefabEscudo;
     [SerializeField] private GameObject prefab222;
     [SerializeField] private GameObject prefab224;
-    [SerializeField] private GameObject prefab226;
-    [SerializeField] private GameObject prefab228;
-    [SerializeField] private GameObject prefab230;
-    [SerializeField] private GameObject prefab232;
-    [SerializeField] private GameObject prefab234;
+
 
     [Header("Configuración del Spawn")]
     private int cantidadInicialCadaUno = 2;
-    private float radioSpawn = 20f; // Qué tan lejos del centro pueden aparecer
-    private float alturaSpawn = 3f;   // Altura para que floten del suelo
+    private float radioSpawn = 400f; // Qué tan lejos del centro pueden aparecer
+    private float alturaSpawn = 3.5f;   // Altura para que floten del suelo
 
     public override void OnNetworkSpawn()
     {
@@ -57,42 +53,46 @@ public class NetworkSpawner : NetworkBehaviour
             Vector3 posicionAleatoria = GenerarPosicionAleatoria();
             SpawnearObjetoEnRed(prefab224, posicionAleatoria);
         }
-        // Spawneamos los 226
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab226, posicionAleatoria);
-        }
-        // Spawneamos los 228
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab228, posicionAleatoria);
-        }
-        // Spawneamos los 230
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab230, posicionAleatoria);
-        }
-        // Spawneamos los 232
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab232, posicionAleatoria);
-        }
-        // Spawneamos los 234
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab234, posicionAleatoria);
-        }
+        //// Spawneamos los 226
+        //for (int i = 0; i < cantidadInicialCadaUno; i++)
+        //{
+        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
+        //    SpawnearObjetoEnRed(prefab226, posicionAleatoria);
+        //}
+        //// Spawneamos los 228
+        //for (int i = 0; i < cantidadInicialCadaUno; i++)
+        //{
+        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
+        //    SpawnearObjetoEnRed(prefab228, posicionAleatoria);
+        //}
+        //// Spawneamos los 230
+        //for (int i = 0; i < cantidadInicialCadaUno; i++)
+        //{
+        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
+        //    SpawnearObjetoEnRed(prefab230, posicionAleatoria);
+        //}
+        //// Spawneamos los 232
+        //for (int i = 0; i < cantidadInicialCadaUno; i++)
+        //{
+        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
+        //    SpawnearObjetoEnRed(prefab232, posicionAleatoria);
+        //}
+        //// Spawneamos los 234
+        //for (int i = 0; i < cantidadInicialCadaUno; i++)
+        //{
+        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
+        //    SpawnearObjetoEnRed(prefab234, posicionAleatoria);
+        //}
 
     }
 
     private void SpawnearObjetoEnRed(GameObject prefab, Vector3 posicion)
     {
-        //if (prefab == null) return;
+        if (prefab == null)
+        {
+            Debug.LogWarning("[NetworkSpawner] ¡Falta asignar un Prefab en las casillas del Inspector!");
+            return;
+        }
 
         // 1. Instanciamos el objeto de manera tradicional en el Servidor
         GameObject nuevoObjeto = Instantiate(prefab, posicion, Quaternion.identity);
@@ -102,7 +102,6 @@ public class NetworkSpawner : NetworkBehaviour
         {
             netObj.Spawn();
         }
-    
     }
 
     private Vector3 GenerarPosicionAleatoria()

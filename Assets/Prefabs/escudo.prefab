@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3807509264825110286}
   - component: {fileID: 3727787552922584978}
   - component: {fileID: 6425242134372495161}
-  - component: {fileID: 3056658963493360553}
   - component: {fileID: -9031588806774130299}
   - component: {fileID: -7490940643741233859}
+  - component: {fileID: 552446640008745777}
   m_Layer: 0
   m_Name: escudo
   m_TagString: Untagged
@@ -115,20 +115,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3056658963493360553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4300127499077117538}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae28829265c184e43986ddd6c143fe27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Coleccionable
-  cantidadAumentar: 1
-  velocidadRotacion: 100
 --- !u!114 &-9031588806774130299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,7 +134,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -179,5 +165,19 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &552446640008745777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300127499077117538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3377313e7feb3b144870e3a8bbf115e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemRecolectable
+  ShowTopMostFoldoutHeaderGroup: 1
+  tipoDeItem: 1

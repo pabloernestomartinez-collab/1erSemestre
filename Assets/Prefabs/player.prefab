@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 992741822386297471}
   - component: {fileID: 6260276935807392875}
   - component: {fileID: 8705253362401567396}
-  - component: {fileID: 1870372764184254060}
+  - component: {fileID: 3719317557513461924}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -212,7 +212,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   speed: 10
   rotationSpeed: 15
---- !u!114 &1870372764184254060
+--- !u!114 &3719317557513461924
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -221,12 +221,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 6051726233588507955}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3ad0a67919bd694db41b1fa2ce210e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 9dbbfa3089e5d014db031d997ac61413, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerScore
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   ShowTopMostFoldoutHeaderGroup: 1
-  textoEspadasUI: {fileID: 0}
-  textoEscudosUI: {fileID: 0}
+  espadas:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  escudos:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  coleccionable222:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  coleccionable224:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!1001 &6209934478577620145
 PrefabInstance:
   m_ObjectHideFlags: 0
