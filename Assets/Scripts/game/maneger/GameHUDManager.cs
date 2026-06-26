@@ -64,8 +64,8 @@ public class GameHUDManager : NetworkBehaviour
         // Actualizamos los strings usando el .Value de las NetworkVariables del jugador
         if (textoEspadas != null) textoEspadas.text = "Espadas: " + jugadorLocalStats.espadas.Value;
         if (textoEscudos != null) textoEscudos.text = "Escudos: " + jugadorLocalStats.escudos.Value;
-        if (texto222 != null) texto222.text = "222: " + jugadorLocalStats.coleccionable222.Value;
-        if (texto224 != null) texto224.text = "224: " + jugadorLocalStats.coleccionable224.Value;
+        if (texto222 != null) texto222.text = "Diamante: " + jugadorLocalStats.coleccionable222.Value;
+        if (texto224 != null) texto224.text = "Anillo: " + jugadorLocalStats.coleccionable224.Value;
     }
 
     public override void OnNetworkDespawn()

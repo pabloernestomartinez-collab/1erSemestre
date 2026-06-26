@@ -1,115 +1,45 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 public class NetworkSpawner : NetworkBehaviour
 {
-    [Header("Prefabs de Red")]
-    [SerializeField] private GameObject prefabEspada;
-    [SerializeField] private GameObject prefabEscudo;
-    [SerializeField] private GameObject prefab222;
-    [SerializeField] private GameObject prefab224;
+    [SerializeField] private GameObject[] prefabsItems;
+    [SerializeField] private float radioSpawn = 400f;
+    [SerializeField] private int cantidadA_Spawnear = 50;
 
-
-    [Header("Configuración del Spawn")]
-    private int cantidadInicialCadaUno = 2;
-    private float radioSpawn = 400f; // Qué tan lejos del centro pueden aparecer
-    private float alturaSpawn = 3.5f;   // Altura para que floten del suelo
-
+    // 🔥 CAMBIO CRÍTICO: Usamos OnNetworkSpawn para que se ejecute en el momento exacto de la red
     public override void OnNetworkSpawn()
     {
-        // Los clientes ignoran este script por completo.
+        // REGLA DE ORO: Solo el servidor/host calcula y distribuye los objetos
         if (!IsServer) return;
 
-        SpawnearObjetosIniciales();
+        SpawnearMundo();
     }
 
-    private void SpawnearObjetosIniciales()
+    private void SpawnearMundo()
     {
-        // Spawneamos las espadas
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
+        for (int i = 0; i < cantidadA_Spawnear; i++)
         {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefabEspada, posicionAleatoria);
-        }
+            // Elegimos un ítem al azar de la lista
+            GameObject prefabElegido = prefabsItems[Random.Range(0, prefabsItems.Length)];
 
-        // Spawneamos los escudos
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefabEscudo, posicionAleatoria);
-        }
+            if (prefabElegido == null) continue;
 
-        // Spawneamos los 222
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab222, posicionAleatoria);
-        }
-        // Spawneamos los 224
-        for (int i = 0; i < cantidadInicialCadaUno; i++)
-        {
-            Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-            SpawnearObjetoEnRed(prefab224, posicionAleatoria);
-        }
-        //// Spawneamos los 226
-        //for (int i = 0; i < cantidadInicialCadaUno; i++)
-        //{
-        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-        //    SpawnearObjetoEnRed(prefab226, posicionAleatoria);
-        //}
-        //// Spawneamos los 228
-        //for (int i = 0; i < cantidadInicialCadaUno; i++)
-        //{
-        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-        //    SpawnearObjetoEnRed(prefab228, posicionAleatoria);
-        //}
-        //// Spawneamos los 230
-        //for (int i = 0; i < cantidadInicialCadaUno; i++)
-        //{
-        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-        //    SpawnearObjetoEnRed(prefab230, posicionAleatoria);
-        //}
-        //// Spawneamos los 232
-        //for (int i = 0; i < cantidadInicialCadaUno; i++)
-        //{
-        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-        //    SpawnearObjetoEnRed(prefab232, posicionAleatoria);
-        //}
-        //// Spawneamos los 234
-        //for (int i = 0; i < cantidadInicialCadaUno; i++)
-        //{
-        //    Vector3 posicionAleatoria = GenerarPosicionAleatoria();
-        //    SpawnearObjetoEnRed(prefab234, posicionAleatoria);
-        //}
+            // Calculamos posición aleatoria en tu mapa gigante
+            Vector3 posicionAleatoria = new Vector3(
+                Random.Range(-radioSpawn, radioSpawn),
+                0.5f, // Altura para que no atraviese el suelo
+                Random.Range(-radioSpawn, radioSpawn)
+            );
 
-    }
+            // Instanciamos en el servidor
+            GameObject nuevoItem = Instantiate(prefabElegido, posicionAleatoria, Quaternion.identity);
 
-    private void SpawnearObjetoEnRed(GameObject prefab, Vector3 posicion)
-    {
-        if (prefab == null)
-        {
-            Debug.LogWarning("[NetworkSpawner] ¡Falta asignar un Prefab en las casillas del Inspector!");
-            return;
-        }
-
-        // 1. Instanciamos el objeto de manera tradicional en el Servidor
-        GameObject nuevoObjeto = Instantiate(prefab, posicion, Quaternion.identity);
-
-        // 2. Le pedimos su componente NetworkObject
-        if (nuevoObjeto.TryGetComponent<NetworkObject>(out NetworkObject netObj))
-        {
-            netObj.Spawn();
+            // Le indicamos a la red que este objeto debe aparecer en las pantallas de todos los clientes
+            if (nuevoItem.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+            {
+                netObj.Spawn();
+            }
         }
     }
-
-    private Vector3 GenerarPosicionAleatoria()
-    {
-        // Genera un punto aleatorio en un círculo alrededor del centro del mapa (0,0,0)
-        Vector2 puntoCirculo = Random.insideUnitCircle * radioSpawn;
-        return new Vector3(puntoCirculo.x, alturaSpawn, puntoCirculo.y);
-    }
-
-
 }

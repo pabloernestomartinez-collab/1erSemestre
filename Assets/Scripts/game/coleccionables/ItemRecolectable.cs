@@ -8,7 +8,6 @@ public class ItemRecolectable : NetworkBehaviour
     [Header("Configuración del Item")]
     [SerializeField] private TipoItem tipoDeItem;
 
-    // 💥 CAMBIO CLAVE: Cambiamos a OnCollisionEnter para colisiones sólidas
     private void OnCollisionEnter(Collision collision)
     {
         // REGLA DE ORO: Solo el servidor procesa la recolección
