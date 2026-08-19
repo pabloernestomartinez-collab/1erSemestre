@@ -183,7 +183,7 @@ public class Lobby : MonoBehaviour
             if (NetworkManager.Singleton.IsServer)
             {
                 GUILayout.Label("Esperando a que el cliente se conecte...");
-                if (jugadoresConectados >= 2)
+                if (jugadoresConectados >= 1)
                 {
                     if (GUILayout.Button("¡EMPEZAR JUEGO!"))
                     {
