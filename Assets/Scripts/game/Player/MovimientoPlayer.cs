@@ -2,19 +2,19 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
 public class MovimientoPlayer : NetworkBehaviour
 {
     [Header("Configuración de Movimiento")]
-    public float speed = 10f;
-    public float rotationSpeed = 15f;
+    [SerializeField] private float speed = 10f;
 
     private Rigidbody rb;
     private Transform mainCameraTransform;
 
     public override void OnNetworkSpawn()
     {
-        // Vinculamos el Rigidbody para que funcione en Servidor y Clientes
         rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
         if (IsOwner)
         {
@@ -32,37 +32,48 @@ public class MovimientoPlayer : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner) return; // Candado de red[cite: 2]
+        if (!IsOwner) return; // Candado de red
 
-        // Re-capturar la cámara de Unity automáticamente si cambiamos de escena
+        // Re-capturar la cámara si cambiamos de escena
         if (mainCameraTransform == null && UnityEngine.Camera.main != null)
         {
             BuscarCamara();
         }
 
-        // 1. LEER INPUTS[cite: 2]
+        if (rb == null || mainCameraTransform == null) return;
+
+        RotarHaciaMouse();
+    }
+
+    void FixedUpdate()
+    {
+        if (!IsOwner) return; // Las físicas se procesan preferentemente en FixedUpdate
+
+        MoverJugador();
+    }
+
+    private void MoverJugador()
+    {
         float moveX = 0f;
         float moveZ = 0f;
 
-        if (Gamepad.current != null)
+        // Soporte para Teclado (Nuevo Input System)
+        if (Keyboard.current.wKey.isPressed) moveZ = 1f;
+        if (Keyboard.current.sKey.isPressed) moveZ = -1f;
+        if (Keyboard.current.aKey.isPressed) moveX = -1f;
+        if (Keyboard.current.dKey.isPressed) moveX = 1f;
+
+        // Soporte secundario opcional para Gamepad
+        if (Gamepad.current != null && moveX == 0f && moveZ == 0f)
         {
             Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
             moveX = leftStick.x;
             moveZ = leftStick.y;
         }
-        else
-        {
-            if (Keyboard.current.wKey.isPressed) moveZ = 1f; //[cite: 2]
-            if (Keyboard.current.sKey.isPressed) moveZ = -1f; //[cite: 2]
-            if (Keyboard.current.aKey.isPressed) moveX = -1f; //[cite: 2]
-            if (Keyboard.current.dKey.isPressed) moveX = 1f; //[cite: 2]
-        }
 
-        if (rb == null || mainCameraTransform == null) return;
-
-        // 2. CALCULAR VECTORES RESPECTO A LA PERSPECTIVA DE LA CÁMARA
+        // Calcular dirección con base en la cámara (aplanando el eje Y)
         Vector3 camForward = mainCameraTransform.forward;
-        camForward.y = 0f; // Aplanamos el vector al suelo
+        camForward.y = 0f;
         camForward = camForward.normalized;
 
         Vector3 camRight = mainCameraTransform.right;
@@ -71,14 +82,34 @@ public class MovimientoPlayer : NetworkBehaviour
 
         Vector3 moveDirection = (camForward * moveZ + camRight * moveX).normalized;
 
-        // 3. ROTACIÓN SUAVE INDEPENDIENTE 
-        if (moveDirection.magnitude >= 0.1f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
+        // Aplicar la velocidad en el Rigidbody de forma limpia manteniendo la gravedad actual
+        rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
+    }
 
-        // 4. APLICAR VELOCIDAD FÍSICA[cite: 2]
-        rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed); //[cite: 2]
+    private void RotarHaciaMouse()
+    {
+        // Creamos un rayo desde la posición del mouse en pantalla hacia el mundo 3D
+        Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+        // Creamos un plano matemático invisible a la altura de los pies del jugador (Y = posición actual)
+        // Esto garantiza que el cálculo sea perfectamente plano en el suelo
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0, transform.position.y, 0));
+
+        // Lanzamos el rayo al plano para ver dónde impacta
+        if (groundPlane.Raycast(ray, out float rayDistance))
+        {
+            // Conseguimos el punto exacto del impacto en el mundo 3D
+            Vector3 pointToLook = ray.GetPoint(rayDistance);
+
+            // Calculamos la dirección desde el jugador hacia ese punto del mouse
+            Vector3 lookDirection = pointToLook - transform.position;
+            lookDirection.y = 0f; // Nos aseguramos de que no intente mirar hacia arriba o abajo
+
+            // Si la distancia es prudente, aplicamos la rotación instantánea y firme
+            if (lookDirection.magnitude > 0.1f)
+            {
+                transform.rotation = Quaternion.LookRotation(lookDirection);
+            }
+        }
     }
 }

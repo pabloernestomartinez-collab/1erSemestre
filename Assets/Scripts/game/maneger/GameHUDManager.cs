@@ -8,11 +8,12 @@ public class GameHUDManager : NetworkBehaviour
 {
     public static GameHUDManager Instance { get; private set; }
 
-    [Header("Textos del Canvas (Asignar en Inspector)")]
-    [SerializeField] private TextMeshProUGUI textoEspadas;
-    [SerializeField] private TextMeshProUGUI textoEscudos;
-    [SerializeField] private TextMeshProUGUI texto222;
-    [SerializeField] private TextMeshProUGUI texto224;
+    [Header("Textos del Canvas")] //respetar el orden: Hierro, Madera, Fuego, Agua, Piedra
+    [SerializeField] private TextMeshProUGUI hierro;
+    [SerializeField] private TextMeshProUGUI madera;
+    [SerializeField] private TextMeshProUGUI fuego;
+    [SerializeField] private TextMeshProUGUI agua;
+    [SerializeField] private TextMeshProUGUI piedra;
 
     private PlayerStats jugadorLocalStats;
 
@@ -62,10 +63,11 @@ public class GameHUDManager : NetworkBehaviour
         if (jugadorLocalStats == null) return;
 
         // Actualizamos los strings usando el .Value de las NetworkVariables del jugador
-        if (textoEspadas != null) textoEspadas.text = "Espadas: " + jugadorLocalStats.espadas.Value;
-        if (textoEscudos != null) textoEscudos.text = "Escudos: " + jugadorLocalStats.escudos.Value;
-        if (texto222 != null) texto222.text = "Diamante: " + jugadorLocalStats.coleccionable222.Value;
-        if (texto224 != null) texto224.text = "Anillo: " + jugadorLocalStats.coleccionable224.Value;
+        if (hierro != null) hierro.text = "Hierro: " + jugadorLocalStats.hierro.Value;
+        if (madera != null) madera.text = "Madera: " + jugadorLocalStats.madera.Value;
+        if (fuego != null) fuego.text = "Fuego: " + jugadorLocalStats.fuego.Value;
+        if (agua != null) agua.text = "Agua: " + jugadorLocalStats.agua.Value;
+        if (agua != null) piedra.text = "Piedra: " + jugadorLocalStats.piedra.Value;
     }
 
     public override void OnNetworkDespawn()

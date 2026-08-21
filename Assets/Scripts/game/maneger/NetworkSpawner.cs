@@ -7,10 +7,8 @@ public class NetworkSpawner : NetworkBehaviour
     [SerializeField] private float radioSpawn = 400f;
     [SerializeField] private int cantidadA_Spawnear = 50;
 
-    // 🔥 CAMBIO CRÍTICO: Usamos OnNetworkSpawn para que se ejecute en el momento exacto de la red
     public override void OnNetworkSpawn()
     {
-        // REGLA DE ORO: Solo el servidor/host calcula y distribuye los objetos
         if (!IsServer) return;
 
         SpawnearMundo();

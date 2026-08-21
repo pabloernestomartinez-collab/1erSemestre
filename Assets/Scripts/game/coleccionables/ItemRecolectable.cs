@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ItemRecolectable : NetworkBehaviour
 {
-    public enum TipoItem { Espada, Escudo, Coleccionable222, Coleccionable224 }
+    public enum TipoItem { Hierro, Madera, Fuego, Agua, Piedra }//espada=hierro+fuego+agua escudo=madera+piedra
 
     [Header("Configuración del Item")]
     [SerializeField] private TipoItem tipoDeItem;
@@ -23,10 +23,11 @@ public class ItemRecolectable : NetworkBehaviour
                 // Según el tipo de ítem asignado en el Inspector, llamamos a su función
                 switch (tipoDeItem)
                 {
-                    case TipoItem.Espada: stats.SumarEspada(); break;
-                    case TipoItem.Escudo: stats.SumarEscudo(); break;
-                    case TipoItem.Coleccionable222: stats.Sumar222(); break;
-                    case TipoItem.Coleccionable224: stats.Sumar224(); break;
+                    case TipoItem.Hierro: stats.SumarHierro(); break;
+                    case TipoItem.Madera: stats.SumarMadera(); break;
+                    case TipoItem.Fuego: stats.SumarFuego(); break;
+                    case TipoItem.Agua: stats.SumarAgua(); break;
+                    case TipoItem.Piedra: stats.SumarPiedra(); break;
                 }
 
                 // Despawn de red: desaparece para todos de forma sincronizada
