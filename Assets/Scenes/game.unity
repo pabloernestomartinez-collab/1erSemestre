@@ -24447,7 +24447,7 @@ GameObject:
   - component: {fileID: 2105589487}
   - component: {fileID: 2105589491}
   - component: {fileID: 2105589490}
-  - component: {fileID: 2105589489}
+  - component: {fileID: 2105589492}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -24508,27 +24508,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &2105589489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105589485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16c192497a75f834899b55674dbe384d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkSpawner
-  ShowTopMostFoldoutHeaderGroup: 1
-  prefabsItems:
-  - {fileID: 7127258190469279219, guid: a086ca3ba8b90a44db2a2af80a76b15d, type: 3}
-  - {fileID: 8480568173484095108, guid: 5dc15daea88f7514888a695136dbc7e9, type: 3}
-  - {fileID: 9000417840585919517, guid: d7716abb40611634aa99ce8f42dfd4ac, type: 3}
-  - {fileID: 8660362679045949711, guid: 28c7ca2846af0c74991daf8afe15e7a5, type: 3}
-  - {fileID: 4300127499077117538, guid: 01e0adc387bf14a45b1da43ec2bb0b82, type: 3}
-  radioSpawn: 100
-  cantidadA_Spawnear: 50
 --- !u!114 &2105589490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24564,6 +24543,27 @@ MonoBehaviour:
   - {fileID: 493531820}
   - {fileID: 99490591}
   - {fileID: 1127528121}
+--- !u!114 &2105589492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105589485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c192497a75f834899b55674dbe384d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  prefabsItems:
+  - {fileID: 7127258190469279219, guid: a086ca3ba8b90a44db2a2af80a76b15d, type: 3}
+  - {fileID: 8480568173484095108, guid: 5dc15daea88f7514888a695136dbc7e9, type: 3}
+  - {fileID: 9000417840585919517, guid: d7716abb40611634aa99ce8f42dfd4ac, type: 3}
+  - {fileID: 8660362679045949711, guid: 28c7ca2846af0c74991daf8afe15e7a5, type: 3}
+  - {fileID: 4300127499077117538, guid: 01e0adc387bf14a45b1da43ec2bb0b82, type: 3}
+  radioSpawn: 400
+  cantidadA_Spawnear: 100
 --- !u!1 &2106098670
 GameObject:
   m_ObjectHideFlags: 0

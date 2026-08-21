@@ -1,5 +1,5 @@
 using Unity.Netcode;
-using UnityEngine;
+//using UnityEngine;
 using System;
 
 public class PlayerStats : NetworkBehaviour
@@ -28,6 +28,6 @@ public class PlayerStats : NetworkBehaviour
     public void SumarHierro() { if (IsServer) hierro.Value++; }
     public void SumarMadera() { if (IsServer) madera.Value++; }
     public void SumarFuego() { if (IsServer) fuego.Value++; }
-    public void SumarAgua() { if (IsServer) piedra.Value++; }
+    public void SumarAgua() { if (IsServer) agua.Value++; }
     public void SumarPiedra() { if (IsServer) piedra.Value++; }
 }

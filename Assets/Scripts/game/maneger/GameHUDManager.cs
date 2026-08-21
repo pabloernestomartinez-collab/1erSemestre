@@ -67,7 +67,7 @@ public class GameHUDManager : NetworkBehaviour
         if (madera != null) madera.text = "Madera: " + jugadorLocalStats.madera.Value;
         if (fuego != null) fuego.text = "Fuego: " + jugadorLocalStats.fuego.Value;
         if (agua != null) agua.text = "Agua: " + jugadorLocalStats.agua.Value;
-        if (agua != null) piedra.text = "Piedra: " + jugadorLocalStats.piedra.Value;
+        if (piedra != null) piedra.text = "Piedra: " + jugadorLocalStats.piedra.Value;
     }
 
     public override void OnNetworkDespawn()

@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemRecolectable
   ShowTopMostFoldoutHeaderGroup: 1
-  tipoDeItem: 3
+  tipoDeItem: 0
 --- !u!114 &-7703455450300634878
 MonoBehaviour:
   m_ObjectHideFlags: 0

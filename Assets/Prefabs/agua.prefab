@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: -1930683545059903030}
   - component: {fileID: -2033328717001751357}
   - component: {fileID: -2592904201646116304}
-  - component: {fileID: 6749675477793365753}
   - component: {fileID: 4230447367694913598}
   m_Layer: 0
   m_Name: agua
@@ -184,21 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemRecolectable
   ShowTopMostFoldoutHeaderGroup: 1
-  tipoDeItem: 2
---- !u!114 &6749675477793365753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7127258190469279219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3377313e7feb3b144870e3a8bbf115e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemRecolectable
-  ShowTopMostFoldoutHeaderGroup: 1
-  tipoDeItem: 0
+  tipoDeItem: 3
 --- !u!114 &4230447367694913598
 MonoBehaviour:
   m_ObjectHideFlags: 0
