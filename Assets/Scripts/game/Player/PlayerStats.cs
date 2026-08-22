@@ -1,33 +1,79 @@
-using Unity.Netcode;
-//using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine; 
 using System;
 
 public class PlayerStats : NetworkBehaviour
 {
-    // Usamos NetworkVariable para que Netcode sincronice los datos autom�ticamente
+    [Header("Configuración de Vida")]
+    [SerializeField] private int vidaMaxima = 100;
+
+    public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
+
+    [Header("Recursos Sincronizados")]
     public NetworkVariable<int> hierro = new NetworkVariable<int>(0);
     public NetworkVariable<int> madera = new NetworkVariable<int>(0);
     public NetworkVariable<int> fuego = new NetworkVariable<int>(0);
     public NetworkVariable<int> agua = new NetworkVariable<int>(0);
     public NetworkVariable<int> piedra = new NetworkVariable<int>(0);
 
-    // Evento para avisarle a la UI que un valor cambi� sin usar el Update
-    public Action OnStatsChanged;
+    public Action OnStatsChanged;    // Evento para avisarle a la UI que un valor cambió sin usar el Update
+
 
     public override void OnNetworkSpawn()
     {
-        // Nos suscribimos a los cambios de red de cada variable
+        if (IsServer)
+        {
+            vidaActual.Value = vidaMaxima;
+        }
+
+        // Nos suscribimos a los cambios de red de cada variable (incluyendo la vida)
+        vidaActual.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         hierro.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         madera.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         fuego.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         agua.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         piedra.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+
+        // Disparamos un aviso inicial para que la UI dibuje los valores correctos al nacer
+        OnStatsChanged?.Invoke();
     }
 
-    // M�todos p�blicos que SOLO el servidor puede ejecutar para sumar de forma segura
+    
+
+    public void RecibirDanio(int cantidadDanio)
+    {
+        if (!IsServer) return;
+
+        // Restamos vida de forma segura en el servidor
+        vidaActual.Value -= cantidadDanio;
+
+        Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} recibió {cantidadDanio} de daño. Vida restante: {vidaActual.Value}");
+
+        // Comprobamos si el jugador murió
+        if (vidaActual.Value <= 0)
+        {
+            Morir();
+        }
+    }
+
+    private void Morir()
+    {
+        //Debug.Log($"💀 [SERVIDOR] Jugador {OwnerClientId} ha muerto.");
+
+        vidaActual.Value = vidaMaxima;        // Lógica de muerte temporal: revivir con la vida al máximo
+
+    }
+
+    // =========================================================================
+    // MÉTODOS DE RECURSOS (SOLO SERVIDOR)
+    // =========================================================================
+
     public void SumarHierro() { if (IsServer) hierro.Value++; }
     public void SumarMadera() { if (IsServer) madera.Value++; }
     public void SumarFuego() { if (IsServer) fuego.Value++; }
     public void SumarAgua() { if (IsServer) agua.Value++; }
     public void SumarPiedra() { if (IsServer) piedra.Value++; }
+
+    // Getter público para que la UI pueda saber cuál es la vida máxima si la necesita
+    public int GetVidaMaxima() => vidaMaxima;
 }

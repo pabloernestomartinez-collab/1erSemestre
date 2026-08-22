@@ -14,12 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemigosData
   _EnemigoNombre: rata
   _EnemigoDescripcion: "enemigo de mucha cantidad pero bajo da\xF1o"
-  _efe3: 
-  _efe4: 
-  _EnemigoVelocidad: 5
-  _EnemigoAtaque: 1
+  _EnemigoVelocidad: 4
+  _EnemigoAtaque: 6
   _EnemigoDefensa: 1
-  _EnemmigoCantidad: 50
-  _GreenFlag: 0
-  _YellowFlag: 0
-  _RedFlag: 0
+  _emelee: 1
+  _distancia: 0

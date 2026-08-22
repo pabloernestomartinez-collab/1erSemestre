@@ -12,14 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd982bc2766ec774b8855a9443197e8f, type: 3}
   m_Name: Enemigo2
   m_EditorClassIdentifier: Assembly-CSharp::enemigosData
-  _EnemigoNombre: 
-  _EnemigoDescripcion: 
-  _efe3: 
-  _efe4: 
-  _EnemigoVelocidad: 0
-  _EnemigoAtaque: 0
-  _EnemigoDefensa: 0
-  _EnemmigoCantidad: 0
-  _GreenFlag: 0
-  _YellowFlag: 0
-  _RedFlag: 0
+  _EnemigoNombre: Enemigo2
+  _EnemigoDescripcion: tiene ataque a distancia
+  _EnemigoVelocidad: 8
+  _EnemigoAtaque: 4
+  _EnemigoDefensa: 6
+  _emelee: 0
+  _distancia: 1

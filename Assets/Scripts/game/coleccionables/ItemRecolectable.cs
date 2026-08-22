@@ -10,10 +10,8 @@ public class ItemRecolectable : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // REGLA DE ORO: Solo el servidor procesa la recolección
         if (!IsServer) return;
 
-        // Comprobamos si lo que nos chocó es un jugador usando collision.gameObject
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerStats stats = collision.gameObject.GetComponent<PlayerStats>();

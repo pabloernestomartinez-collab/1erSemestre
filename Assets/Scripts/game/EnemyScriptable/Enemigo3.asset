@@ -12,14 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd982bc2766ec774b8855a9443197e8f, type: 3}
   m_Name: Enemigo3
   m_EditorClassIdentifier: Assembly-CSharp::enemigosData
-  _EnemigoNombre: 
-  _EnemigoDescripcion: 
-  _efe3: 
-  _efe4: 
-  _EnemigoVelocidad: 0
-  _EnemigoAtaque: 0
-  _EnemigoDefensa: 0
-  _EnemmigoCantidad: 0
-  _GreenFlag: 0
-  _YellowFlag: 0
-  _RedFlag: 0
+  _EnemigoNombre: Boss
+  _EnemigoDescripcion: ultimo y mas dificil enemigo
+  _EnemigoVelocidad: 12
+  _EnemigoAtaque: 2
+  _EnemigoDefensa: 9
+  _emelee: 1
+  _distancia: 1

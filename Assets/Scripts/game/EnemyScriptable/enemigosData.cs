@@ -4,29 +4,18 @@ public class enemigosData : ScriptableObject //plantilla para cargar los datos d
 {
     [SerializeField] private string _EnemigoNombre;
     [SerializeField] private string _EnemigoDescripcion;
-    [SerializeField] private string _efe3;
-    [SerializeField] private string _efe4;
-    [SerializeField] private int _EnemigoVelocidad;
-    [SerializeField] private int _EnemigoAtaque;
-    [SerializeField] private int _EnemigoDefensa;
-    [SerializeField] private int _EnemmigoCantidad;
-    [SerializeField] private bool _GreenFlag;
-    [SerializeField] private bool _YellowFlag;
-    [SerializeField] private bool _RedFlag;
+    [SerializeField] private float _EnemigoVelocidad;
+    [SerializeField] private int _EnemigoAtaque;//cantidad de golpes que mata al player
+    [SerializeField] private int _EnemigoDefensa;// cantida de golpes que recibe para morir
+    [SerializeField] private bool _emelee;
+    [SerializeField] private bool _distancia;
 
 
     public string EnemigoNombre { get { return _EnemigoNombre; } }
     public string EnemigoDescripcion { get { return _EnemigoDescripcion; } }
-    public string efe3 { get { return _efe3; } }
-    public string efe4 { get { return _efe4; } }
-    public int EnemigoVelocidad { get { return _EnemigoVelocidad; } }
-    public int EnemigoVeAtaque { get { return _EnemigoAtaque; } }
+    public float EnemigoVelocidad { get { return _EnemigoVelocidad; } }
+    public int EnemigoAtaque { get { return _EnemigoAtaque; } }
     public int EnemigoDefensa { get { return _EnemigoDefensa; } }
-    public int EnemmigoCantidad { get { return _EnemmigoCantidad; } }
-    public bool GreenFlag { get { return _GreenFlag; } }
-    public bool YellowFlag { get { return _YellowFlag; } }
-    public bool RedFlag { get { return _RedFlag; } }
-
-
-
+    public bool Emelee { get { return _emelee; } }
+    public bool Distancia { get { return _distancia; } }
 }
