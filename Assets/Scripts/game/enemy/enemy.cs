@@ -78,7 +78,9 @@ public class enemy : NetworkBehaviour
     private void EjecutarAtaqueADistancia()
     {
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
-
+        
+        //***************************** PARA * HACER **************************
+        
         // AQUÍ INSTANCIARÁS TU PREFAB DE FLECHA/HECHIZO EN EL SERVIDOR:
         // GameObject proyectil = Instantiate(prefabProyectil, puntoDisparo.position, Quaternion.identity);
         // proyectil.GetComponent<NetworkObject>().Spawn();
@@ -88,7 +90,7 @@ public class enemy : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Si un jugador entra en el área de detección lo fijamos como presa
+        // if entra en el area de detección lo sigo
         if (other.CompareTag("Player") && jugadorObjetivo == null)
         {
             jugadorObjetivo = other.transform;
@@ -99,7 +101,7 @@ public class enemy : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Si el jugador que estábamos persiguiendo sale del rango el enemigo pierde el interés
+        // if sale del rango el enemigo pierde el interés
         if (other.CompareTag("Player") && other.transform == jugadorObjetivo)
         {
             jugadorObjetivo = null;

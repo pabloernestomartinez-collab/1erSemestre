@@ -23181,7 +23181,6 @@ MonoBehaviour:
   prefabEnemigo2: {fileID: 5775010041132503760, guid: cb62facbc6af81b4780846836366c14b, type: 3}
   prefabEnemigo3: {fileID: 8927045118803338925, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
   radioSpawn: 400
-  cantidadPorOleada: 10
   alturaSpawn: 1
 --- !u!65 &2112219970
 BoxCollider:
@@ -23451,7 +23450,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1808078013112415873, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.035
+      value: -0.0301
       objectReference: {fileID: 0}
     - target: {fileID: -1321194169844683221, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x

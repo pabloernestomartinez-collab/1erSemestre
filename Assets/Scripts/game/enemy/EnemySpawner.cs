@@ -8,7 +8,7 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] private GameObject prefabEnemigo1;
     [SerializeField] private GameObject prefabEnemigo2;
     [SerializeField] private GameObject prefabEnemigo3;
-    [Header("Configuración del Área y Cantidad")]
+    [Header("Configuración del Área")]
     [SerializeField] private float radioSpawn = 400f;
     [SerializeField] private float alturaSpawn = 1f;
 

@@ -58,7 +58,6 @@ public class PlayerStats : NetworkBehaviour
 
     private void Morir()
     {
-        //Debug.Log($"💀 [SERVIDOR] Jugador {OwnerClientId} ha muerto.");
 
         vidaActual.Value = vidaMaxima;        // Lógica de muerte temporal: revivir con la vida al máximo
 
