@@ -34,8 +34,8 @@ public class PlayerStats : NetworkBehaviour
         agua.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         piedra.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
 
-        // Disparamos un aviso inicial para que la UI dibuje los valores correctos al nacer
-        OnStatsChanged?.Invoke();
+        OnStatsChanged?.Invoke();        // Disparamos un aviso inicial para que la UI dibuje los valores correctos al nacer
+
     }
 
     
@@ -44,8 +44,8 @@ public class PlayerStats : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Restamos vida de forma segura en el servidor
-        vidaActual.Value -= cantidadDanio;
+        vidaActual.Value -= cantidadDanio;        // Restamos vida de forma segura en el servidor
+
 
         Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} recibió {cantidadDanio} de daño. Vida restante: {vidaActual.Value}");
 
@@ -59,13 +59,10 @@ public class PlayerStats : NetworkBehaviour
     private void Morir()
     {
 
-        vidaActual.Value = vidaMaxima;        // Lógica de muerte temporal: revivir con la vida al máximo
+        vidaActual.Value = vidaMaxima;        //  revivir con la vida al máximo hasta saber que tengo que hacer con la programacion
 
     }
 
-    // =========================================================================
-    // MÉTODOS DE RECURSOS (SOLO SERVIDOR)
-    // =========================================================================
 
     public void SumarHierro() { if (IsServer) hierro.Value++; }
     public void SumarMadera() { if (IsServer) madera.Value++; }

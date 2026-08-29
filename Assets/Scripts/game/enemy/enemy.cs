@@ -7,6 +7,10 @@ public class enemy : NetworkBehaviour
     [Header("Configuración Base")]
     [SerializeField] private enemigosData enemigosData;
 
+    [Header("Referencias de Ataque a Distancia")]
+    [SerializeField] private GameObject prefabProyectil; // El prefab de la bola de fuego
+    [SerializeField] private Transform puntoDisparo;    // arma del enemigo
+
     [Header("Rangos de Ataque (Opcionales para ajustar)")]
     [SerializeField] private float rangoMelee = 2f;
     [SerializeField] private float rangoDistancia = 15f;
@@ -19,7 +23,6 @@ public class enemy : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         agente = GetComponent<NavMeshAgent>();
-
 
         // Configuramos la velocidad del enemigo usando los datos de nuestro scriptable
         if (agente != null)
@@ -36,14 +39,12 @@ public class enemy : NetworkBehaviour
 
     void Update()
     {
-        if (!IsServer) return; 
+        if (!IsServer) return;
 
         if (jugadorObjetivo == null || agente == null || !agente.enabled) return;
 
-        
         agente.SetDestination(jugadorObjetivo.position);// Persecución: Actualizamos la posición del jugador objetivo
 
-        
         float distanciaAlJugador = Vector3.Distance(transform.position, jugadorObjetivo.position);// Ataques distancia
 
         if (Time.time >= tiempoSiguienteAtaque)
@@ -65,12 +66,9 @@ public class enemy : NetworkBehaviour
     {
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
 
-        // Buscamos el componente de vida en el jugador que estamos persiguiendo
         PlayerStats stats = jugadorObjetivo.GetComponent<PlayerStats>();
-
         if (stats != null)
         {
-            // El servidor le ordena al jugador restar la fuerza de ataque definida en tu ScriptableObject
             stats.RecibirDanio(enemigosData.EnemigoAtaque);
         }
     }
@@ -78,21 +76,29 @@ public class enemy : NetworkBehaviour
     private void EjecutarAtaqueADistancia()
     {
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
+        Vector3 direccionHaciaJugador = (jugadorObjetivo.position - puntoDisparo.position).normalized;
+        Quaternion rotacionHaciaJugador = Quaternion.LookRotation(direccionHaciaJugador);
 
-        //***************************** PARA * HACER **************************
+        GameObject proyectilInstance = Instantiate(prefabProyectil, puntoDisparo.position, rotacionHaciaJugador);        // Instanciamos el proyectil 
 
-        // AQUÍ INSTANCIARÁS TU PREFAB DE FLECHA/HECHIZO EN EL SERVIDOR:
-        // GameObject proyectil = Instantiate(prefabProyectil, puntoDisparo.position, Quaternion.identity);
-        // proyectil.GetComponent<NetworkObject>().Spawn();
 
-        
+        //  daño del ScriptableObject al proyectil para que sepa cuánto sacar al chocar
+        if (proyectilInstance.TryGetComponent<ProyectilEnemigo>(out ProyectilEnemigo scriptProyectil))
+        {
+            scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque);
+        }
+
+        if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))        //  Spawn en red
+
+        {
+            netObj.Spawn();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) return;
 
-        // if entra en el area de detección lo sigo
         if (other.CompareTag("Player") && jugadorObjetivo == null)
         {
             jugadorObjetivo = other.transform;
@@ -103,14 +109,13 @@ public class enemy : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // if sale del rango el enemigo pierde el interés
         if (other.CompareTag("Player") && other.transform == jugadorObjetivo)
         {
             jugadorObjetivo = null;
 
             if (agente != null && agente.enabled)
             {
-                agente.ResetPath(); // Borra la ruta actual para que se detenga inmediatamente
+                agente.ResetPath();
             }
         }
     }

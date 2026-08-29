@@ -114,6 +114,37 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &5175196868428405206
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3569596090574020835}
+  m_Layer: 0
+  m_Name: arma
+  m_TagString: Untagged
+  m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3569596090574020835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5175196868428405206}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.447, z: 1.113}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2364264641448898545}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6003534675939185705
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,6 +352,7 @@ Transform:
   - {fileID: 5855568996826138352}
   - {fileID: 6121158314164270227}
   - {fileID: 1249222204382939010}
+  - {fileID: 3569596090574020835}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6805843399998783214
@@ -457,6 +489,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemy
   ShowTopMostFoldoutHeaderGroup: 1
   enemigosData: {fileID: 11400000, guid: 5b16f4922ae21bc42a07a141598d80c8, type: 2}
+  prefabProyectil: {fileID: 0}
+  puntoDisparo: {fileID: 0}
   rangoMelee: 2
   rangoDistancia: 15
   cooldownAtaque: 1
@@ -472,6 +506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a774e5af94c8b4192fcbfc6aa4d5c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::patrullaje
+  ShowTopMostFoldoutHeaderGroup: 1
   Waypoints:
   - {fileID: 0}
   - {fileID: 0}

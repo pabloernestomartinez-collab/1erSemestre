@@ -23522,6 +23522,14 @@ PrefabInstance:
       propertyPath: 'Waypoints.Array.data[4]'
       value: 
       objectReference: {fileID: 562910009}
+    - target: {fileID: 5189758889424984543, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+      propertyPath: puntoDisparo
+      value: 
+      objectReference: {fileID: 1656246295}
+    - target: {fileID: 5189758889424984543, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+      propertyPath: prefabProyectil
+      value: 
+      objectReference: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
     - target: {fileID: 6805843399998783214, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1264427288
@@ -23535,6 +23543,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+--- !u!4 &1656246295 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3569596090574020835, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+  m_PrefabInstance: {fileID: 1656246294}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1666046803
 GameObject:
   m_ObjectHideFlags: 0

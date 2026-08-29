@@ -28,8 +28,8 @@ public class ItemRecolectable : NetworkBehaviour
                     case TipoItem.Piedra: stats.SumarPiedra(); break;
                 }
 
-                // Despawn de red: desaparece para todos de forma sincronizada
-                GetComponent<NetworkObject>().Despawn();
+                GetComponent<NetworkObject>().Despawn();                // Despawn de red: desaparece para todos de forma sincronizada
+
             }
         }
     }

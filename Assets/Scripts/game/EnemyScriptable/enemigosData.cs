@@ -5,8 +5,8 @@ public class enemigosData : ScriptableObject //plantilla para cargar los datos d
     [SerializeField] private string _EnemigoNombre;
     [SerializeField] private string _EnemigoDescripcion;
     [SerializeField] private float _EnemigoVelocidad;
-    [SerializeField] private int _EnemigoAtaque;//cantidad de golpes que mata al player
-    [SerializeField] private int _EnemigoDefensa;// cantida de golpes que recibe para morir
+    [SerializeField] private int _EnemigoAtaque;//fuerza del golpe que ejecuta el enemy
+    [SerializeField] private int _EnemigoDefensa;//resistencia para morir el enemy
     [SerializeField] private bool _emelee;
     [SerializeField] private bool _distancia;
 

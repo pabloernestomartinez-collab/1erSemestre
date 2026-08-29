@@ -18,20 +18,16 @@ public class NetworkSpawner : NetworkBehaviour
     {
         for (int i = 0; i < cantidadA_Spawnear; i++)
         {
-            // Elegimos un ítem al azar de la lista
-            GameObject prefabElegido = prefabsItems[Random.Range(0, prefabsItems.Length)];
+            GameObject prefabElegido = prefabsItems[Random.Range(0, prefabsItems.Length)]; // Elegimos un ítem al azar de la lista
+
 
             if (prefabElegido == null) continue;
 
-            // Calculamos posición aleatoria en tu mapa gigante
-            Vector3 posicionAleatoria = new Vector3(
-                Random.Range(-radioSpawn, radioSpawn),
-                0.5f, // Altura para que no atraviese el suelo
-                Random.Range(-radioSpawn, radioSpawn)
-            );
+            Vector3 posicionAleatoria = new Vector3(Random.Range(-radioSpawn, radioSpawn),0.5f,Random.Range(-radioSpawn, radioSpawn)); // posición aleatoria 
 
-            // Instanciamos en el servidor
-            GameObject nuevoItem = Instantiate(prefabElegido, posicionAleatoria, Quaternion.identity);
+
+            GameObject nuevoItem = Instantiate(prefabElegido, posicionAleatoria, Quaternion.identity); // Instanciamos en el servidor
+
 
             // Le indicamos a la red que este objeto debe aparecer en las pantallas de todos los clientes
             if (nuevoItem.TryGetComponent<NetworkObject>(out NetworkObject netObj))

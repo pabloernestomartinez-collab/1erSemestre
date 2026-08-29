@@ -11,18 +11,18 @@ public class patrullaje : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        agente = GetComponent<NavMeshAgent>();        // Guardamos el componente de navegación del enemigo
+        agente = GetComponent<NavMeshAgent>(); // Guardamos el componente de navegación del enemigo
 
 
         if (!IsServer) return;
 
-        StartCoroutine(BucleTeletransporte());        // Iniciamos el bucle de teletransporte una SOLA vez al nacer
+        StartCoroutine(BucleTeletransporte()); // Iniciamos el bucle de teletransporte una SOLA vez al nacer
 
     }
 
     private IEnumerator BucleTeletransporte()
     {
-        // Este bucle se ejecutará de forma segura cada 5 segundos durante toda la partida
+        // cada 5 segundos durante toda la partida
         while (true)
         {
             yield return new WaitForSeconds(20f);
