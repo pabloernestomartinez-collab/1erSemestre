@@ -78,12 +78,14 @@ public class enemy : NetworkBehaviour
     private void EjecutarAtaqueADistancia()
     {
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
-        
+
         //***************************** PARA * HACER **************************
-        
+
         // AQUÍ INSTANCIARÁS TU PREFAB DE FLECHA/HECHIZO EN EL SERVIDOR:
         // GameObject proyectil = Instantiate(prefabProyectil, puntoDisparo.position, Quaternion.identity);
         // proyectil.GetComponent<NetworkObject>().Spawn();
+
+        
     }
 
     private void OnTriggerEnter(Collider other)

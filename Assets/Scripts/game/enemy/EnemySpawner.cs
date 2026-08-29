@@ -7,7 +7,7 @@ public class EnemySpawner : NetworkBehaviour
     [Header("Prefabs Individuales de Enemigos")]
     [SerializeField] private GameObject prefabEnemigo1;
     [SerializeField] private GameObject prefabEnemigo2;
-    [SerializeField] private GameObject prefabEnemigo3;
+    //[SerializeField] private GameObject prefabEnemigo3;
     [Header("Configuración del Área")]
     [SerializeField] private float radioSpawn = 400f;
     [SerializeField] private float alturaSpawn = 1f;
@@ -45,17 +45,17 @@ public class EnemySpawner : NetworkBehaviour
             }
         }
 
-        yield return new WaitForSeconds(30f);
+        //yield return new WaitForSeconds(30f);
 
-        for (int i = 0; i < 2; i++)
-        {
-            Vector3 posicionAleatoria = new Vector3(Random.Range(-radioSpawn, radioSpawn),alturaSpawn,Random.Range(-radioSpawn, radioSpawn));
-            Quaternion rotacionAleatoria = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-            GameObject nuevoEnemigo = Instantiate(prefabEnemigo3, posicionAleatoria, rotacionAleatoria);
-            if (nuevoEnemigo.TryGetComponent<NetworkObject>(out NetworkObject netObj))
-            {
-                netObj.Spawn();
-            }
-        }
+        ////for (int i = 0; i < 2; i++)
+        ////{
+        //    Vector3 posicionAleatoria = new Vector3(Random.Range(-radioSpawn, radioSpawn),alturaSpawn,Random.Range(-radioSpawn, radioSpawn));
+        //    Quaternion rotacionAleatoria = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        //    GameObject nuevoEnemigo = Instantiate(prefabEnemigo3, posicionAleatoria, rotacionAleatoria);
+        //    if (nuevoEnemigo.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+        //    {
+        //        netObj.Spawn();
+        //    }
+        ////}
     }
 }
