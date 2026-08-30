@@ -7,6 +7,13 @@ public class PlayerStats : NetworkBehaviour
     [Header("Configuración de Vida")]
     [SerializeField] private int vidaMaxima = 100;
 
+    [Header("Configuración de Combate")]
+    [SerializeField] private int danioMeleeJugador = 25; // Daño que inflige el jugador
+
+    public int GetDanioMelee() => danioMeleeJugador;    // Método público (Getter) para que el script de ataque pueda leer este daño
+
+
+
     public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
 
     [Header("Recursos Sincronizados")]

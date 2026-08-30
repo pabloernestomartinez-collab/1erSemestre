@@ -1,4 +1,4 @@
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 public class ProyectilEnemigo : NetworkBehaviour
@@ -10,7 +10,7 @@ public class ProyectilEnemigo : NetworkBehaviour
 
     public void ConfigurarProyectil(int danio)
     {
-        danioProyectil = danio; // El script del enemigo le inyecta el da�o aqu� al nacer
+        danioProyectil = danio; // El script del enemigo le inyecta el daño aquí al nacer
 
     }
 
@@ -29,21 +29,28 @@ public class ProyectilEnemigo : NetworkBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
         if (!IsServer) return;
 
+        GameObject objetoChocado = collision.gameObject;
 
-        if (other.CompareTag("Player"))
+        if (objetoChocado.CompareTag("Player"))
         {
-            if (other.TryGetComponent<PlayerStats>(out PlayerStats stats))  // if le pegamos al jugador, buscamos sus Stats de vida
-
+            if (objetoChocado.TryGetComponent<PlayerStats>(out PlayerStats stats))
             {
                 stats.RecibirDanio(danioProyectil);
             }
 
-            GetComponent<NetworkObject>().Despawn();            // Una vez que impacta al jugador, el proyectil desaparece de la red
+            GetComponent<NetworkObject>().Despawn();
+            return;
+        }
 
+        if (!objetoChocado.CompareTag("Enemy"))        // Ignoramos si choca con el propio enemigo que lo disparó
+
+        {
+            Debug.Log($"💥 Proyectil destruido físicamente por chocar contra: {objetoChocado.name}");
+            GetComponent<NetworkObject>().Despawn();
         }
     }
 }

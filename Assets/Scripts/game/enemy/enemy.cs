@@ -7,6 +7,10 @@ public class enemy : NetworkBehaviour
     [Header("Configuración Base")]
     [SerializeField] private enemigosData enemigosData;
 
+    [Header("Vida del Enemigo (Netcode)")]
+    [SerializeField] private int vidaMaxima = 100;
+    public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
+
     [Header("Referencias de Ataque a Distancia")]
     [SerializeField] private GameObject prefabProyectil; // El prefab de la bola de fuego
     [SerializeField] private Transform puntoDisparo;    // arma del enemigo
@@ -25,9 +29,15 @@ public class enemy : NetworkBehaviour
         agente = GetComponent<NavMeshAgent>();
 
         // Configuramos la velocidad del enemigo usando los datos de nuestro scriptable
-        if (agente != null)
+        if (agente != null && enemigosData != null)
         {
             agente.speed = enemigosData.EnemigoVelocidad;
+        }
+
+        // SI SOMOS EL SERVIDOR, inicializamos la vida usando el valor configurado
+        if (IsServer)
+        {
+            vidaActual.Value = vidaMaxima;
         }
 
         // El NavMesh solo debe activarse y calcular caminos en el Servidor.
@@ -41,11 +51,12 @@ public class enemy : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (jugadorObjetivo == null || agente == null || !agente.enabled) return;
+        // Si no hay jugador que perseguir, permitimos que el script siga vivo por si recibe daño de la nada
+        if (jugadorObjetivo == null || agente == null || !agente.enabled || !agente.isOnNavMesh) return;
 
-        agente.SetDestination(jugadorObjetivo.position);// Persecución: Actualizamos la posición del jugador objetivo
+        agente.SetDestination(jugadorObjetivo.position); // Persecución
 
-        float distanciaAlJugador = Vector3.Distance(transform.position, jugadorObjetivo.position);// Ataques distancia
+        float distanciaAlJugador = Vector3.Distance(transform.position, jugadorObjetivo.position);
 
         if (Time.time >= tiempoSiguienteAtaque)
         {
@@ -75,23 +86,42 @@ public class enemy : NetworkBehaviour
 
     private void EjecutarAtaqueADistancia()
     {
+        if (prefabProyectil == null || puntoDisparo == null) return;
+
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
         Vector3 direccionHaciaJugador = (jugadorObjetivo.position - puntoDisparo.position).normalized;
         Quaternion rotacionHaciaJugador = Quaternion.LookRotation(direccionHaciaJugador);
 
-        GameObject proyectilInstance = Instantiate(prefabProyectil, puntoDisparo.position, rotacionHaciaJugador);        // Instanciamos el proyectil 
+        GameObject proyectilInstance = Instantiate(prefabProyectil, puntoDisparo.position, rotacionHaciaJugador);
 
-
-        //  daño del ScriptableObject al proyectil para que sepa cuánto sacar al chocar
         if (proyectilInstance.TryGetComponent<ProyectilEnemigo>(out ProyectilEnemigo scriptProyectil))
         {
             scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque);
         }
 
-        if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))        //  Spawn en red
-
+        if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))
         {
             netObj.Spawn();
+        }
+    }
+
+    // Método central para procesar golpes del jugador
+    public void RecibirDanio(int cantidadDanioBase)
+    {
+        if (!IsServer) return;
+
+        // Aseguramos que existan los datos del scriptable para evitar errores
+        int defensaMultiplicadora = (enemigosData != null) ? enemigosData.EnemigoDefensa : 1;
+
+        //  El daño final es el daño del jugador multiplicado por la resistencia/fuerza de defensa del enemigo
+        int danioFinal = cantidadDanioBase * defensaMultiplicadora;
+
+        vidaActual.Value -= danioFinal;
+
+       
+        if (vidaActual.Value <= 0)
+        {
+            GetComponent<NetworkObject>().Despawn();
         }
     }
 
@@ -113,7 +143,7 @@ public class enemy : NetworkBehaviour
         {
             jugadorObjetivo = null;
 
-            if (agente != null && agente.enabled)
+            if (agente != null && agente.enabled && agente.isOnNavMesh)
             {
                 agente.ResetPath();
             }

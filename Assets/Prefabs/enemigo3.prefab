@@ -139,7 +139,7 @@ Transform:
   m_GameObject: {fileID: 5175196868428405206}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.447, z: 1.113}
+  m_LocalPosition: {x: 0, y: 0.91, z: 1.113}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 988030129309624499}
   m_Layer: 0
   m_Name: cuerpo
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -310,8 +310,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 1
+  m_Height: 3
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8927045118803338925
@@ -367,7 +367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1264427288
+  GlobalObjectIdHash: 70516269
   InScenePlacedSourceGlobalObjectIdHash: 70516269
   DeferredDespawnTick: 0
   Ownership: 1
@@ -489,8 +489,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemy
   ShowTopMostFoldoutHeaderGroup: 1
   enemigosData: {fileID: 11400000, guid: 5b16f4922ae21bc42a07a141598d80c8, type: 2}
-  prefabProyectil: {fileID: 0}
-  puntoDisparo: {fileID: 0}
+  vidaMaxima: 100
+  vidaActual:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 100
+  prefabProyectil: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
+  puntoDisparo: {fileID: 3569596090574020835}
   rangoMelee: 2
   rangoDistancia: 15
   cooldownAtaque: 1

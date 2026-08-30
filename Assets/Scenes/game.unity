@@ -183,6 +183,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: objetos fogata (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 65a2d52c0b84bc84c8b0e7afb4e78cd8, type: 3}
+      propertyPath: m_TagString
+      value: solido
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -533,7 +537,7 @@ GameObject:
   - component: {fileID: 125239749}
   m_Layer: 0
   m_Name: collider1 (24)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -586,7 +590,7 @@ GameObject:
   - component: {fileID: 127939664}
   m_Layer: 0
   m_Name: collider1 (36)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -639,7 +643,7 @@ GameObject:
   - component: {fileID: 131300249}
   m_Layer: 0
   m_Name: collider1 (39)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -831,7 +835,7 @@ GameObject:
   - component: {fileID: 139663470}
   m_Layer: 0
   m_Name: collider1 (10)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -884,7 +888,7 @@ GameObject:
   - component: {fileID: 149669693}
   m_Layer: 0
   m_Name: collider1 (20)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1085,7 +1089,7 @@ GameObject:
   - component: {fileID: 224823656}
   m_Layer: 0
   m_Name: collider1 (12)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1530,6 +1534,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 65a2d52c0b84bc84c8b0e7afb4e78cd8, type: 3}
       propertyPath: m_Name
       value: objetos fogata (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 65a2d52c0b84bc84c8b0e7afb4e78cd8, type: 3}
+      propertyPath: m_TagString
+      value: solido
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2004,7 +2012,7 @@ GameObject:
   - component: {fileID: 410278654}
   m_Layer: 0
   m_Name: collider1 (40)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2078,7 +2086,7 @@ GameObject:
   - component: {fileID: 456390896}
   m_Layer: 0
   m_Name: collider1 (35)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2310,7 +2318,7 @@ GameObject:
   - component: {fileID: 473738259}
   m_Layer: 0
   m_Name: collider1
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2546,7 +2554,7 @@ GameObject:
   - component: {fileID: 573352755}
   m_Layer: 0
   m_Name: collider1 (9)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2620,7 +2628,7 @@ GameObject:
   - component: {fileID: 592490895}
   m_Layer: 0
   m_Name: collider1 (44)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7801,7 +7809,7 @@ GameObject:
   - component: {fileID: 693793254}
   m_Layer: 0
   m_Name: collider1 (19)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7875,7 +7883,7 @@ GameObject:
   - component: {fileID: 718537255}
   m_Layer: 0
   m_Name: collider1 (15)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8191,6 +8199,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_Name
       value: rocas
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
+      propertyPath: m_TagString
+      value: solido
       objectReference: {fileID: 0}
     - target: {fileID: 1540097114198647656, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8652,6 +8664,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rocas (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
+      propertyPath: m_TagString
+      value: solido
+      objectReference: {fileID: 0}
     - target: {fileID: 1540097114198647656, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.28
@@ -9104,7 +9120,7 @@ GameObject:
   - component: {fileID: 762734874}
   m_Layer: 0
   m_Name: collider1 (34)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9199,7 +9215,7 @@ GameObject:
   - component: {fileID: 780231451}
   m_Layer: 0
   m_Name: collider1 (18)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9789,9 +9805,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: CASTILLO.2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4e1877b965442a84194bc4ed8e39c9d2, type: 3}
+      propertyPath: m_TagString
+      value: solido
+      objectReference: {fileID: 0}
     - target: {fileID: 1373768622712501437, guid: 4e1877b965442a84194bc4ed8e39c9d2, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1373768622712501437, guid: 4e1877b965442a84194bc4ed8e39c9d2, type: 3}
+      propertyPath: m_TagString
+      value: solido
       objectReference: {fileID: 0}
     - target: {fileID: 8224605170845232202, guid: 4e1877b965442a84194bc4ed8e39c9d2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -10335,7 +10359,7 @@ GameObject:
   - component: {fileID: 934129942}
   m_Layer: 0
   m_Name: collider1 (21)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10409,7 +10433,7 @@ GameObject:
   - component: {fileID: 939521949}
   m_Layer: 0
   m_Name: collider1 (3)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10530,7 +10554,7 @@ GameObject:
   - component: {fileID: 1035549377}
   m_Layer: 0
   m_Name: collider1 (37)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10583,7 +10607,7 @@ GameObject:
   - component: {fileID: 1042773911}
   m_Layer: 0
   m_Name: collider1 (14)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10636,7 +10660,7 @@ GameObject:
   - component: {fileID: 1049516155}
   m_Layer: 0
   m_Name: collider1 (41)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10711,7 +10735,7 @@ GameObject:
   - component: {fileID: 1061542508}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -11079,7 +11103,7 @@ GameObject:
   - component: {fileID: 1169843367}
   m_Layer: 0
   m_Name: collider1 (30)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11547,7 +11571,7 @@ GameObject:
   - component: {fileID: 1270264143}
   m_Layer: 0
   m_Name: collider1 (6)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12140,6 +12164,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rocas (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
+      propertyPath: m_TagString
+      value: solido
+      objectReference: {fileID: 0}
     - target: {fileID: 1540097114198647656, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.28
@@ -12571,7 +12599,7 @@ GameObject:
   - component: {fileID: 1307371314}
   m_Layer: 0
   m_Name: collider1 (5)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17591,7 +17619,7 @@ GameObject:
   - component: {fileID: 1451787912}
   m_Layer: 0
   m_Name: collider1 (1)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22501,7 +22529,7 @@ GameObject:
   - component: {fileID: 1477153691}
   m_Layer: 0
   m_Name: collider1 (8)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22575,7 +22603,7 @@ GameObject:
   - component: {fileID: 1500435149}
   m_Layer: 0
   m_Name: collider1 (33)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22687,7 +22715,7 @@ GameObject:
   - component: {fileID: 1520797461}
   m_Layer: 0
   m_Name: collider1 (42)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22740,7 +22768,7 @@ GameObject:
   - component: {fileID: 1536878697}
   m_Layer: 0
   m_Name: collider1 (31)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22793,7 +22821,7 @@ GameObject:
   - component: {fileID: 1538671153}
   m_Layer: 0
   m_Name: collider1 (7)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22867,7 +22895,7 @@ GameObject:
   - component: {fileID: 1567596535}
   m_Layer: 0
   m_Name: collider1 (23)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22972,6 +23000,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: objetos fogata
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 65a2d52c0b84bc84c8b0e7afb4e78cd8, type: 3}
+      propertyPath: m_TagString
+      value: solido
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -23070,7 +23102,7 @@ GameObject:
   - component: {fileID: 1600819182}
   m_Layer: 0
   m_Name: collider1 (32)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23260,7 +23292,7 @@ GameObject:
   - component: {fileID: 1607780349}
   m_Layer: 0
   m_Name: collider1 (22)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23313,7 +23345,7 @@ GameObject:
   - component: {fileID: 1613583168}
   m_Layer: 0
   m_Name: collider1 (11)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23392,7 +23424,7 @@ GameObject:
   - component: {fileID: 1634990351}
   m_Layer: 0
   m_Name: collider1 (28)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23522,14 +23554,6 @@ PrefabInstance:
       propertyPath: 'Waypoints.Array.data[4]'
       value: 
       objectReference: {fileID: 562910009}
-    - target: {fileID: 5189758889424984543, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
-      propertyPath: puntoDisparo
-      value: 
-      objectReference: {fileID: 1656246295}
-    - target: {fileID: 5189758889424984543, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
-      propertyPath: prefabProyectil
-      value: 
-      objectReference: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
     - target: {fileID: 6805843399998783214, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1264427288
@@ -23543,11 +23567,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
---- !u!4 &1656246295 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3569596090574020835, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
-  m_PrefabInstance: {fileID: 1656246294}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1666046803
 GameObject:
   m_ObjectHideFlags: 0
@@ -23678,7 +23697,7 @@ GameObject:
   - component: {fileID: 1689215745}
   m_Layer: 0
   m_Name: collider1 (43)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23994,7 +24013,7 @@ GameObject:
   - component: {fileID: 1793920597}
   m_Layer: 0
   m_Name: collider1 (29)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24146,7 +24165,7 @@ GameObject:
   - component: {fileID: 1839656086}
   m_Layer: 0
   m_Name: collider1 (27)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24225,7 +24244,7 @@ GameObject:
   - component: {fileID: 1854655702}
   m_Layer: 0
   m_Name: collider1 (13)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24609,6 +24628,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_Name
       value: rocas (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
+      propertyPath: m_TagString
+      value: solido
       objectReference: {fileID: 0}
     - target: {fileID: 1540097114198647656, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x
@@ -25062,7 +25085,7 @@ GameObject:
   - component: {fileID: 1907947875}
   m_Layer: 0
   m_Name: collider1 (38)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25199,7 +25222,7 @@ GameObject:
   - component: {fileID: 1964292229}
   m_Layer: 0
   m_Name: collider1 (17)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25252,7 +25275,7 @@ GameObject:
   - component: {fileID: 1993445790}
   m_Layer: 0
   m_Name: collider1 (4)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25326,7 +25349,7 @@ GameObject:
   - component: {fileID: 2041721963}
   m_Layer: 0
   m_Name: collider1 (25)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25516,7 +25539,7 @@ GameObject:
   - component: {fileID: 2066686667}
   m_Layer: 0
   m_Name: collider1 (26)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25569,7 +25592,7 @@ GameObject:
   - component: {fileID: 2067579436}
   m_Layer: 0
   m_Name: collider1 (16)
-  m_TagString: Untagged
+  m_TagString: solido
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26117,6 +26140,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_Name
       value: rocas (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
+      propertyPath: m_TagString
+      value: solido
       objectReference: {fileID: 0}
     - target: {fileID: 1540097114198647656, guid: 64ef7bcedb845e04cb7cb38d0ad6afed, type: 3}
       propertyPath: m_LocalPosition.x

@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1352690137
+  GlobalObjectIdHash: 556633076
   InScenePlacedSourceGlobalObjectIdHash: 556633076
   DeferredDespawnTick: 0
   Ownership: 1
@@ -343,6 +343,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemy
   ShowTopMostFoldoutHeaderGroup: 1
   enemigosData: {fileID: 11400000, guid: 5ae765b620b94564e878978a67668eb7, type: 2}
+  vidaMaxima: 100
+  vidaActual:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 100
   prefabProyectil: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
   puntoDisparo: {fileID: 4419154576734168312}
   rangoMelee: 2
@@ -362,7 +368,7 @@ GameObject:
   - component: {fileID: 4788178558896364420}
   m_Layer: 0
   m_Name: cuerpo
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -458,8 +464,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 1
+  m_Height: 3
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9115853023168269933
@@ -474,7 +480,7 @@ GameObject:
   m_Layer: 0
   m_Name: arma
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -487,7 +493,7 @@ Transform:
   m_GameObject: {fileID: 9115853023168269933}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.91, z: 1.104}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

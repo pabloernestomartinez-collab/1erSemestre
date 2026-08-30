@@ -15,7 +15,7 @@ MonoBehaviour:
   _EnemigoNombre: rata
   _EnemigoDescripcion: "enemigo de mucha cantidad pero bajo da\xF1o"
   _EnemigoVelocidad: 4
-  _EnemigoAtaque: 6
-  _EnemigoDefensa: 1
-  _emelee: 1
+  _EnemigoAtaque: 3
+  _EnemigoDefensa: 50
+  _melee: 0
   _distancia: 0

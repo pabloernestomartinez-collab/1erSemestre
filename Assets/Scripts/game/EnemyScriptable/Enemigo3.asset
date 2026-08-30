@@ -15,7 +15,7 @@ MonoBehaviour:
   _EnemigoNombre: Boss
   _EnemigoDescripcion: ultimo y mas dificil enemigo
   _EnemigoVelocidad: 12
-  _EnemigoAtaque: 2
-  _EnemigoDefensa: 9
-  _emelee: 1
+  _EnemigoAtaque: 26
+  _EnemigoDefensa: 10
+  _melee: 0
   _distancia: 1

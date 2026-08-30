@@ -15,7 +15,7 @@ MonoBehaviour:
   _EnemigoNombre: Enemigo2
   _EnemigoDescripcion: tiene ataque a distancia
   _EnemigoVelocidad: 8
-  _EnemigoAtaque: 4
-  _EnemigoDefensa: 6
-  _emelee: 0
+  _EnemigoAtaque: 10
+  _EnemigoDefensa: 26
+  _melee: 0
   _distancia: 1
