@@ -17,5 +17,5 @@ MonoBehaviour:
   _EnemigoVelocidad: 12
   _EnemigoAtaque: 26
   _EnemigoDefensa: 10
-  _melee: 0
+  _melee: 1
   _distancia: 1

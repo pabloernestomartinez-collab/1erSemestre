@@ -3,29 +3,34 @@ using UnityEngine;
 
 public class ProyectilEnemigo : NetworkBehaviour
 {
-    [SerializeField] private float velocidadProyectil = 15f;
-    [SerializeField] private float tiempoDeVida = 4f; // Se destruye solo si no le pega a nada
+    private float velocidadProyectil = 15f;
+    private float tiempoDeVida = 4f;
 
     private int danioProyectil;
 
-    public void ConfigurarProyectil(int danio)
+    // recibe el daño y el collider del enemigo que lo lanza
+    public void ConfigurarProyectil(int danio, Collider colliderAtacante)
     {
-        danioProyectil = danio; // El script del enemigo le inyecta el daño aquí al nacer
+        danioProyectil = danio;
 
+        // Desactivamos físicamente que el proyectil choque con el propio enemigo que lo creó
+        if (colliderAtacante != null && TryGetComponent<Collider>(out Collider miCollider))
+        {
+            Physics.IgnoreCollision(miCollider, colliderAtacante);
+        }
     }
 
     void Update()
     {
-        transform.Translate(Vector3.forward * velocidadProyectil * Time.deltaTime); // El movimiento lineal lo calcula tanto el servidor como el cliente
+        transform.Translate(Vector3.forward * velocidadProyectil * Time.deltaTime);
 
+        if (!IsServer) return;
 
-        if (!IsServer) return;// El servidor controla el reloj para borrarlo
-
-        tiempoDeVida -= Time.deltaTime;  
+        tiempoDeVida -= Time.deltaTime;
 
         if (tiempoDeVida <= 0)
         {
-            GetComponent<NetworkObject>().Despawn(); // Borrado limpio en red
+            GetComponent<NetworkObject>().Despawn();
         }
     }
 
@@ -35,6 +40,7 @@ public class ProyectilEnemigo : NetworkBehaviour
 
         GameObject objetoChocado = collision.gameObject;
 
+        // Si choca con el Jugador, hace daño y se destruye
         if (objetoChocado.CompareTag("Player"))
         {
             if (objetoChocado.TryGetComponent<PlayerStats>(out PlayerStats stats))
@@ -46,11 +52,11 @@ public class ProyectilEnemigo : NetworkBehaviour
             return;
         }
 
-        if (!objetoChocado.CompareTag("Enemy"))        // Ignoramos si choca con el propio enemigo que lo disparó
-
+        if (objetoChocado.CompareTag("solido"))
         {
-            Debug.Log($"💥 Proyectil destruido físicamente por chocar contra: {objetoChocado.name}");
             GetComponent<NetworkObject>().Despawn();
+            return;
         }
+
     }
 }

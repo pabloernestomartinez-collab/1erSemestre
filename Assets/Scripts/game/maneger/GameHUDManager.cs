@@ -1,8 +1,9 @@
-using System.Collections;
+﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI; // 🔥 NUEVO: Necesario por si decides usar un Slider para la barra de vida
 
 public class GameHUDManager : NetworkBehaviour
 {
@@ -14,6 +15,11 @@ public class GameHUDManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI fuego;
     [SerializeField] private TextMeshProUGUI agua;
     [SerializeField] private TextMeshProUGUI piedra;
+    [SerializeField] private TextMeshProUGUI puntosText;
+
+    [Header("UI de Vida del Player")]
+    [SerializeField] private TextMeshProUGUI vidaText;
+    [SerializeField] private Slider vidaSlider;
 
     private PlayerStats jugadorLocalStats;
 
@@ -51,10 +57,10 @@ public class GameHUDManager : NetworkBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Cuando lo encuentra, nos suscribimos a su evento de cambio de estad�sticas
+        // Cuando lo encuentra, nos suscribimos a su evento de cambio de estadísticas
         jugadorLocalStats.OnStatsChanged += ActualizarPantallaVisual;
 
-        // Hacemos la primera actualizaci�n para que no arranque en blanco
+        // Hacemos la primera actualización para que no arranque en blanco
         ActualizarPantallaVisual();
     }
 
@@ -62,12 +68,26 @@ public class GameHUDManager : NetworkBehaviour
     {
         if (jugadorLocalStats == null) return;
 
-        // Actualizamos los strings usando el .Value de las NetworkVariables del jugador
         if (hierro != null) hierro.text = "Hierro: " + jugadorLocalStats.hierro.Value;
         if (madera != null) madera.text = "Madera: " + jugadorLocalStats.madera.Value;
         if (fuego != null) fuego.text = "Fuego: " + jugadorLocalStats.fuego.Value;
         if (agua != null) agua.text = "Agua: " + jugadorLocalStats.agua.Value;
         if (piedra != null) piedra.text = "Piedra: " + jugadorLocalStats.piedra.Value;
+        if (puntosText != null) puntosText.text = "Puntos: " + jugadorLocalStats.puntos.Value;
+
+        int vidaAct = jugadorLocalStats.vidaActual.Value;
+        int vidaMax = jugadorLocalStats.GetVidaMaxima();
+
+        if (vidaText != null)
+        {
+            vidaText.text = $"Vida: {vidaAct} / {vidaMax}";
+        }
+
+        if (vidaSlider != null)
+        {
+            vidaSlider.maxValue = vidaMax;
+            vidaSlider.value = vidaAct;
+        }
     }
 
     public override void OnNetworkDespawn()

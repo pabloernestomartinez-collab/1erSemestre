@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,11 +13,15 @@ public class enemy : NetworkBehaviour
     public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
 
     [Header("Referencias de Ataque a Distancia")]
-    [SerializeField] private GameObject prefabProyectil; // El prefab de la bola de fuego
+    [SerializeField] private GameObject prefabProyectil;
     [SerializeField] private Transform puntoDisparo;    // arma del enemigo
 
+    [Header("Señal Visual de Ataque (Melee)")]
+    [SerializeField] private GameObject senalVisualGolpe;
+    [SerializeField] private float duracionSenalVisual = 0.2f; // Cuánto tiempo se queda prendido en pantalla
+
     [Header("Rangos de Ataque (Opcionales para ajustar)")]
-    [SerializeField] private float rangoMelee = 2f;
+    [SerializeField] private float rangoMelee = 2.2f;
     [SerializeField] private float rangoDistancia = 15f;
     [SerializeField] private float cooldownAtaque = 1.5f; // Tiempo de espera entre golpes
 
@@ -27,6 +32,12 @@ public class enemy : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         agente = GetComponent<NavMeshAgent>();
+
+        // Aseguramos que la señal visual empiece apagada en todos lados
+        if (senalVisualGolpe != null)
+        {
+            senalVisualGolpe.SetActive(false);
+        }
 
         // Configuramos la velocidad del enemigo usando los datos de nuestro scriptable
         if (agente != null && enemigosData != null)
@@ -51,7 +62,6 @@ public class enemy : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Si no hay jugador que perseguir, permitimos que el script siga vivo por si recibe daño de la nada
         if (jugadorObjetivo == null || agente == null || !agente.enabled || !agente.isOnNavMesh) return;
 
         agente.SetDestination(jugadorObjetivo.position); // Persecución
@@ -64,6 +74,7 @@ public class enemy : NetworkBehaviour
             if (enemigosData.Emelee && distanciaAlJugador <= rangoMelee)
             {
                 EjecutarAtaqueMelee();
+                Debug.Log("ataque melee");
             }
             // Intentar Ataque a Distancia
             else if (enemigosData.Distancia && distanciaAlJugador <= rangoDistancia && distanciaAlJugador > rangoMelee)
@@ -77,10 +88,30 @@ public class enemy : NetworkBehaviour
     {
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
 
+        ControlarVisualAtaqueClientRpc(true);
+
         PlayerStats stats = jugadorObjetivo.GetComponent<PlayerStats>();
         if (stats != null)
         {
             stats.RecibirDanio(enemigosData.EnemigoAtaque);
+        }
+
+        StartCoroutine(ApagarSenalVisualDespuesDeTiempo());
+    }
+
+    // Corrutina en el servidor para esperar y enviar la orden de apagado
+    private IEnumerator ApagarSenalVisualDespuesDeTiempo()
+    {
+        yield return new WaitForSeconds(duracionSenalVisual);
+        ControlarVisualAtaqueClientRpc(false); // 🔥 Le avisa a todos que se apague
+    }
+
+    [ClientRpc]
+    private void ControlarVisualAtaqueClientRpc(bool activar)
+    {
+        if (senalVisualGolpe != null)
+        {
+            senalVisualGolpe.SetActive(activar);
         }
     }
 
@@ -96,7 +127,7 @@ public class enemy : NetworkBehaviour
 
         if (proyectilInstance.TryGetComponent<ProyectilEnemigo>(out ProyectilEnemigo scriptProyectil))
         {
-            scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque);
+            scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque, GetComponent<Collider>());
         }
 
         if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))
@@ -105,22 +136,29 @@ public class enemy : NetworkBehaviour
         }
     }
 
-    // Método central para procesar golpes del jugador
-    public void RecibirDanio(int cantidadDanioBase)
+    // 🔥 CONTROLADO Y ACTUALIZADO: Agregamos el parámetro 'jugadorAtacante' con valor por defecto null
+    public void RecibirDanio(int cantidadDanioBase, GameObject jugadorAtacante = null)
     {
         if (!IsServer) return;
 
-        // Aseguramos que existan los datos del scriptable para evitar errores
         int defensaMultiplicadora = (enemigosData != null) ? enemigosData.EnemigoDefensa : 1;
-
-        //  El daño final es el daño del jugador multiplicado por la resistencia/fuerza de defensa del enemigo
         int danioFinal = cantidadDanioBase * defensaMultiplicadora;
 
         vidaActual.Value -= danioFinal;
 
-       
         if (vidaActual.Value <= 0)
         {
+            // 🔥 ASIGNACIÓN DE PUNTOS: Si el enemigo muere y conocemos al atacante, le damos sus puntos
+            if (jugadorAtacante != null && enemigosData != null)
+            {
+                if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
+                {
+                    // Redondeamos el float de EnemigoVelocidad al entero más cercano
+                    int puntosAOtorgar = Mathf.RoundToInt(enemigosData.EnemigoVelocidad);
+                    statsAsesino.SumarPuntos(puntosAOtorgar);
+                }
+            }
+
             GetComponent<NetworkObject>().Despawn();
         }
     }
