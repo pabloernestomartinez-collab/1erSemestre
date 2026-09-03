@@ -589,7 +589,7 @@ MonoBehaviour:
   prefabProyectil: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
   puntoDisparo: {fileID: 3569596090574020835}
   senalVisualGolpe: {fileID: 7336399496315490860}
-  duracionSenalVisual: 0.2
+  duracionSenalVisual: 0.1
   rangoMelee: 2.2
   rangoDistancia: 15
   cooldownAtaque: 1

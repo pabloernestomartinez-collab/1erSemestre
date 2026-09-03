@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1457751588
+  GlobalObjectIdHash: 4241182399
   InScenePlacedSourceGlobalObjectIdHash: 4241182399
   DeferredDespawnTick: 0
   Ownership: 1
@@ -290,6 +290,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  puntos:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!114 &8483132623196618513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,7 +309,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   ShowTopMostFoldoutHeaderGroup: 1
   rangoAtaque: 2.5
-  cooldownAtaque: 1
+  cooldownAtaque: 0.6
   puntoAtaque: {fileID: 2764200257445955977}
   senalVisualGolpe: {fileID: 6104962220499362356}
   duracionSenalVisual: 0.15

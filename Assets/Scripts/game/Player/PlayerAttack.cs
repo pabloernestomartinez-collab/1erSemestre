@@ -10,7 +10,6 @@ public class PlayerAttack : NetworkBehaviour
     [SerializeField] private Transform puntoAtaque;         // Objeto vacío al frente del jugador
 
     [Header("Señal Visual de Ataque")]
-    // 🔥 ARRASTRA AQUÍ EL OBJETO HIJO (puedes usar un cubo translúcido, efecto de espada, etc.)
     [SerializeField] private GameObject senalVisualGolpe;
     [SerializeField] private float duracionSenalVisual = 0.15f; // Cuánto tiempo se queda prendido en pantalla
 
@@ -47,7 +46,6 @@ public class PlayerAttack : NetworkBehaviour
     [ServerRpc]
     private void SolicitarAtaqueServerRpc(Vector3 posicionDelGolpe, int danio)
     {
-        // 🔥 LE AVISAMOS A TODOS LOS CLIENTES QUE ENCIENDAN LA SEÑAL VISUAL DE ESTE JUGADOR
         ControlarVisualAtaqueClientRpc(true);
 
         Collider[] enemigosGolpeados = Physics.OverlapSphere(posicionDelGolpe, rangoAtaque);
@@ -60,13 +58,11 @@ public class PlayerAttack : NetworkBehaviour
 
                 if (scriptEnemigo != null)
                 {
-                    // 🔥 CONTROLADO Y ACTUALIZADO: Pasamos el daño Y ADEMÁS el GameObject de este jugador (gameObject)
                     scriptEnemigo.RecibirDanio(danio, gameObject);
                 }
             }
         }
 
-        // 🔥 Iniciamos el temporizador en el servidor para apagar el efecto
         StartCoroutine(ApagarSenalVisualDespuesDeTiempo());
     }
 
@@ -77,7 +73,6 @@ public class PlayerAttack : NetworkBehaviour
         ControlarVisualAtaqueClientRpc(false); // Le avisa a todos que se apague
     }
 
-    // 🔥 RPC DE CLIENTE: El servidor fuerza a todas las pantallas a prender/apagar el objeto visual
     [ClientRpc]
     private void ControlarVisualAtaqueClientRpc(bool activar)
     {

@@ -20,7 +20,6 @@ public class PlayerStats : NetworkBehaviour
     public NetworkVariable<int> fuego = new NetworkVariable<int>(0);
     public NetworkVariable<int> agua = new NetworkVariable<int>(0);
     public NetworkVariable<int> piedra = new NetworkVariable<int>(0);
-    // 🔥 NUEVA VARIABLE: Puntos acumulados por eliminar enemigos veloces
     public NetworkVariable<int> puntos = new NetworkVariable<int>(0);
 
     public Action OnStatsChanged;    // Evento para avisarle a la UI que un valor cambió sin usar el Update
@@ -64,7 +63,6 @@ public class PlayerStats : NetworkBehaviour
         vidaActual.Value = vidaMaxima;        //  revivir con la vida al máximo hasta saber que tengo que hacer con la programación
     }
 
-    // 🔥 NUEVO MÉTODO PÚBLICO: El servidor llamará a esto para inyectar los puntos de velocidad
     public void SumarPuntos(int cantidad)
     {
         if (IsServer)
@@ -79,7 +77,5 @@ public class PlayerStats : NetworkBehaviour
     public void SumarFuego() { if (IsServer) fuego.Value++; }
     public void SumarAgua() { if (IsServer) agua.Value++; }
     public void SumarPiedra() { if (IsServer) piedra.Value++; }
-
-    // Getter público para que la UI pueda saber cuál es la vida máxima si la necesita
     public int GetVidaMaxima() => vidaMaxima;
 }

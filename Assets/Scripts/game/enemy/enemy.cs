@@ -136,7 +136,6 @@ public class enemy : NetworkBehaviour
         }
     }
 
-    // 🔥 CONTROLADO Y ACTUALIZADO: Agregamos el parámetro 'jugadorAtacante' con valor por defecto null
     public void RecibirDanio(int cantidadDanioBase, GameObject jugadorAtacante = null)
     {
         if (!IsServer) return;
@@ -148,7 +147,6 @@ public class enemy : NetworkBehaviour
 
         if (vidaActual.Value <= 0)
         {
-            // 🔥 ASIGNACIÓN DE PUNTOS: Si el enemigo muere y conocemos al atacante, le damos sus puntos
             if (jugadorAtacante != null && enemigosData != null)
             {
                 if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
