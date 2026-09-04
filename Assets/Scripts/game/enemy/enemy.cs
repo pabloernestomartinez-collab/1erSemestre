@@ -18,7 +18,7 @@ public class enemy : NetworkBehaviour
 
     [Header("Señal Visual de Ataque (Melee)")]
     [SerializeField] private GameObject senalVisualGolpe;
-    [SerializeField] private float duracionSenalVisual = 0.2f; // Cuánto tiempo se queda prendido en pantalla
+    [SerializeField] private float duracionSenalVisual = 0.5f; // Tiempo de aviso previo al golpe
 
     [Header("Rangos de Ataque (Opcionales para ajustar)")]
     [SerializeField] private float rangoMelee = 2.2f;
@@ -28,30 +28,30 @@ public class enemy : NetworkBehaviour
     private NavMeshAgent agente;
     private Transform jugadorObjetivo = null; // Guarda al jugador que está persiguiendo
     private float tiempoSiguienteAtaque = 0f;
+    private bool estaAtacandoMelee = false;   // Previene iniciar ataques solapados
 
     public override void OnNetworkSpawn()
     {
         agente = GetComponent<NavMeshAgent>();
 
-        // Aseguramos que la señal visual empiece apagada en todos lados
+        // señal visual empieza apagada 
         if (senalVisualGolpe != null)
         {
             senalVisualGolpe.SetActive(false);
         }
 
-        // Configuramos la velocidad del enemigo usando los datos de nuestro scriptable
         if (agente != null && enemigosData != null)
         {
             agente.speed = enemigosData.EnemigoVelocidad;
         }
 
-        // SI SOMOS EL SERVIDOR, inicializamos la vida usando el valor configurado
+        // inicializamos la vida 
         if (IsServer)
         {
             vidaActual.Value = vidaMaxima;
         }
 
-        // El NavMesh solo debe activarse y calcular caminos en el Servidor.
+        //  NavMesh solo  en el Servidor.
         if (!IsServer && agente != null)
         {
             agente.enabled = false;
@@ -64,17 +64,19 @@ public class enemy : NetworkBehaviour
 
         if (jugadorObjetivo == null || agente == null || !agente.enabled || !agente.isOnNavMesh) return;
 
+        // if está preparando el golpe melee, detenemos el movimiento
+        if (estaAtacandoMelee) return;
+
         agente.SetDestination(jugadorObjetivo.position); // Persecución
 
         float distanciaAlJugador = Vector3.Distance(transform.position, jugadorObjetivo.position);
 
         if (Time.time >= tiempoSiguienteAtaque)
         {
-            // Intentar Ataque Cuerpo a Cuerpo (Melee)
+            // Intentar Ataque Cuerpo a Cuerpo
             if (enemigosData.Emelee && distanciaAlJugador <= rangoMelee)
             {
-                EjecutarAtaqueMelee();
-                Debug.Log("ataque melee");
+                StartCoroutine(SecuenciaAtaqueMelee());
             }
             // Intentar Ataque a Distancia
             else if (enemigosData.Distancia && distanciaAlJugador <= rangoDistancia && distanciaAlJugador > rangoMelee)
@@ -84,26 +86,42 @@ public class enemy : NetworkBehaviour
         }
     }
 
-    private void EjecutarAtaqueMelee()
+    private IEnumerator SecuenciaAtaqueMelee()
     {
+        estaAtacandoMelee = true;
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
+
+        if (agente != null && agente.isOnNavMesh)
+        {
+            agente.isStopped = true;
+        }
 
         ControlarVisualAtaqueClientRpc(true);
 
-        PlayerStats stats = jugadorObjetivo.GetComponent<PlayerStats>();
-        if (stats != null)
+        yield return new WaitForSeconds(duracionSenalVisual);
+
+        ControlarVisualAtaqueClientRpc(false);
+
+        if (jugadorObjetivo != null)
         {
-            stats.RecibirDanio(enemigosData.EnemigoAtaque);
+            float distanciaActual = Vector3.Distance(transform.position, jugadorObjetivo.position);
+
+            if (distanciaActual <= rangoMelee)
+            {
+                PlayerStats stats = jugadorObjetivo.GetComponent<PlayerStats>();
+                if (stats != null)
+                {
+                    stats.RecibirDanio(enemigosData.EnemigoAtaque);
+                }
+            }
         }
 
-        StartCoroutine(ApagarSenalVisualDespuesDeTiempo());
-    }
+        if (agente != null && agente.isOnNavMesh)
+        {
+            agente.isStopped = false;
+        }
 
-    // Corrutina en el servidor para esperar y enviar la orden de apagado
-    private IEnumerator ApagarSenalVisualDespuesDeTiempo()
-    {
-        yield return new WaitForSeconds(duracionSenalVisual);
-        ControlarVisualAtaqueClientRpc(false); // 🔥 Le avisa a todos que se apague
+        estaAtacandoMelee = false;
     }
 
     [ClientRpc]
@@ -120,19 +138,27 @@ public class enemy : NetworkBehaviour
         if (prefabProyectil == null || puntoDisparo == null) return;
 
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
-        Vector3 direccionHaciaJugador = (jugadorObjetivo.position - puntoDisparo.position).normalized;
-        Quaternion rotacionHaciaJugador = Quaternion.LookRotation(direccionHaciaJugador);
 
-        GameObject proyectilInstance = Instantiate(prefabProyectil, puntoDisparo.position, rotacionHaciaJugador);
+        Vector3 objetivoAjustado = new Vector3(jugadorObjetivo.position.x, puntoDisparo.position.y, jugadorObjetivo.position.z);
 
-        if (proyectilInstance.TryGetComponent<ProyectilEnemigo>(out ProyectilEnemigo scriptProyectil))
+        Vector3 direccionHaciaJugador = (objetivoAjustado - puntoDisparo.position).normalized;
+
+        // Evitamos rotaciones extrañas si están en la misma posición vertical: CONSEJO DE GOOGLE
+        if (direccionHaciaJugador != Vector3.zero)
         {
-            scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque, GetComponent<Collider>());
-        }
+            Quaternion rotacionHaciaJugador = Quaternion.LookRotation(direccionHaciaJugador);
 
-        if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))
-        {
-            netObj.Spawn();
+            GameObject proyectilInstance = Instantiate(prefabProyectil, puntoDisparo.position, rotacionHaciaJugador);
+
+            if (proyectilInstance.TryGetComponent<ProyectilEnemigo>(out ProyectilEnemigo scriptProyectil))
+            {
+                scriptProyectil.ConfigurarProyectil(enemigosData.EnemigoAtaque, GetComponent<Collider>());
+            }
+
+            if (proyectilInstance.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+            {
+                netObj.Spawn();
+            }
         }
     }
 
@@ -151,7 +177,6 @@ public class enemy : NetworkBehaviour
             {
                 if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
                 {
-                    // Redondeamos el float de EnemigoVelocidad al entero más cercano
                     int puntosAOtorgar = Mathf.RoundToInt(enemigosData.EnemigoVelocidad);
                     statsAsesino.SumarPuntos(puntosAOtorgar);
                 }
