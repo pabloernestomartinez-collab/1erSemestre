@@ -8,6 +8,7 @@ TagManager:
   - solido
   - Enemy
   - pulperia
+  - armamento
   layers:
   - Default
   - TransparentFX

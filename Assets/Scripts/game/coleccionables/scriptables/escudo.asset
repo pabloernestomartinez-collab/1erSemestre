@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: escudo
   m_EditorClassIdentifier: Assembly-CSharp::menuInventario
   imagenObjeto: {fileID: 21300000, guid: f270ae2815e437842921f264c20b5271, type: 3}
-  nombreObjeto: 
+  nombreObjeto: escudo
