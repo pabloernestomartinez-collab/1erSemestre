@@ -7,6 +7,7 @@ TagManager:
   - TextoPuntaje
   - solido
   - Enemy
+  - pulperia
   layers:
   - Default
   - TransparentFX
