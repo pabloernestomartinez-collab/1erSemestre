@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d29b8879ab358a64e840af40b353135f, type: 3}
-  m_Name: resina
+  m_Name: sabiduria
   m_EditorClassIdentifier: Assembly-CSharp::menuInventario
-  imagenObjeto: {fileID: 4534810592809177352, guid: f75f748a9e71b074c86d71575333afcf, type: 3}
-  nombreObjeto: resina
+  imagenObjeto: {fileID: 21300000, guid: 01e77d20268c10549970c6e3787cd10e, type: 3}
+  nombreObjeto: sabiduria
