@@ -5,7 +5,7 @@ using System;
 public class PlayerStats : NetworkBehaviour
 {
     [Header("Configuración de Vida")]
-    [SerializeField] private int vidaMaxima = 100;
+    public int vidaMaxima = 100;
     public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
 
     [Header("Configuración de Combate")]
@@ -27,12 +27,28 @@ public class PlayerStats : NetworkBehaviour
             vidaActual.Value = vidaMaxima;
         }
 
-        vidaActual.OnValueChanged += (o, n) => OnStatsChanged?.Invoke();
-        oro.OnValueChanged += (o, n) => OnStatsChanged?.Invoke();
-        hierba.OnValueChanged += (o, n) => OnStatsChanged?.Invoke();
-        sabiduria.OnValueChanged += (o, n) => OnStatsChanged?.Invoke();
-        puntos.OnValueChanged += (o, n) => OnStatsChanged?.Invoke();
+        // Suscripción a eventos cuando cambian las NetworkVariables
+        vidaActual.OnValueChanged += AlCambiarStat;
+        oro.OnValueChanged += AlCambiarStat;
+        hierba.OnValueChanged += AlCambiarStat;
+        sabiduria.OnValueChanged += AlCambiarStat;
+        puntos.OnValueChanged += AlCambiarStat;
 
+        OnStatsChanged?.Invoke();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        // Limpieza de eventos al ser destruido o desconectado
+        vidaActual.OnValueChanged -= AlCambiarStat;
+        oro.OnValueChanged -= AlCambiarStat;
+        hierba.OnValueChanged -= AlCambiarStat;
+        sabiduria.OnValueChanged -= AlCambiarStat;
+        puntos.OnValueChanged -= AlCambiarStat;
+    }
+
+    private void AlCambiarStat(int valorAnterior, int valorNuevo)
+    {
         OnStatsChanged?.Invoke();
     }
 
@@ -64,11 +80,11 @@ public class PlayerStats : NetworkBehaviour
 
             // Restaura 50 de vida al jugador asegurando no exceder el máximo
             vidaActual.Value = Mathf.Clamp(vidaActual.Value + 50, 0, vidaMaxima);
-            Debug.Log($"🟢 [SERVIDOR] Jugador {OwnerClientId} crafteó una poción con éxito.");
+            Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} crafteó una poción con éxito.");
         }
         else
         {
-            Debug.LogWarning($"⚠️ [SERVIDOR] Jugador {OwnerClientId} intentó craftear sin suficientes recursos.");
+            Debug.LogWarning($"[SERVIDOR] Jugador {OwnerClientId} intentó craftear sin suficientes recursos.");
         }
     }
 
@@ -80,10 +96,11 @@ public class PlayerStats : NetworkBehaviour
             oro.Value -= costoOro;
             danioMeleeJugador += danioAdicional;
 
-            Debug.Log($"🟢 [SERVIDOR] Jugador {OwnerClientId} compró un arma. Oro restante: {oro.Value}, Nuevo daño: {danioMeleeJugador}");
+            Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} compró un arma. Oro restante: {oro.Value}, Nuevo daño: {danioMeleeJugador}");
         }
     }
 
+    // Métodos para sumar recursos desde el servidor
     public void SumarOro(int cantidad = 1) { if (IsServer) oro.Value += cantidad; }
     public void SumarHierba(int cantidad = 1) { if (IsServer) hierba.Value += cantidad; }
     public void SumarSabiduria(int cantidad = 1) { if (IsServer) sabiduria.Value += cantidad; }

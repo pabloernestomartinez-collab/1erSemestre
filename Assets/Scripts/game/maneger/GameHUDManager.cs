@@ -39,7 +39,7 @@ public class GameHUDManager : NetworkBehaviour
     private IEnumerator EsperarYVincularJugador()
     {
         // Esperamos a salir de escenas no jugables (ej. lobby) si aplica
-        while (SceneManager.GetActiveScene().name == "lobby")
+        while (SceneManager.GetActiveScene().name.ToLower() == "lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
@@ -59,18 +59,32 @@ public class GameHUDManager : NetworkBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Nos suscribimos a los cambios de sus estadísticas
+        // Suscripción al evento personalizado OnStatsChanged
         jugadorLocalStats.OnStatsChanged += ActualizarPantallaVisual;
+
+        // Suscripción directa a las NetworkVariables por respaldo
+        SuscribirANetworkVariables();
 
         // Primera actualización visual
         ActualizarPantallaVisual();
+    }
+
+    private void SuscribirANetworkVariables()
+    {
+        if (jugadorLocalStats == null) return;
+
+        jugadorLocalStats.oro.OnValueChanged += (vAnt, vNuevo) => ActualizarPantallaVisual();
+        jugadorLocalStats.hierba.OnValueChanged += (vAnt, vNuevo) => ActualizarPantallaVisual();
+        jugadorLocalStats.sabiduria.OnValueChanged += (vAnt, vNuevo) => ActualizarPantallaVisual();
+        jugadorLocalStats.puntos.OnValueChanged += (vAnt, vNuevo) => ActualizarPantallaVisual();
+        jugadorLocalStats.vidaActual.OnValueChanged += (vAnt, vNuevo) => ActualizarPantallaVisual();
     }
 
     private void ActualizarPantallaVisual()
     {
         if (jugadorLocalStats == null) return;
 
-        // Actualizamos los contadores de los 3 nuevos recursos + puntos
+        // Actualizamos los contadores de los 3 recursos + puntos
         if (oroText != null) oroText.text = "Oro: " + jugadorLocalStats.oro.Value;
         if (hierbaText != null) hierbaText.text = "Hierba: " + jugadorLocalStats.hierba.Value;
         if (sabiduriaText != null) sabiduriaText.text = "Sabiduría: " + jugadorLocalStats.sabiduria.Value;

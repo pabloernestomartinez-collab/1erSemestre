@@ -16043,6 +16043,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.114404686, y: 0.11199906, z: 0.041317966}
   m_Center: {x: -0.010963448, y: 0.011862881, z: 0.011098773}
+--- !u!1 &308827987
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 308827988}
+  - component: {fileID: 308827989}
+  m_Layer: 0
+  m_Name: ZonaSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &308827988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308827987}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 500, y: 0, z: 500}
+  m_LocalScale: {x: 900, y: 1, z: 900}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1061542507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &308827989
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308827987}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &309451123
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68174,6 +68227,7 @@ Transform:
   - {fileID: 1522106086}
   - {fileID: 791268587}
   - {fileID: 1836035110}
+  - {fileID: 308827988}
   m_Father: {fileID: 1938860980}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!154 &1061542508
@@ -138999,13 +139053,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NetworkSpawner
   ShowTopMostFoldoutHeaderGroup: 1
   prefabsItems:
-  - {fileID: 7127258190469279219, guid: a086ca3ba8b90a44db2a2af80a76b15d, type: 3}
+  - {fileID: 8660362679045949711, guid: 28c7ca2846af0c74991daf8afe15e7a5, type: 3}
   - {fileID: 8480568173484095108, guid: 5dc15daea88f7514888a695136dbc7e9, type: 3}
   - {fileID: 9000417840585919517, guid: d7716abb40611634aa99ce8f42dfd4ac, type: 3}
-  - {fileID: 8660362679045949711, guid: 28c7ca2846af0c74991daf8afe15e7a5, type: 3}
-  - {fileID: 4300127499077117538, guid: 01e0adc387bf14a45b1da43ec2bb0b82, type: 3}
-  radioSpawn: 400
-  cantidadA_Spawnear: 100
+  cantidadA_Spawnear: 500
+  zonaSpawn: {fileID: 308827989}
+  alturaFijaY: 0.5
 --- !u!114 &2105589493
 MonoBehaviour:
   m_ObjectHideFlags: 0

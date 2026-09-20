@@ -29,6 +29,7 @@ public class enemy : NetworkBehaviour
     private Transform jugadorObjetivo = null; // Guarda al jugador que está persiguiendo
     private float tiempoSiguienteAtaque = 0f;
     private bool estaAtacandoMelee = false;   // Previene iniciar ataques solapados
+    private bool estaMuerto = false;          // 🔥 Candado para evitar doble procesamiento de muerte
 
     public override void OnNetworkSpawn()
     {
@@ -51,7 +52,7 @@ public class enemy : NetworkBehaviour
             vidaActual.Value = vidaMaxima;
         }
 
-        //  NavMesh solo  en el Servidor.
+        // NavMesh solo en el Servidor.
         if (!IsServer && agente != null)
         {
             agente.enabled = false;
@@ -60,11 +61,11 @@ public class enemy : NetworkBehaviour
 
     void Update()
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
 
         if (jugadorObjetivo == null || agente == null || !agente.enabled || !agente.isOnNavMesh) return;
 
-        // if está preparando el golpe melee, detenemos el movimiento
+        // Si está preparando el golpe melee, detenemos el movimiento
         if (estaAtacandoMelee) return;
 
         agente.SetDestination(jugadorObjetivo.position); // Persecución
@@ -102,7 +103,7 @@ public class enemy : NetworkBehaviour
 
         ControlarVisualAtaqueClientRpc(false);
 
-        if (jugadorObjetivo != null)
+        if (jugadorObjetivo != null && !estaMuerto)
         {
             float distanciaActual = Vector3.Distance(transform.position, jugadorObjetivo.position);
 
@@ -140,10 +141,8 @@ public class enemy : NetworkBehaviour
         tiempoSiguienteAtaque = Time.time + cooldownAtaque;
 
         Vector3 objetivoAjustado = new Vector3(jugadorObjetivo.position.x, puntoDisparo.position.y, jugadorObjetivo.position.z);
-
         Vector3 direccionHaciaJugador = (objetivoAjustado - puntoDisparo.position).normalized;
 
-        // Evitamos rotaciones extrañas si están en la misma posición vertical: CONSEJO DE GOOGLE
         if (direccionHaciaJugador != Vector3.zero)
         {
             Quaternion rotacionHaciaJugador = Quaternion.LookRotation(direccionHaciaJugador);
@@ -164,31 +163,53 @@ public class enemy : NetworkBehaviour
 
     public void RecibirDanio(int cantidadDanioBase, GameObject jugadorAtacante = null)
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
 
         int defensaMultiplicadora = (enemigosData != null) ? enemigosData.EnemigoDefensa : 1;
         int danioFinal = cantidadDanioBase * defensaMultiplicadora;
 
         vidaActual.Value -= danioFinal;
 
+        // 🔥 Verificación de Muerte
         if (vidaActual.Value <= 0)
         {
-            if (jugadorAtacante != null && enemigosData != null)
-            {
-                if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
-                {
-                    int puntosAOtorgar = Mathf.RoundToInt(enemigosData.EnemigoVelocidad);
-                    statsAsesino.SumarPuntos(puntosAOtorgar);
-                }
-            }
+            estaMuerto = true;
+            ProcesarMuerte(jugadorAtacante);
+        }
+    }
 
-            GetComponent<NetworkObject>().Despawn();
+    private void ProcesarMuerte(GameObject jugadorAtacante)
+    {
+        // 1. Otorgar Puntos al Asesino
+        if (jugadorAtacante != null)
+        {
+            if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
+            {
+                // Si enemigosData tiene 'EnemigoPuntos' usa ese valor; de lo contrario calcula con Velocidad
+                int puntosAOtorgar = (enemigosData != null) ? Mathf.RoundToInt(enemigosData.EnemigoVelocidad * 10f) : 50;
+                statsAsesino.SumarPuntos(puntosAOtorgar);
+
+                Debug.Log($"💀 Enemigo eliminado. Jugador {statsAsesino.OwnerClientId} recibió {puntosAOtorgar} puntos.");
+            }
+        }
+
+        // 2. Detener NavMeshAgent para evitar errores
+        if (agente != null && agente.isOnNavMesh)
+        {
+            agente.isStopped = true;
+            agente.enabled = false;
+        }
+
+        // 3. Destruir en la red
+        if (NetworkObject != null && NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
 
         if (other.CompareTag("Player") && jugadorObjetivo == null)
         {
@@ -198,7 +219,7 @@ public class enemy : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
 
         if (other.CompareTag("Player") && other.transform == jugadorObjetivo)
         {
