@@ -1,35 +1,41 @@
-ï»¿using Unity.Netcode;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemRecolectable : NetworkBehaviour
 {
-    public enum TipoItem { Hierro, Madera, Fuego, Agua, Piedra }//espada=hierro+fuego+agua escudo=madera+piedra
+    public enum TipoItem { Oro, Hierba, Sabiduria }
 
-    [Header("ConfiguraciÃ³n del Item")]
+    [Header("Configuración del Recolectable")]
     [SerializeField] private TipoItem tipoDeItem;
+    [SerializeField] private int cantidadAOtorgar = 1;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
+        // Solo el Servidor procesa las colisiones de red
         if (!IsServer) return;
 
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            PlayerStats stats = collision.gameObject.GetComponent<PlayerStats>();
+            PlayerStats stats = other.GetComponent<PlayerStats>();
 
             if (stats != null)
             {
-                // SegÃºn el tipo de Ã­tem asignado en el Inspector, llamamos a su funciÃ³n
+                // Aumentamos la cantidad correspondiente según el tipo
                 switch (tipoDeItem)
                 {
-                    case TipoItem.Hierro: stats.SumarHierro(); break;
-                    case TipoItem.Madera: stats.SumarMadera(); break;
-                    case TipoItem.Fuego: stats.SumarFuego(); break;
-                    case TipoItem.Agua: stats.SumarAgua(); break;
-                    case TipoItem.Piedra: stats.SumarPiedra(); break;
+                    case TipoItem.Oro:
+                        stats.SumarOro(cantidadAOtorgar);
+                        break;
+                    case TipoItem.Hierba:
+                        stats.SumarHierba(cantidadAOtorgar);
+                        break;
+                    case TipoItem.Sabiduria:
+                        stats.SumarSabiduria(cantidadAOtorgar);
+                        break;
                 }
 
-                GetComponent<NetworkObject>().Despawn();   // Despawn de red: desaparece para todos de forma sincronizada
-
+                // Despawn de red: destruye el ítem en el servidor y lo sincroniza con todos los clientes
+                GetComponent<NetworkObject>().Despawn();
             }
         }
     }

@@ -3,18 +3,16 @@ using Unity.Netcode;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // 🔥 NUEVO: Necesario por si decides usar un Slider para la barra de vida
+using UnityEngine.UI;
 
 public class GameHUDManager : NetworkBehaviour
 {
     public static GameHUDManager Instance { get; private set; }
 
-    [Header("Textos del Canvas")] //respetar el orden: Hierro, Madera, Fuego, Agua, Piedra
-    [SerializeField] private TextMeshProUGUI hierro;
-    [SerializeField] private TextMeshProUGUI madera;
-    [SerializeField] private TextMeshProUGUI fuego;
-    [SerializeField] private TextMeshProUGUI agua;
-    [SerializeField] private TextMeshProUGUI piedra;
+    [Header("Textos del Canvas")]
+    [SerializeField] private TextMeshProUGUI oroText;
+    [SerializeField] private TextMeshProUGUI hierbaText;
+    [SerializeField] private TextMeshProUGUI sabiduriaText;
     [SerializeField] private TextMeshProUGUI puntosText;
 
     [Header("UI de Vida del Player")]
@@ -25,7 +23,11 @@ public class GameHUDManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
@@ -36,14 +38,14 @@ public class GameHUDManager : NetworkBehaviour
 
     private IEnumerator EsperarYVincularJugador()
     {
-        // Esperamos a salir del lobby de forma segura si aplica
+        // Esperamos a salir de escenas no jugables (ej. lobby) si aplica
         while (SceneManager.GetActiveScene().name == "lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
         yield return new WaitForSeconds(0.2f);
 
-        // Bucle para buscar al jugador asignado a este cliente local
+        // Busca al jugador local en la red
         while (jugadorLocalStats == null)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
@@ -57,10 +59,10 @@ public class GameHUDManager : NetworkBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Cuando lo encuentra, nos suscribimos a su evento de cambio de estadísticas
+        // Nos suscribimos a los cambios de sus estadísticas
         jugadorLocalStats.OnStatsChanged += ActualizarPantallaVisual;
 
-        // Hacemos la primera actualización para que no arranque en blanco
+        // Primera actualización visual
         ActualizarPantallaVisual();
     }
 
@@ -68,13 +70,13 @@ public class GameHUDManager : NetworkBehaviour
     {
         if (jugadorLocalStats == null) return;
 
-        if (hierro != null) hierro.text = "Hierro: " + jugadorLocalStats.hierro.Value;
-        if (madera != null) madera.text = "Madera: " + jugadorLocalStats.madera.Value;
-        if (fuego != null) fuego.text = "Fuego: " + jugadorLocalStats.fuego.Value;
-        if (agua != null) agua.text = "Agua: " + jugadorLocalStats.agua.Value;
-        if (piedra != null) piedra.text = "Piedra: " + jugadorLocalStats.piedra.Value;
+        // Actualizamos los contadores de los 3 nuevos recursos + puntos
+        if (oroText != null) oroText.text = "Oro: " + jugadorLocalStats.oro.Value;
+        if (hierbaText != null) hierbaText.text = "Hierba: " + jugadorLocalStats.hierba.Value;
+        if (sabiduriaText != null) sabiduriaText.text = "Sabiduría: " + jugadorLocalStats.sabiduria.Value;
         if (puntosText != null) puntosText.text = "Puntos: " + jugadorLocalStats.puntos.Value;
 
+        // Actualizamos la barra y texto de vida
         int vidaAct = jugadorLocalStats.vidaActual.Value;
         int vidaMax = jugadorLocalStats.GetVidaMaxima();
 
@@ -92,7 +94,14 @@ public class GameHUDManager : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        if (jugadorLocalStats != null) jugadorLocalStats.OnStatsChanged -= ActualizarPantallaVisual;
-        if (Instance == this) Instance = null;
+        if (jugadorLocalStats != null)
+        {
+            jugadorLocalStats.OnStatsChanged -= ActualizarPantallaVisual;
+        }
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 }

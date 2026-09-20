@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -4300606181571770168}
   - component: {fileID: -7703455450300634878}
   m_Layer: 0
-  m_Name: hierro
+  m_Name: oro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,7 +162,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -184,6 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemRecolectable
   ShowTopMostFoldoutHeaderGroup: 1
   tipoDeItem: 0
+  cantidadAOtorgar: 1
 --- !u!114 &-7703455450300634878
 MonoBehaviour:
   m_ObjectHideFlags: 0

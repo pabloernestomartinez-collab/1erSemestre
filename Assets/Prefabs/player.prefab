@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 6886796074336584894}
   - component: {fileID: 393348509725906956}
   - component: {fileID: 992741822386297471}
-  - component: {fileID: 6260276935807392875}
   - component: {fileID: 8705253362401567396}
   - component: {fileID: 3719317557513461924}
   - component: {fileID: 8483132623196618513}
@@ -211,26 +210,6 @@ MonoBehaviour:
   colorParaHost: {r: 0, g: 0, b: 1, a: 1}
   colorParaCliente: {r: 1, g: 0, b: 0, a: 1}
   meshRenderer: {fileID: 4437866803047167648}
---- !u!114 &6260276935807392875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6051726233588507955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 861f6595a09d3af418d058280ed8b55f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerCamera
-  ShowTopMostFoldoutHeaderGroup: 1
-  offset: {x: 0, y: 2, z: -4}
-  suavizado: 5
-  sensibilidadMouse: 0.15
-  sensibilidadJoystick: 150
-  minAnguloVertical: -25
-  maxAnguloVertical: 60
-  mouseX: 0
 --- !u!114 &8705253362401567396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +223,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovimientoPlayer
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 10
+  speed: 20
+  rotationSpeed: 150
 --- !u!114 &3719317557513461924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,33 +239,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   ShowTopMostFoldoutHeaderGroup: 1
   vidaMaxima: 100
-  danioMeleeJugador: 1
   vidaActual:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 100
-  hierro:
+  danioMeleeJugador: 1
+  oro:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  madera:
+  hierba:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  fuego:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  agua:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  piedra:
+  sabiduria:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0

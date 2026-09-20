@@ -1,6 +1,7 @@
-﻿using System.Collections; // 🔥 Necesario para usar Corrutinas (IEnumerator)
+﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem; // 🔥 Aseguramos la librería del Input System
 
 public class PlayerAttack : NetworkBehaviour
 {
@@ -31,8 +32,8 @@ public class PlayerAttack : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        // Mouse.current.leftButton.wasPressedThisFrame detecta el clic izquierdo del nuevo sistema
-        if (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame && Time.time >= tiempoSiguienteAtaque)
+        // 🔥 Se reemplazó el clic del mouse por la tecla Espacio (spaceKey)
+        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && Time.time >= tiempoSiguienteAtaque)
         {
             tiempoSiguienteAtaque = Time.time + cooldownAtaque;
 
