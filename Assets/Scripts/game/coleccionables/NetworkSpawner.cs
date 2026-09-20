@@ -26,7 +26,6 @@ public class NetworkSpawner : NetworkBehaviour
 
             GameObject nuevoItem = Instantiate(prefabElegido, posicionAleatoria, Quaternion.identity); // Instanciamos en el servidor
 
-            // Le indicamos a la red que este objeto debe aparecer en las pantallas de todos los clientes
             if (nuevoItem.TryGetComponent<NetworkObject>(out NetworkObject netObj))
             {
                 netObj.Spawn();

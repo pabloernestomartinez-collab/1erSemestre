@@ -34,7 +34,7 @@ public class UICrafteo : MonoBehaviour
             }
             else
             {
-                Debug.Log("❌ No tienes suficientes materiales para la poción.");
+                Debug.Log("No tienes suficientes materiales para la poción.");
             }
         }
     }

@@ -113411,6 +113411,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1685759868}
+  - component: {fileID: 1685759869}
   m_Layer: 5
   m_Name: menu_tienda
   m_TagString: Untagged
@@ -113439,6 +113440,23 @@ RectTransform:
   m_AnchoredPosition: {x: 248, y: 76}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1685759869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685759867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 223c8ff6bbbe771479ad52f440b9a8a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::pulperia
+  catalogoArmas:
+  - {fileID: 11400000, guid: 7a4e8ec575b65a0429d7393eef70bbd9, type: 2}
+  - {fileID: 11400000, guid: 654a2a7669c5fef47a3e8b06415e0449, type: 2}
+  contenedorGrilla: {fileID: 2106816030}
+  prefabSlotItem: {fileID: 6273522790320749284, guid: 4d7909518f01e2946893e6b2e6b1aa93, type: 3}
 --- !u!65 &1686028472
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -138964,7 +138982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e97a3f955e93b941b7b0425779b1fa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ControlSubmenus
-  canvasMochila: {fileID: 0}
+  canvasMochila: {fileID: 455925461}
   canvasCrafteo: {fileID: 1458020116}
   canvasKiosco: {fileID: 1685759867}
 --- !u!114 &2105589492

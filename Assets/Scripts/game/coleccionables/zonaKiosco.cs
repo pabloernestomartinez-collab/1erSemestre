@@ -13,7 +13,7 @@ public class zonaKiosco : MonoBehaviour
                 if (MenuManager.Instance != null)
                 {
                     MenuManager.Instance.AbrirKiosco();
-                    Debug.Log("🛒 Entraste a la zona del Kiosco. Interfaz abierta.");
+                    Debug.Log("Entraste a la zona del Kiosco. Interfaz abierta.");
                 }
             }
         }
@@ -29,7 +29,7 @@ public class zonaKiosco : MonoBehaviour
                 if (MenuManager.Instance != null)
                 {
                     MenuManager.Instance.CerrarTodo();
-                    Debug.Log("👋 Saliste de la zona del Kiosco. Interfaz cerrada.");
+                    Debug.Log("Saliste de la zona del Kiosco. Interfaz cerrada.");
                 }
             }
         }

@@ -67,7 +67,6 @@ public class PlayerAttack : NetworkBehaviour
         StartCoroutine(ApagarSenalVisualDespuesDeTiempo());
     }
 
-    // Corrutina en el servidor para esperar y enviar la orden de apagado
     private IEnumerator ApagarSenalVisualDespuesDeTiempo()
     {
         yield return new WaitForSeconds(duracionSenalVisual);

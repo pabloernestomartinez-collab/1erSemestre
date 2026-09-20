@@ -54,7 +54,6 @@ public class PlayerStats : NetworkBehaviour
         vidaActual.Value = vidaMaxima; // Respawn temporal
     }
 
-    // 🔥 SERVER RPC PARA CRAFTEO DE POCIÓN (Solicitado por UICrafteo)
     [ServerRpc]
     public void CraquearPocionServerRpc(int reqHierba, int reqSabiduria)
     {
@@ -70,6 +69,18 @@ public class PlayerStats : NetworkBehaviour
         else
         {
             Debug.LogWarning($"⚠️ [SERVIDOR] Jugador {OwnerClientId} intentó craftear sin suficientes recursos.");
+        }
+    }
+
+    [ServerRpc]
+    public void ComprarArmaServerRpc(int costoOro, int danioAdicional)
+    {
+        if (oro.Value >= costoOro)
+        {
+            oro.Value -= costoOro;
+            danioMeleeJugador += danioAdicional;
+
+            Debug.Log($"🟢 [SERVIDOR] Jugador {OwnerClientId} compró un arma. Oro restante: {oro.Value}, Nuevo daño: {danioMeleeJugador}");
         }
     }
 

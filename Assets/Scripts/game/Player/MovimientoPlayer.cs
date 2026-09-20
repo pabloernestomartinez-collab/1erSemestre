@@ -51,7 +51,6 @@ public class MovimientoPlayer : NetworkBehaviour
             moveZ = leftStick.y;
         }
 
-        // 🔥 CORRECCIÓN: El movimiento ahora se calcula relativo a la rotación propia del Player (transform)
         Vector3 moveDirection = (transform.forward * moveZ + transform.right * moveX).normalized;
 
         // Aplicar velocidad al Rigidbody

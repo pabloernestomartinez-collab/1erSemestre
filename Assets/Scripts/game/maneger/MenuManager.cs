@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem; // 🔥 Importante para el nuevo Input System
-
+using UnityEngine.InputSystem; 
 public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance { get; private set; }
@@ -18,10 +17,11 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        // 🔥 Uso compatible con el nuevo Input System para la tecla 'I'
-        if (Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame)
+        if (Keyboard.current == null) return;
+
+        if (Keyboard.current.cKey.wasPressedThisFrame)
         {
-            ToggleCanvas(canvasMochila);
+            ToggleCanvas(canvasCrafteo);
         }
     }
 
