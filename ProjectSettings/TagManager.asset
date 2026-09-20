@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - pulperia
   - armamento
+  - crafteo
   layers:
   - Default
   - TransparentFX
