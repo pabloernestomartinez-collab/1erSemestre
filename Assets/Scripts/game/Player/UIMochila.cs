@@ -1,95 +1,84 @@
-using Unity.Netcode;
 using UnityEngine;
-using TMPro;
+using Unity.Netcode;
+using System.Collections;
 
 public class UIMochila : MonoBehaviour
 {
-    [Header("Referencias de UI (TextMeshPro)")]
-    [SerializeField] private TextMeshProUGUI textoVida;
-    [SerializeField] private TextMeshProUGUI textoOro;
-    [SerializeField] private TextMeshProUGUI textoHierba;
-    [SerializeField] private TextMeshProUGUI textoSabiduria;
+    [Header("Referencias de UI Mochila")]
+    [SerializeField] private Transform contenedorGrilla;  // Objeto con GridLayoutGroup
+    [SerializeField] private GameObject prefabSlotMochila; // Prefab UI del Slot de la Mochila
 
-    private PlayerStats localPlayerStats;
+    private InventarioPlayer inventarioLocal;
 
-    private void Update()
+    private void OnEnable()
     {
-        // 1. Buscamos el PlayerStats del jugador local si aún no lo tenemos vinculado
-        if (localPlayerStats == null)
+        // Al abrir la mochila, aseguramos vincular y refrescar datos
+        StartCoroutine(EsperarYVincularPlayer());
+    }
+
+    private IEnumerator EsperarYVincularPlayer()
+    {
+        // Esperamos en bucle hasta que Netcode haya spawneado al jugador local
+        while (NetworkManager.Singleton == null ||
+               NetworkManager.Singleton.LocalClient == null ||
+               NetworkManager.Singleton.LocalClient.PlayerObject == null)
         {
-            VincularmconJugadorLocal();
+            yield return null;
+        }
+
+        var netObj = NetworkManager.Singleton.LocalClient.PlayerObject;
+        if (netObj.TryGetComponent<InventarioPlayer>(out var inv))
+        {
+            // Evitamos doble suscripción
+            if (inventarioLocal != null)
+            {
+                inventarioLocal.OnInventarioCambiado -= RefrescarMochila;
+            }
+
+            inventarioLocal = inv;
+            inventarioLocal.OnInventarioCambiado += RefrescarMochila;
+
+            RefrescarMochila();
         }
     }
 
-    private void VincularmconJugadorLocal()
+    public void RefrescarMochila()
     {
-        var localClient = NetworkManager.Singleton?.LocalClient;
-        if (localClient != null && localClient.PlayerObject != null)
+        if (inventarioLocal == null || contenedorGrilla == null) return;
+
+        // Limpieza limpia y en sentido inverso (evita desorden en la grilla antes del re-instanciado)
+        for (int i = contenedorGrilla.childCount - 1; i >= 0; i--)
         {
-            if (localClient.PlayerObject.TryGetComponent<PlayerStats>(out var stats))
+            Destroy(contenedorGrilla.GetChild(i).gameObject);
+        }
+
+        // Generar un slot por cada arma que el jugador ha comprado o recogido
+        foreach (itemsMenu item in inventarioLocal.listaDeItems)
+        {
+            if (item == null) continue;
+
+            GameObject nuevoSlot = Instantiate(prefabSlotMochila, contenedorGrilla);
+
+            if (nuevoSlot.TryGetComponent<SlotMochilaUI>(out var slotScript))
             {
-                localPlayerStats = stats;
-                SuscribirAEventos();
-                ActualizarTodaLaUI();
+                slotScript.ConfigurarSlot(item);
             }
         }
     }
 
-    private void SuscribirAEventos()
-    {
-        if (localPlayerStats == null) return;
-
-        localPlayerStats.vidaActual.OnValueChanged += AlCambiarVida;
-        localPlayerStats.oro.OnValueChanged += AlCambiarOro;
-        localPlayerStats.hierba.OnValueChanged += AlCambiarHierba;
-        localPlayerStats.sabiduria.OnValueChanged += AlCambiarSabiduria;
-    }
-
     private void OnDisable()
     {
-        if (localPlayerStats != null)
+        if (inventarioLocal != null)
         {
-            localPlayerStats.vidaActual.OnValueChanged -= AlCambiarVida;
-            localPlayerStats.oro.OnValueChanged -= AlCambiarOro;
-            localPlayerStats.hierba.OnValueChanged -= AlCambiarHierba;
-            localPlayerStats.sabiduria.OnValueChanged -= AlCambiarSabiduria;
+            inventarioLocal.OnInventarioCambiado -= RefrescarMochila;
         }
     }
 
-    // --- MÉTODOS DE ACTUALIZACIÓN INDIVIDUAL ---
-
-    private void AlCambiarVida(int valorAnterior, int valorNuevo)
+    private void OnDestroy()
     {
-        if (textoVida != null)
-            textoVida.text = $"Vida: {valorNuevo} / {localPlayerStats.vidaMaxima}";
-    }
-
-    private void AlCambiarOro(int valorAnterior, int valorNuevo)
-    {
-        if (textoOro != null)
-            textoOro.text = $"Oro: {valorNuevo}";
-    }
-
-    private void AlCambiarHierba(int valorAnterior, int valorNuevo)
-    {
-        if (textoHierba != null)
-            textoHierba.text = $"Hierba: {valorNuevo}";
-    }
-
-    private void AlCambiarSabiduria(int valorAnterior, int valorNuevo)
-    {
-        if (textoSabiduria != null)
-            textoSabiduria.text = $"Sabiduría: {valorNuevo}";
-    }
-
-    // Actualiza todos los valores de golpe cuando abre el Canvas por primera vez
-    private void ActualizarTodaLaUI()
-    {
-        if (localPlayerStats == null) return;
-
-        AlCambiarVida(0, localPlayerStats.vidaActual.Value);
-        AlCambiarOro(0, localPlayerStats.oro.Value);
-        AlCambiarHierba(0, localPlayerStats.hierba.Value);
-        AlCambiarSabiduria(0, localPlayerStats.sabiduria.Value);
+        if (inventarioLocal != null)
+        {
+            inventarioLocal.OnInventarioCambiado -= RefrescarMochila;
+        }
     }
 }

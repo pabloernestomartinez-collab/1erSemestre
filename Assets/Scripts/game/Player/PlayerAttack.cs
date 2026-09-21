@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem; // 🔥 Aseguramos la librería del Input System
+using UnityEngine.InputSystem; // Aseguramos la librería del Input System
 
 public class PlayerAttack : NetworkBehaviour
 {
@@ -32,7 +32,7 @@ public class PlayerAttack : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        // 🔥 Se reemplazó el clic del mouse por la tecla Espacio (spaceKey)
+        //  Se reemplazó el clic del mouse por la tecla Espacio (spaceKey)
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && Time.time >= tiempoSiguienteAtaque)
         {
             tiempoSiguienteAtaque = Time.time + cooldownAtaque;

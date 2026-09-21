@@ -8,8 +8,8 @@ public class GameGameStateManager : NetworkBehaviour
 {
     public static GameGameStateManager Instance { get; private set; }
 
-    [Header("Marcadores de Fin de Partida")]
-    private TextMeshProUGUI textoFinCliente;
+    [Header("Referencias de UI")]
+    [SerializeField] private TextMeshProUGUI textoFinCliente;
 
     private bool mostrarMenuFin = false;
     private string textoGanador = "";
@@ -30,32 +30,31 @@ public class GameGameStateManager : NetworkBehaviour
         mostrarMenuFin = false;
         textoGanador = "";
         regresandoAlLobby = false;
+
         StartCoroutine(EsperarYVincularUIFin());
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        if (Instance == this) Instance = null;
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (Instance == this) Instance = null;
     }
 
     private IEnumerator EsperarYVincularUIFin()
     {
-        while (SceneManager.GetActiveScene().name == "lobby")
+        while (SceneManager.GetActiveScene().name.ToLower() == "lobby")
         {
             yield return new WaitForSeconds(0.1f);
         }
+
         yield return new WaitForSeconds(0.2f);
 
-        GameObject objFinCliente = GameObject.Find("TextoFinCliente");
-        if (objFinCliente != null)
+        // Intento de vincular automáticamente si la referencia del inspector es nula
+        if (textoFinCliente == null)
         {
-            textoFinCliente = objFinCliente.GetComponent<TextMeshProUGUI>();
+            GameObject objFinCliente = GameObject.Find("TextoFinCliente");
+            if (objFinCliente != null)
+            {
+                textoFinCliente = objFinCliente.GetComponent<TextMeshProUGUI>();
+            }
+        }
+
+        if (textoFinCliente != null)
+        {
             textoFinCliente.gameObject.SetActive(false);
         }
     }
@@ -85,15 +84,19 @@ public class GameGameStateManager : NetworkBehaviour
     private IEnumerator EsperarYVolverAlLobby()
     {
         yield return new WaitForSeconds(5f);
-        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
-        yield return null;
+
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        yield return new WaitForSeconds(0.1f);
         SceneManager.LoadScene("lobby");
     }
 
     private void OnGUI()
     {
-        if (!mostrarMenuFin) return;
-        if (!IsServer) return;
+        if (!mostrarMenuFin || !IsServer) return;
 
         float xCentro = (Screen.width / 2) - 150;
         float yCentro = (Screen.height / 2) - 90;
@@ -102,34 +105,64 @@ public class GameGameStateManager : NetworkBehaviour
         GUILayout.Label("=== PARTIDO TERMINADO ===", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
         GUILayout.Space(5);
 
-        GUIStyle estiloGanador = new GUIStyle(GUI.skin.box);
-        estiloGanador.alignment = TextAnchor.MiddleCenter;
+        GUIStyle estiloGanador = new GUIStyle(GUI.skin.box)
+        {
+            alignment = TextAnchor.MiddleCenter
+        };
         estiloGanador.normal.textColor = Color.yellow;
         GUILayout.Box(textoGanador, estiloGanador, GUILayout.Height(30));
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("¿Jugar otra partida?")) StartCoroutine(ReiniciarPartidaHost());
+        if (GUILayout.Button("¿Jugar otra partida?"))
+        {
+            StartCoroutine(ReiniciarPartidaHost());
+        }
+
         GUILayout.Space(5);
-        if (GUILayout.Button("Volver a Windows")) StartCoroutine(CierreOrdenadoJuego());
+
+        if (GUILayout.Button("Volver a Windows"))
+        {
+            StartCoroutine(CierreOrdenadoJuego());
+        }
 
         GUILayout.EndArea();
     }
 
     private IEnumerator ReiniciarPartidaHost()
     {
-        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
-        yield return null;
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        yield return new WaitForSeconds(0.1f);
         SceneManager.LoadScene("lobby");
     }
 
     private IEnumerator CierreOrdenadoJuego()
     {
-        if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
-        yield return null;
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        yield return new WaitForSeconds(0.1f);
         Application.Quit();
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (Instance == this) Instance = null;
     }
 }

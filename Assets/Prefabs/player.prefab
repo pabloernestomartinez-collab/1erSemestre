@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 8705253362401567396}
   - component: {fileID: 3719317557513461924}
   - component: {fileID: 8483132623196618513}
+  - component: {fileID: 3242995392638272663}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -108,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4241182399
+  GlobalObjectIdHash: 1192356868
   InScenePlacedSourceGlobalObjectIdHash: 4241182399
   DeferredDespawnTick: 0
   Ownership: 1
@@ -238,18 +239,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   ShowTopMostFoldoutHeaderGroup: 1
-  vidaMaxima: 100
-  vidaActual:
+  puntosVida:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 100
-  danioMeleeJugador: 1
+  puntosVidaMax:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 100
   oro:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
+    m_InternalValue: 20
   hierba:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -260,7 +264,27 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  puntos:
+  danioMeleeJugador:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 25
+  tieneEspada:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  tieneDaga:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  cantidadEspadas:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  cantidadDagas:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
@@ -283,6 +307,20 @@ MonoBehaviour:
   puntoAtaque: {fileID: 2764200257445955977}
   senalVisualGolpe: {fileID: 6104962220499362356}
   duracionSenalVisual: 0.15
+--- !u!114 &3242995392638272663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a91d44b8708e348a68d63c1e296ac9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventarioPlayer
+  ShowTopMostFoldoutHeaderGroup: 1
+  listaDeItems: []
 --- !u!1 &6104962220499362356
 GameObject:
   m_ObjectHideFlags: 0

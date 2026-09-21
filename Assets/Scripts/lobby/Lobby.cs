@@ -18,7 +18,6 @@ public class Lobby : MonoBehaviour
         buscandoHost = false;
         mensajeEstado = "Elige tu rol para comenzar.";
 
-        // if la red quedó abierta a medias, forzamos un apagado limpio aquí también
         if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient))
         {
             NetworkManager.Singleton.Shutdown();
@@ -29,7 +28,6 @@ public class Lobby : MonoBehaviour
     {
         if (NetworkManager.Singleton != null)
         {
-            // Esto evita que el evento se ejecute 2 o 3 veces seguidas en la segunda partida.
             NetworkManager.Singleton.OnClientDisconnectCallback -= AlDesconectarseDelServidor;
             NetworkManager.Singleton.OnClientDisconnectCallback += AlDesconectarseDelServidor;
 
@@ -97,24 +95,21 @@ public class Lobby : MonoBehaviour
         ConfigurarIpTransporte(ipServidor);
         NetworkManager.Singleton.StartClient();
 
-        // Esperamos un máximo de 4 segundos a que Netcode conecte
         float tiempoEspera = 0f;
         while (tiempoEspera < 4f && !hostDetectado)
         {
-            // if el motor nativo de Netcode confirms la conexión exitosa
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
             {
                 hostDetectado = true;
                 buscandoHost = false;
                 mensajeEstado = "¡Host encontrado! Entrando...";
-                yield break; // Salimos de la corrutina exitosamente y NO apagamos la red.
+                yield break;
             }
 
             tiempoEspera += Time.deltaTime;
             yield return null;
         }
 
-        // Si pasaron los 4 segundos y nunca cambió 'hostDetectado' a true (el Host realmente no estaba)
         if (!hostDetectado)
         {
             if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
@@ -132,12 +127,13 @@ public class Lobby : MonoBehaviour
             GUILayout.BeginArea(new Rect(10, 10, 300, 420));
 
             GUILayout.Label("Grupo: Promo Team");
-            GUILayout.Label("Juego: Lux  Umbra");
+            GUILayout.Label("Juego: Lux Umbra");
             GUILayout.Box($"Estado: {mensajeEstado}");
             GUILayout.Space(20);
 
             if (GUILayout.Button("Crear Partida (Host)"))
             {
+                ConfigurarIpTransporte(ipServidor);
                 NetworkManager.Singleton.StartHost();
             }
 
@@ -212,7 +208,7 @@ public class Lobby : MonoBehaviour
             NetworkManager.Singleton.Shutdown();
         }
 
-        yield return null; // Esperamos un frame para liberar sockets antes de matar el proceso
+        yield return null;
 
         Application.Quit();
 

@@ -1,110 +1,142 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
 using UnityEngine;
-using System;
 
 public class PlayerStats : NetworkBehaviour
 {
-    [Header("Configuración de Vida")]
-    public int vidaMaxima = 100;
-    public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
-
-    [Header("Configuración de Combate")]
-    [SerializeField] private int danioMeleeJugador = 25;
-    public int GetDanioMelee() => danioMeleeJugador;
-
-    [Header("Recursos Sincronizados")]
-    public NetworkVariable<int> oro = new NetworkVariable<int>(0);
-    public NetworkVariable<int> hierba = new NetworkVariable<int>(0);
-    public NetworkVariable<int> sabiduria = new NetworkVariable<int>(0);
-    public NetworkVariable<int> puntos = new NetworkVariable<int>(0);
-
+    // Delegado para notificar cambios a la UI (GameHUDManager)
     public Action OnStatsChanged;
+
+    [Header("Estadísticas del Jugador (Sincronizadas)")]
+    public NetworkVariable<int> puntosVida = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> puntosVidaMax = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> oro = new NetworkVariable<int>(50, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> hierba = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> sabiduria = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> danioMeleeJugador = new NetworkVariable<int>(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    [Header("Posesión de Armas (Booleanos)")]
+    public NetworkVariable<bool> tieneEspada = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> tieneDaga = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    [Header("Cantidad de Armas Compradas")]
+    public NetworkVariable<int> cantidadEspadas = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> cantidadDagas = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    // --- Propiedades de Compatibilidad Directa con GameHUDManager ---
+    public NetworkVariable<int> vidaActual => puntosVida;
+    public NetworkVariable<int> puntos => sabiduria;
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
-        {
-            vidaActual.Value = vidaMaxima;
-        }
-
-        // Suscripción a eventos cuando cambian las NetworkVariables
-        vidaActual.OnValueChanged += AlCambiarStat;
-        oro.OnValueChanged += AlCambiarStat;
-        hierba.OnValueChanged += AlCambiarStat;
-        sabiduria.OnValueChanged += AlCambiarStat;
-        puntos.OnValueChanged += AlCambiarStat;
-
-        OnStatsChanged?.Invoke();
+        puntosVida.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        puntosVidaMax.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        oro.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        hierba.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        sabiduria.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        danioMeleeJugador.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        tieneEspada.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        tieneDaga.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
     }
 
     public override void OnNetworkDespawn()
     {
-        // Limpieza de eventos al ser destruido o desconectado
-        vidaActual.OnValueChanged -= AlCambiarStat;
-        oro.OnValueChanged -= AlCambiarStat;
-        hierba.OnValueChanged -= AlCambiarStat;
-        sabiduria.OnValueChanged -= AlCambiarStat;
-        puntos.OnValueChanged -= AlCambiarStat;
+        puntosVida.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        puntosVidaMax.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        oro.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        hierba.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        sabiduria.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        danioMeleeJugador.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        tieneEspada.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        tieneDaga.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
     }
 
-    private void AlCambiarStat(int valorAnterior, int valorNuevo)
-    {
-        OnStatsChanged?.Invoke();
-    }
+    // --- Métodos Getters para lectura desde UI ---
+    public int GetVidaActual() => puntosVida.Value;
+    public int GetVidaMaxima() => puntosVidaMax.Value;
+    public int GetOro() => oro.Value;
+    public int GetHierba() => hierba.Value;
+    public int GetSabiduria() => sabiduria.Value;
+    public int GetDanioMelee() => danioMeleeJugador.Value;
 
-    public void RecibirDanio(int cantidadDanio)
+    // --- Métodos Requeridos por Enemigos y Proyectiles ---
+    public void RecibirDanio(int danio)
     {
         if (!IsServer) return;
 
-        vidaActual.Value -= cantidadDanio;
-        Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} recibió {cantidadDanio} de daño. Vida restante: {vidaActual.Value}");
-
-        if (vidaActual.Value <= 0)
-        {
-            Morir();
-        }
+        puntosVida.Value = Mathf.Max(0, puntosVida.Value - danio);
+        //Debug.Log($"[JUGADOR {OwnerClientId}] Recibió {danio} de daño. Vida restante: {puntosVida.Value}");
     }
 
-    private void Morir()
+    public void SumarPuntos(int cantidad)
     {
-        vidaActual.Value = vidaMaxima; // Respawn temporal
+        if (!IsServer) return;
+        sabiduria.Value += cantidad;
+    }
+
+    // --- Métodos de Modificación en Servidor ---
+    public void SumarOro(int cantidad)
+    {
+        if (!IsServer) return;
+        oro.Value += cantidad;
+    }
+
+    public void SumarHierba(int cantidad)
+    {
+        if (!IsServer) return;
+        hierba.Value += cantidad;
+    }
+
+    public void SumarSabiduria(int cantidad)
+    {
+        if (!IsServer) return;
+        sabiduria.Value += cantidad;
+    }
+
+    // --- RPCs de Compra y Crafteo ---
+    [ServerRpc]
+    public void CraftearPocionServerRpc(int costoHierba, int costoSabiduria, int curacionHP)
+    {
+        if (hierba.Value >= costoHierba && sabiduria.Value >= costoSabiduria)
+        {
+            hierba.Value -= costoHierba;
+            sabiduria.Value -= costoSabiduria;
+            puntosVida.Value = Mathf.Min(puntosVidaMax.Value, puntosVida.Value + curacionHP);
+
+            //Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} crafteó poción (-{costoHierba} Hierba, -{costoSabiduria} Sabiduría, +{curacionHP} HP).");
+        }
     }
 
     [ServerRpc]
-    public void CraquearPocionServerRpc(int reqHierba, int reqSabiduria)
+    public void ComprarArmaServerRpc(int precioOro, int danioExtra)
     {
-        if (hierba.Value >= reqHierba && sabiduria.Value >= reqSabiduria)
+        if (oro.Value >= precioOro)
         {
-            hierba.Value -= reqHierba;
-            sabiduria.Value -= reqSabiduria;
-
-            // Restaura 50 de vida al jugador asegurando no exceder el máximo
-            vidaActual.Value = Mathf.Clamp(vidaActual.Value + 50, 0, vidaMaxima);
-            Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} crafteó una poción con éxito.");
-        }
-        else
-        {
-            Debug.LogWarning($"[SERVIDOR] Jugador {OwnerClientId} intentó craftear sin suficientes recursos.");
+            oro.Value -= precioOro;
+            danioMeleeJugador.Value += danioExtra;
         }
     }
 
     [ServerRpc]
-    public void ComprarArmaServerRpc(int costoOro, int danioAdicional)
+    public void ComprarArmaEspecificaServerRpc(string tipoArma, int precioOro, int danioExtra)
     {
-        if (oro.Value >= costoOro)
+        if (oro.Value >= precioOro)
         {
-            oro.Value -= costoOro;
-            danioMeleeJugador += danioAdicional;
+            oro.Value -= precioOro;
+            danioMeleeJugador.Value += danioExtra;
 
-            Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} compró un arma. Oro restante: {oro.Value}, Nuevo daño: {danioMeleeJugador}");
+            if (tipoArma == "Espada")
+            {
+                tieneEspada.Value = true;
+                cantidadEspadas.Value++;
+            }
+            else if (tipoArma == "Daga")
+            {
+                tieneDaga.Value = true;
+                cantidadDagas.Value++;
+            }
+
+            //Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} compró {tipoArma}. Total {tipoArma}s: {(tipoArma == "Espada" ? cantidadEspadas.Value : cantidadDagas.Value)}");
         }
     }
-
-    // Métodos para sumar recursos desde el servidor
-    public void SumarOro(int cantidad = 1) { if (IsServer) oro.Value += cantidad; }
-    public void SumarHierba(int cantidad = 1) { if (IsServer) hierba.Value += cantidad; }
-    public void SumarSabiduria(int cantidad = 1) { if (IsServer) sabiduria.Value += cantidad; }
-    public void SumarPuntos(int cantidad) { if (IsServer) puntos.Value += cantidad; }
-
-    public int GetVidaMaxima() => vidaMaxima;
 }

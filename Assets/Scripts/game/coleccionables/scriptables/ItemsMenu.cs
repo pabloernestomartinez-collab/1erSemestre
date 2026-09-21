@@ -6,7 +6,7 @@ public class itemsMenu : ScriptableObject
     [Header("Información del Armamento")]
     public string nombreArma = "Espada de Hierro";
     public Sprite icono;
-    public string descripcion = "Aumenta el daño cuerpo a cuerpo.";
+    [TextArea] public string descripcion = "Aumenta el daño cuerpo a cuerpo.";
 
     [Header("Precio y Stats")]
     public int precioOro = 10;

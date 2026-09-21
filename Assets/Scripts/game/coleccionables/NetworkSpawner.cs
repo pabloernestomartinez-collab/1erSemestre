@@ -15,24 +15,25 @@ public class NetworkSpawner : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) return;
+        if (!IsServer) return;        // Solo el Servidor/Host debe instanciar objetos en la red
+
 
         SpawnearMundo();
     }
 
     private void SpawnearMundo()
     {
-        if (prefabsItems == null || prefabsItems.Length == 0)
-        {
-            Debug.LogWarning("[NetworkSpawner] No hay prefabs asignados en 'prefabsItems'.");
-            return;
-        }
+        //if (prefabsItems == null || prefabsItems.Length == 0)
+        //{
+        //    Debug.LogWarning("[NetworkSpawner] No hay prefabs asignados en 'prefabsItems'.");
+        //    return;
+        //}
 
-        if (zonaSpawn == null)
-        {
-            Debug.LogError("[NetworkSpawner] Debes asignar un BoxCollider en 'zonaSpawn'.");
-            return;
-        }
+        //if (zonaSpawn == null)
+        //{
+        //    Debug.LogError("[NetworkSpawner] Debes asignar un BoxCollider en 'zonaSpawn'.");
+        //    return;
+        //}
 
         // Extrae los límites globales (min y max) del BoxCollider en la escena
         Bounds limites = zonaSpawn.bounds;
@@ -42,7 +43,12 @@ public class NetworkSpawner : NetworkBehaviour
         for (int i = 0; i < cantidadA_Spawnear; i++)
         {
             GameObject prefabElegido = prefabsItems[Random.Range(0, prefabsItems.Length)];
-            if (prefabElegido == null) continue;
+
+            if (prefabElegido == null)
+            {
+                //Debug.LogWarning($"[NetworkSpawner] Se detectó un elemento nulo en la posición {i} del arreglo 'prefabsItems'.");
+                continue;
+            }
 
             // Genera coordenadas aleatorias dentro de los bordes exactos de la caja
             float randomX = Random.Range(limites.min.x, limites.max.x);
@@ -57,8 +63,13 @@ public class NetworkSpawner : NetworkBehaviour
                 netObj.Spawn();
                 instanciadosExitosos++;
             }
+            else
+            {
+                //Debug.LogError($"[NetworkSpawner] El prefab '{prefabElegido.name}' no tiene el componente NetworkObject asignado.");
+                Destroy(nuevoItem);
+            }
         }
 
-        Debug.Log($"[SERVIDOR] Se generaron {instanciadosExitosos} de {cantidadA_Spawnear} ítems dentro del área del BoxCollider.");
+        //Debug.Log($"[SERVIDOR] Se generaron {instanciadosExitosos} de {cantidadA_Spawnear} ítems dentro del área del BoxCollider.");
     }
 }

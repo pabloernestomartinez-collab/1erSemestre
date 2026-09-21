@@ -1,40 +1,78 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+﻿using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class UICrafteo : MonoBehaviour
 {
-    [Header("Receta Poción")]
-    [SerializeField] private int costoHierbaPocion = 2;
-    [SerializeField] private int costoSabiduriaPocion = 1;
+    [Header("UI del Crafteo")]
+    [Tooltip("Arrastra aquí el Panel de Crafteo (el cuadro visible que se abrirá/cerrará)")]
+    [SerializeField] private GameObject panelCrafteo;
 
-    [Header("UI")]
-    [SerializeField] private Button botonCraquearPocion;
-    [SerializeField] private TextMeshProUGUI textoRequisitos;
-
-    private void OnEnable()
+    private void Start()
     {
-        if (textoRequisitos != null)
+        if (panelCrafteo != null)        // Al iniciar el juego, aseguramos que el panel empiece cerrado
+
         {
-            textoRequisitos.text = $"Poción de Vida\nRequiere: {costoHierbaPocion} Hierbas, {costoSabiduriaPocion} Sabiduría";
+            panelCrafteo.SetActive(false);
         }
     }
 
-    // Método asignado al botón "Craquear Poción"
-    public void IntentarCraquearPocion()
+    private void Update()
     {
-        var netObj = Unity.Netcode.NetworkManager.Singleton.LocalClient?.PlayerObject;
+        if (Keyboard.current == null) return;        // Verificamos si existe un teclado activo
+
+
+        if (Keyboard.current.cKey.wasPressedThisFrame)        // Detectar si se presionó la tecla C
+
+        {
+            TogglePanel();
+        }
+    }
+
+    public void TogglePanel()
+    {
+        if (panelCrafteo != null)
+        {
+            bool estaActivo = panelCrafteo.activeSelf;
+            panelCrafteo.SetActive(!estaActivo);
+            Debug.Log($"[CRAFTEO] Panel crafteo conmutado a: {!estaActivo}");
+        }
+        else
+        {
+            Debug.LogWarning("[CRAFTEO] No se asignó la referencia 'panelCrafteo' en el Inspector.");
+        }
+    }
+
+    public void AbrirPanel()
+    {
+        if (panelCrafteo != null) panelCrafteo.SetActive(true);
+    }
+
+    public void CerrarPanel()
+    {
+        if (panelCrafteo != null) panelCrafteo.SetActive(false);
+    }
+
+    public void CraftearPocion()    // Método asignado al evento On Click () del Botón 'Craftear'
+
+    {
+        ProcesarCrafteoPocion(10, 5, 25); // Costo Hierba, Costo Sabiduría, Curación HP
+    }
+
+    private void ProcesarCrafteoPocion(int costoHierba, int costoSabiduria, int curacionHP)
+    {
+        var netObj = NetworkManager.Singleton?.LocalClient?.PlayerObject;
+
         if (netObj != null && netObj.TryGetComponent<PlayerStats>(out PlayerStats stats))
         {
-            // Validamos que tenga recursos
-            if (stats.hierba.Value >= costoHierbaPocion && stats.sabiduria.Value >= costoSabiduriaPocion)
+            if (stats.hierba.Value >= costoHierba && stats.sabiduria.Value >= costoSabiduria)
             {
-                // Petición al servidor (ServerRpc) para procesar el crafteo seguro
-                stats.CraquearPocionServerRpc(costoHierbaPocion, costoSabiduriaPocion);
+                stats.CraftearPocionServerRpc(costoHierba, costoSabiduria, curacionHP);
+                Debug.Log($"[CRAFTEO] ¡Poción creada! Se usaron {costoHierba} de hierba y {costoSabiduria} de sabiduría.");
             }
             else
             {
-                Debug.Log("No tienes suficientes materiales para la poción.");
+                Debug.LogWarning($"[CRAFTEO] Recursos insuficientes. Necesitas {costoHierba} Hierba y {costoSabiduria} Sabiduría.");
             }
         }
     }

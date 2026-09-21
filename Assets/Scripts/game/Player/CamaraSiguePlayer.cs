@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class CamaraSiguePlayer : MonoBehaviour
 {
@@ -25,7 +26,17 @@ public class CamaraSiguePlayer : MonoBehaviour
 
     private void BuscarJugadorLocal()
     {
-        MovimientoPlayer[] jugadores = FindObjectsOfType<MovimientoPlayer>();
+        // Intento principal: Referencia directa de Netcode
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.LocalClient != null &&
+            NetworkManager.Singleton.LocalClient.PlayerObject != null)
+        {
+            objetivoPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.transform;
+            return;
+        }
+
+        // Respaldo: Búsqueda eficiente en la escena
+        MovimientoPlayer[] jugadores = Object.FindObjectsByType<MovimientoPlayer>(FindObjectsSortMode.None);
         foreach (var p in jugadores)
         {
             if (p.IsOwner)

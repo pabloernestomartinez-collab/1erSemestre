@@ -1,20 +1,17 @@
+using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class InventarioPlayer : MonoBehaviour
+public class InventarioPlayer : NetworkBehaviour
 {
-    // Lista de ítems en posesión
     public List<itemsMenu> listaDeItems = new List<itemsMenu>();
+    public Action OnInventarioCambiado;
 
-    // Evento para notificar a la UI de la mochila que hay un ítem nuevo
-    public System.Action OnInventarioCambiado;
-
-    public void AgregarItem(itemsMenu nuevoItem)
+    public void AgregarItemLocal(itemsMenu nuevoItem)
     {
+        if (nuevoItem == null) return;
         listaDeItems.Add(nuevoItem);
-        Debug.Log($"Añadido {nuevoItem.nombreArma} al inventario.");
-
-        // Notificamos a la UI para que cree el ítem visualmente
         OnInventarioCambiado?.Invoke();
     }
 }

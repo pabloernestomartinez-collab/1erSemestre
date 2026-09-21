@@ -1,57 +1,53 @@
-﻿//using System.CollectionsCollections;
-using System.Collections.Generic;
+﻿using Unity.Netcode;
 using UnityEngine;
-using Unity.Netcode;
 
 public class pulperia : MonoBehaviour
 {
-    [Header("Catálogo de Armas")]
-    [SerializeField] private List<itemsMenu> catalogoArmas;
-
-    [Header("Referencias de UI")]
-    [SerializeField] private Transform contenedorGrilla; // Objeto con 'GridLayoutGroup'
-    [SerializeField] private GameObject prefabSlotItem;   // Prefab con 'SlotKioscoUI'
-
-    private void OnEnable()
+    public void AbrirTienda()
     {
-        GenerarTienda();
+        gameObject.SetActive(true);
     }
 
-    private void GenerarTienda()
+    public void CerrarTienda()
     {
-        // Limpiamos la grilla previa si ya existía
-        foreach (Transform child in contenedorGrilla)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Instanciamos un slot por cada arma definida en el catálogo
-        foreach (itemsMenu arma in catalogoArmas)
-        {
-            GameObject nuevoSlot = Instantiate(prefabSlotItem, contenedorGrilla);
-            if (nuevoSlot.TryGetComponent<SlotKioscoUI>(out var slotScript))
-            {
-                slotScript.ConfigurarSlot(arma, this);
-            }
-        }
+        gameObject.SetActive(false);
     }
 
-    public void ComprarArma(itemsMenu arma)
+    public void ComprarEspada()
     {
-        // Buscamos las estadísticas del jugador local
-        var netObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        ProcesarCompra("Espada", 10, 15); // Nombre, Precio, Daño Extra
+    }
+
+    public void ComprarDaga()
+    {
+        ProcesarCompra("Daga", 5, 8); // Nombre, Precio, Daño Extra
+    }
+
+    private void ProcesarCompra(string nombreArma, int precioOro, int danioExtra)
+    {
+        var netObj = NetworkManager.Singleton?.LocalClient?.PlayerObject;
+
         if (netObj != null && netObj.TryGetComponent<PlayerStats>(out PlayerStats stats))
         {
-            if (stats.oro.Value >= arma.precioOro)
+            if (stats.oro.Value >= precioOro)
             {
-                // Solicitamos al servidor procesar el cobro e incremento de daño
-                stats.ComprarArmaServerRpc(arma.precioOro, arma.danioExtra);
-                Debug.Log($"Compra solicitada: {arma.nombreArma} por {arma.precioOro} de Oro.");
+                // Enviamos la compra al servidor para actualizar oro, daño, booleano y contador
+                stats.ComprarArmaEspecificaServerRpc(nombreArma, precioOro, danioExtra);
+
+                // Notificamos al inventario local
+                if (netObj.TryGetComponent<InventarioPlayer>(out var inventario))
+                {
+                    itemsMenu nuevaArma = ScriptableObject.CreateInstance<itemsMenu>();
+                    nuevaArma.nombreArma = nombreArma;
+                    nuevaArma.danioExtra = danioExtra;
+
+                    inventario.AgregarItemLocal(nuevaArma);
+                }
             }
-            else
-            {
-                Debug.LogWarning("No tienes suficiente Oro para comprar esta arma.");
-            }
+            //else
+            //{
+            //    Debug.LogWarning("[KIOSCO] No tienes suficiente oro.");
+            //}
         }
     }
 }

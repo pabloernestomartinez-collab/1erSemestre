@@ -42,41 +42,67 @@ public class ItemRecolectable : NetworkBehaviour
                     case TipoItem.Arma:
                         if (datosArma != null)
                         {
-                            // 1. Aumentamos el daño del jugador en el Servidor
-                            stats.ComprarArmaServerRpc(0, datosArma.danioExtra);
+                            // Aumentamos el daño del jugador directamente en el Servidor
+                            stats.danioMeleeJugador.Value += datosArma.danioExtra;
 
-                            // 2. Si el jugador tiene el componente de Inventario, le añadimos el arma
-                            if (other.TryGetComponent<InventarioPlayer>(out var inventario))
+                            //  Notificamos al Cliente objetivo para que añada el arma a su inventario visual
+                            AgregarArmaAlClienteClientRpc(datosArma.nombreArma, datosArma.danioExtra, new ClientRpcParams
                             {
-                                // Llamamos a una función ClientRpc para enviarlo a su pantalla local
-                                AgregarArmaAlClienteClientRpc(datosArma.nombreArma, new ClientRpcParams
+                                Send = new ClientRpcSendParams
                                 {
-                                    Send = new ClientRpcSendParams
-                                    {
-                                        TargetClientIds = new ulong[] { stats.OwnerClientId }
-                                    }
-                                });
-                            }
+                                    TargetClientIds = new ulong[] { stats.OwnerClientId }
+                                }
+                            });
                         }
                         break;
                 }
 
                 // Destruye el objeto del mundo de forma sincronizada en toda la red
-                GetComponent<NetworkObject>().Despawn();
+                if (NetworkObject != null && NetworkObject.IsSpawned)
+                {
+                    NetworkObject.Despawn();
+                }
             }
         }
     }
 
     [ClientRpc]
-    private void AgregarArmaAlClienteClientRpc(string nombreArma, ClientRpcParams clientRpcParams = default)
+    private void AgregarArmaAlClienteClientRpc(string nombreArma, int danio, ClientRpcParams clientRpcParams = default)
     {
-        // Este código solo se ejecuta en el jugador que recogió el arma
-        var localPlayer = NetworkManager.Singleton.LocalClient?.PlayerObject;
+        // Este código solo se ejecuta en el jugador local que recogió el arma
+        var localPlayer = NetworkManager.Singleton?.LocalClient?.PlayerObject;
         if (localPlayer != null && localPlayer.TryGetComponent<InventarioPlayer>(out var inventario))
         {
-            // Agrega el arma a su inventario/mochila local
-            // (puedes buscar el ScriptableObject o pasarlo directamente)
-            Debug.Log($"¡Has recogido del suelo: {nombreArma}!");
+            // Si tenemos el objeto asignado localmente, lo agregamos
+            if (datosArma != null)
+            {
+                inventario.AgregarItemLocal(datosArma);
+            }
+            else
+            {
+                // De respaldo creamos una instancia temporal con los datos recibidos
+                itemsMenu nuevaArma = ScriptableObject.CreateInstance<itemsMenu>();
+                nuevaArma.nombreArma = nombreArma;
+                nuevaArma.danioExtra = danio;
+                inventario.AgregarItemLocal(nuevaArma);
+            }
+
+            //Debug.Log($"[INVENTARIO] ¡Has recogido del suelo: {nombreArma}!");
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        // Dibuja una esfera de color para visualizar el recolectable en el editor
+        Gizmos.color = tipoDeItem switch
+        {
+            TipoItem.Oro => Color.yellow,
+            TipoItem.Hierba => Color.green,
+            TipoItem.Sabiduria => Color.cyan,
+            TipoItem.Arma => Color.red,
+            _ => Color.white
+        };
+
+        Gizmos.DrawWireSphere(transform.position, 0.5f);
     }
 }
