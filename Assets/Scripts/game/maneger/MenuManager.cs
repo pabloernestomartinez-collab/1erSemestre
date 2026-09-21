@@ -5,8 +5,7 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance { get; private set; }
 
-    [Header("Referencias de Canvas / Paneles")]
-    [SerializeField] private GameObject canvasMochila;
+    [Header("Referencias de Canvas / Paneles Intermitentes")]
     [SerializeField] private GameObject canvasCrafteo;
     [SerializeField] private GameObject canvasKiosco;
 
@@ -29,21 +28,17 @@ public class MenuManager : MonoBehaviour
         {
             ToggleCanvas(canvasCrafteo);
         }
-
-        // Abrir / Cerrar Mochila con la tecla I o Tab (Opcional)
-        if (Keyboard.current.iKey.wasPressedThisFrame)
-        {
-            ToggleCanvas(canvasMochila);
-        }
     }
 
-    public void AbrirMochila() => AbrirUnico(canvasMochila);
+    // Métodos públicos para botones de la UI o Triggers
     public void AbrirCrafteo() => AbrirUnico(canvasCrafteo);
     public void AbrirKiosco() => AbrirUnico(canvasKiosco);
 
+    /// <summary>
+    /// Cierra todos los menús emergentes (Tiendas/Crafteo)
+    /// </summary>
     public void CerrarTodo()
     {
-        if (canvasMochila != null) canvasMochila.SetActive(false);
         if (canvasCrafteo != null) canvasCrafteo.SetActive(false);
         if (canvasKiosco != null) canvasKiosco.SetActive(false);
     }
@@ -54,10 +49,10 @@ public class MenuManager : MonoBehaviour
 
         bool estabaActivo = targetCanvas.activeSelf;
 
-        // Cerramos los demás paneles
+        // Cerramos cualquier otro menú abierto
         CerrarTodo();
 
-        // Si estaba cerrado, lo abrimos. Si estaba abierto, se queda cerrado por CerrarTodo()
+        // Si estaba cerrado lo abrimos, si estaba abierto se queda cerrado por CerrarTodo()
         targetCanvas.SetActive(!estabaActivo);
     }
 

@@ -139036,7 +139036,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e97a3f955e93b941b7b0425779b1fa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ControlSubmenus
-  canvasMochila: {fileID: 455925461}
   canvasCrafteo: {fileID: 1458020116}
   canvasKiosco: {fileID: 1685759867}
 --- !u!114 &2105589492
@@ -139088,8 +139087,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1350b6d0707754a42b080ec1e5a7ca7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UICrafteo
-  costoHierbaPocion: 0
-  costoSabiduriaPocion: 0
+  costoHierbaPocion: 3
+  costoSabiduriaPocion: 1
   botonCraquearPocion: {fileID: 1536173979}
   textoRequisitos: {fileID: 44302387}
 --- !u!1 &2106816029
