@@ -13,17 +13,21 @@ public class pulperia : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // --- MÉTODOS INDEPENDIENTES PARA CADA BOTÓN ---
+
+    // Asignar ÚNICAMENTE al Botón "Comprar Espada"
     public void ComprarEspada()
     {
-        ProcesarCompra("Espada", 10, 15); // Nombre, Precio, Daño Extra
+        ProcesarCompra("Espada", 10, 15); // Tipo, Precio Oro, Daño Extra
     }
 
+    // Asignar ÚNICAMENTE al Botón "Comprar Daga"
     public void ComprarDaga()
     {
-        ProcesarCompra("Daga", 5, 8); // Nombre, Precio, Daño Extra
+        ProcesarCompra("Daga", 5, 8); // Tipo, Precio Oro, Daño Extra
     }
 
-    private void ProcesarCompra(string nombreArma, int precioOro, int danioExtra)
+    private void ProcesarCompra(string tipoArma, int precioOro, int danioExtra)
     {
         var netObj = NetworkManager.Singleton?.LocalClient?.PlayerObject;
 
@@ -31,23 +35,24 @@ public class pulperia : MonoBehaviour
         {
             if (stats.oro.Value >= precioOro)
             {
-                // Enviamos la compra al servidor para actualizar oro, daño, booleano y contador
-                stats.ComprarArmaEspecificaServerRpc(nombreArma, precioOro, danioExtra);
+                // 1. Envía la compra al servidor especificado SOLO por tipoArma ("Espada" o "Daga")
+                stats.ComprarArmaEspecificaServerRpc(tipoArma, precioOro, danioExtra);
 
-                // Notificamos al inventario local
+                // 2. Agrega SOLO UN ítem al inventario local
                 if (netObj.TryGetComponent<InventarioPlayer>(out var inventario))
                 {
                     itemsMenu nuevaArma = ScriptableObject.CreateInstance<itemsMenu>();
-                    nuevaArma.nombreArma = nombreArma;
+                    nuevaArma.nombreArma = tipoArma;
                     nuevaArma.danioExtra = danioExtra;
 
                     inventario.AgregarItemLocal(nuevaArma);
+                    Debug.Log($"[KIOSCO] ¡{tipoArma} comprada con éxito!");
                 }
             }
-            //else
-            //{
-            //    Debug.LogWarning("[KIOSCO] No tienes suficiente oro.");
-            //}
+            else
+            {
+                Debug.LogWarning($"[KIOSCO] No tienes suficiente oro para comprar {tipoArma}.");
+            }
         }
     }
 }
