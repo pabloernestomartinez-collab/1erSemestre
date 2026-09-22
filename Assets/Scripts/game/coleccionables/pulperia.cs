@@ -13,15 +13,12 @@ public class pulperia : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // --- MÉTODOS INDEPENDIENTES PARA CADA BOTÓN ---
 
-    // Asignar ÚNICAMENTE al Botón "Comprar Espada"
     public void ComprarEspada()
     {
         ProcesarCompra("Espada", 10, 15); // Tipo, Precio Oro, Daño Extra
     }
 
-    // Asignar ÚNICAMENTE al Botón "Comprar Daga"
     public void ComprarDaga()
     {
         ProcesarCompra("Daga", 5, 8); // Tipo, Precio Oro, Daño Extra
@@ -35,10 +32,10 @@ public class pulperia : MonoBehaviour
         {
             if (stats.oro.Value >= precioOro)
             {
-                // 1. Envía la compra al servidor especificado SOLO por tipoArma ("Espada" o "Daga")
+                // Envía la compra al servidor especificado SOLO por tipoArma ("Espada" o "Daga")
                 stats.ComprarArmaEspecificaServerRpc(tipoArma, precioOro, danioExtra);
 
-                // 2. Agrega SOLO UN ítem al inventario local
+                //Agrega SOLO UN ítem al inventario local
                 if (netObj.TryGetComponent<InventarioPlayer>(out var inventario))
                 {
                     itemsMenu nuevaArma = ScriptableObject.CreateInstance<itemsMenu>();
@@ -49,10 +46,10 @@ public class pulperia : MonoBehaviour
                     Debug.Log($"[KIOSCO] ¡{tipoArma} comprada con éxito!");
                 }
             }
-            else
-            {
-                Debug.LogWarning($"[KIOSCO] No tienes suficiente oro para comprar {tipoArma}.");
-            }
+            //else
+            //{
+            //    Debug.LogWarning($"[KIOSCO] No tienes suficiente oro para comprar {tipoArma}.");
+            //}
         }
     }
 }
