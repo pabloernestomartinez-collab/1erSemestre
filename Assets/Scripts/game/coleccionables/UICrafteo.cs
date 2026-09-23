@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 public class UICrafteo : MonoBehaviour
 {
     [Header("UI del Crafteo")]
-    [Tooltip("Arrastra aquí el Panel de Crafteo (el cuadro visible que se abrirá/cerrará)")]
     [SerializeField] private GameObject panelCrafteo;
 
     private void Start()
@@ -35,12 +34,8 @@ public class UICrafteo : MonoBehaviour
         {
             bool estaActivo = panelCrafteo.activeSelf;
             panelCrafteo.SetActive(!estaActivo);
-            Debug.Log($"[CRAFTEO] Panel crafteo conmutado a: {!estaActivo}");
         }
-        else
-        {
-            Debug.LogWarning("[CRAFTEO] No se asignó la referencia 'panelCrafteo' en el Inspector.");
-        }
+        
     }
 
     public void AbrirPanel()
@@ -68,12 +63,8 @@ public class UICrafteo : MonoBehaviour
             if (stats.hierba.Value >= costoHierba && stats.sabiduria.Value >= costoSabiduria)
             {
                 stats.CraftearPocionServerRpc(costoHierba, costoSabiduria, curacionHP);
-                Debug.Log($"[CRAFTEO] ¡Poción creada! Se usaron {costoHierba} de hierba y {costoSabiduria} de sabiduría.");
             }
-            else
-            {
-                Debug.LogWarning($"[CRAFTEO] Recursos insuficientes. Necesitas {costoHierba} Hierba y {costoSabiduria} Sabiduría.");
-            }
+ 
         }
     }
 }

@@ -65,7 +65,6 @@ public class PlayerStats : NetworkBehaviour
         if (!IsServer) return;
 
         puntosVida.Value = Mathf.Max(0, puntosVida.Value - danio);
-        //Debug.Log($"[JUGADOR {OwnerClientId}] Recibió {danio} de daño. Vida restante: {puntosVida.Value}");
     }
 
     public void SumarPuntos(int cantidad)
@@ -103,7 +102,6 @@ public class PlayerStats : NetworkBehaviour
             sabiduria.Value -= costoSabiduria;
             puntosVida.Value = Mathf.Min(puntosVidaMax.Value, puntosVida.Value + curacionHP);
 
-            //Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} crafteó poción (-{costoHierba} Hierba, -{costoSabiduria} Sabiduría, +{curacionHP} HP).");
         }
     }
 
@@ -136,7 +134,6 @@ public class PlayerStats : NetworkBehaviour
                 cantidadDagas.Value++;
             }
 
-            //Debug.Log($"[SERVIDOR] Jugador {OwnerClientId} compró {tipoArma}. Total {tipoArma}s: {(tipoArma == "Espada" ? cantidadEspadas.Value : cantidadDagas.Value)}");
         }
     }
 }

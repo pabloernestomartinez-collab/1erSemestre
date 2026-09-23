@@ -46,10 +46,7 @@ public class pulperia : MonoBehaviour
                     Debug.Log($"[KIOSCO] ¡{tipoArma} comprada con éxito!");
                 }
             }
-            //else
-            //{
-            //    Debug.LogWarning($"[KIOSCO] No tienes suficiente oro para comprar {tipoArma}.");
-            //}
+            
         }
     }
 }

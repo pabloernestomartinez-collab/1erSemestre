@@ -105433,7 +105433,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1458020118}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UICrafteo, Assembly-CSharp
         m_MethodName: CraftearPocion
         m_Mode: 1
@@ -140093,7 +140093,6 @@ GameObject:
   - component: {fileID: 2105589490}
   - component: {fileID: 2105589492}
   - component: {fileID: 2105589493}
-  - component: {fileID: 2105589494}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -140225,19 +140224,6 @@ MonoBehaviour:
   prefabEnemigo2: {fileID: 5775010041132503760, guid: cb62facbc6af81b4780846836366c14b, type: 3}
   radioSpawn: 400
   alturaSpawn: 1
---- !u!114 &2105589494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105589485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1350b6d0707754a42b080ec1e5a7ca7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UICrafteo
-  panelCrafteo: {fileID: 0}
 --- !u!1 &2106816029
 GameObject:
   m_ObjectHideFlags: 0
