@@ -40,8 +40,8 @@ public class MovimientoPlayer : NetworkBehaviour
         // Lectura de teclado
         if (Keyboard.current.wKey.isPressed) moveZ = 1f;
         if (Keyboard.current.sKey.isPressed) moveZ = -1f;
-        if (Keyboard.current.aKey.isPressed) moveX = -1f;
-        if (Keyboard.current.dKey.isPressed) moveX = 1f;
+        //if (Keyboard.current.aKey.isPressed) moveX = -1f;
+        //if (Keyboard.current.dKey.isPressed) moveX = 1f;
 
         // Soporte secundario para Gamepad
         if (Gamepad.current != null && moveX == 0f && moveZ == 0f)
@@ -61,8 +61,8 @@ public class MovimientoPlayer : NetworkBehaviour
     {
         float rotacion = 0f;
 
-        if (Keyboard.current.qKey.isPressed) rotacion -= 1f; // Girar a la izquierda
-        if (Keyboard.current.eKey.isPressed) rotacion += 1f; // Girar a la derecha
+        if (Keyboard.current.aKey.isPressed) rotacion -= 1f; // Girar a la izquierda
+        if (Keyboard.current.dKey.isPressed) rotacion += 1f; // Girar a la derecha
 
         if (rotacion != 0f)
         {
