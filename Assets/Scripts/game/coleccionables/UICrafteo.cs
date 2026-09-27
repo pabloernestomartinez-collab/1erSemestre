@@ -7,10 +7,14 @@ public class UICrafteo : MonoBehaviour
     [Header("UI del Crafteo")]
     [SerializeField] private GameObject panelCrafteo;
 
+    [Header("Costos de Craftear Poción")]
+    [SerializeField] private int costoHierba = 2;
+    [SerializeField] private int costoSabiduria = 5;
+
     private void Start()
     {
-        if (panelCrafteo != null)        // Al iniciar el juego, aseguramos que el panel empiece cerrado
-
+        // Al iniciar el juego, aseguramos que el panel empiece cerrado
+        if (panelCrafteo != null)
         {
             panelCrafteo.SetActive(false);
         }
@@ -18,11 +22,10 @@ public class UICrafteo : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current == null) return;        // Verificamos si existe un teclado activo
+        if (Keyboard.current == null) return;
 
-
-        if (Keyboard.current.cKey.wasPressedThisFrame)        // Detectar si se presionó la tecla C
-
+        // Abrir/Cerrar panel de crafteo con la tecla 'C'
+        if (Keyboard.current.cKey.wasPressedThisFrame)
         {
             TogglePanel();
         }
@@ -35,7 +38,6 @@ public class UICrafteo : MonoBehaviour
             bool estaActivo = panelCrafteo.activeSelf;
             panelCrafteo.SetActive(!estaActivo);
         }
-        
     }
 
     public void AbrirPanel()
@@ -48,23 +50,21 @@ public class UICrafteo : MonoBehaviour
         if (panelCrafteo != null) panelCrafteo.SetActive(false);
     }
 
-    public void CraftearPocion()    // Método asignado al evento On Click () del Botón 'Craftear'
-
+    // Método asignado al evento On Click () del Botón 'Craftear' en la UI
+    public void CraftearPocion()
     {
-        ProcesarCrafteoPocion(10, 5, 25); // Costo Hierba, Costo Sabiduría, Curación HP
+        ProcesarCrafteoPocion();
     }
 
-    private void ProcesarCrafteoPocion(int costoHierba, int costoSabiduria, int curacionHP)
+    private void ProcesarCrafteoPocion()
     {
         var netObj = NetworkManager.Singleton?.LocalClient?.PlayerObject;
 
-        if (netObj != null && netObj.TryGetComponent<PlayerStats>(out PlayerStats stats))
+        if (netObj != null && netObj.TryGetComponent<PocionManager>(out PocionManager pocionMgr))
         {
-            if (stats.hierba.Value >= costoHierba && stats.sabiduria.Value >= costoSabiduria)
-            {
-                stats.CraftearPocionServerRpc(costoHierba, costoSabiduria, curacionHP);
-            }
- 
+            // Ejecutar la petición de crafteo directamente a través del PocionManager del jugador local
+            pocionMgr.IntentarCraftearPocion();
         }
+
     }
 }

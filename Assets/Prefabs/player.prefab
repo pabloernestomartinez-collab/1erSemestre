@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 8483132623196618513}
   - component: {fileID: 3242995392638272663}
   - component: {fileID: -8533805884600913108}
+  - component: {fileID: -4896261932543420171}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -348,6 +349,28 @@ MonoBehaviour:
   radioAtaque: 5
   puntosMaximos: 10
   nombreSliderUI: BarraHabilidad
+--- !u!114 &-4896261932543420171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6051726233588507955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b67150039a3dc4e46a5661a761aacd36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PocionManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  costoHierba: 2
+  costoSabiduria: 5
+  nombreImagenPocionUI: ImagenPocion
+  nombreTextoPocionUI: TextoPociones
+  cantidadPociones:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!1 &6104962220499362356
 GameObject:
   m_ObjectHideFlags: 0

@@ -58,9 +58,7 @@ public class pulperia : MonoBehaviour
                     inventario.AgregarItemLocal(nuevaArma);
                 }
             }
-            //else
-            //{
-            //}
+            
         }
     }
 }

@@ -13,6 +13,7 @@ public class PlayerStats : NetworkBehaviour
     public NetworkVariable<int> oro = new NetworkVariable<int>(50, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<int> hierba = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<int> sabiduria = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> puntuacion = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); // Separado de sabiduría
     public NetworkVariable<int> danioMeleeJugador = new NetworkVariable<int>(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     [Header("Posesión de Armas (Booleanos)")]
@@ -30,7 +31,7 @@ public class PlayerStats : NetworkBehaviour
 
     // --- Propiedades de Compatibilidad Directa con GameHUDManager ---
     public NetworkVariable<int> vidaActual => puntosVida;
-    public NetworkVariable<int> puntos => sabiduria;
+    public NetworkVariable<int> puntos => puntuacion; // Ahora apunta a puntuacion, NO a sabiduria
 
     public override void OnNetworkSpawn()
     {
@@ -40,6 +41,7 @@ public class PlayerStats : NetworkBehaviour
         oro.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         hierba.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         sabiduria.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
+        puntuacion.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         danioMeleeJugador.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
 
         // Suscripción a eventos de posesión de armas
@@ -76,6 +78,7 @@ public class PlayerStats : NetworkBehaviour
         oro.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         hierba.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         sabiduria.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
+        puntuacion.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         danioMeleeJugador.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
 
         tieneEspada.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
@@ -91,12 +94,13 @@ public class PlayerStats : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        // Incrementa la puntuación (Score) del juego por sobrevivir
         if (puntosVida.Value > 0)
         {
             temporizadorPuntos += Time.deltaTime;
             if (temporizadorPuntos >= 1f)
             {
-                sabiduria.Value += 1;
+                puntuacion.Value += 1; // Incrementa la puntuación por segundo, la Sabiduría se junta jugando
                 temporizadorPuntos = 0f;
             }
         }
@@ -108,6 +112,7 @@ public class PlayerStats : NetworkBehaviour
     public int GetOro() => oro.Value;
     public int GetHierba() => hierba.Value;
     public int GetSabiduria() => sabiduria.Value;
+    public int GetPuntuacion() => puntuacion.Value;
     public int GetDanioMelee() => danioMeleeJugador.Value;
 
     // --- Métodos Requeridos por Enemigos y Proyectiles ---
@@ -120,7 +125,7 @@ public class PlayerStats : NetworkBehaviour
     public void SumarPuntos(int cantidad)
     {
         if (!IsServer) return;
-        sabiduria.Value += cantidad;
+        puntuacion.Value += cantidad;
     }
 
     // --- Métodos de Modificación en Servidor ---

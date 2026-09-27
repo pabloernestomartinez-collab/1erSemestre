@@ -13,7 +13,7 @@ public class GameHUDManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI oroText;
     [SerializeField] private TextMeshProUGUI hierbaText;
     [SerializeField] private TextMeshProUGUI sabiduriaText;
-    [SerializeField] private TextMeshProUGUI puntosText;
+    [SerializeField] private TextMeshProUGUI puntosText; // Muestra la Puntuación/Score del jugador
 
     [Header("UI de Vida del Player")]
     [SerializeField] private TextMeshProUGUI vidaText;
@@ -43,7 +43,6 @@ public class GameHUDManager : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Espera activa hasta encontrar el objeto jugador de la sesión local de Netcode
         while (jugadorLocalStats == null)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
@@ -69,8 +68,9 @@ public class GameHUDManager : MonoBehaviour
         jugadorLocalStats.oro.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.hierba.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.sabiduria.OnValueChanged += OnVariableChanged;
-        jugadorLocalStats.puntos.OnValueChanged += OnVariableChanged;
-        jugadorLocalStats.vidaActual.OnValueChanged += OnVariableChanged;
+        jugadorLocalStats.puntuacion.OnValueChanged += OnVariableChanged; // Suscripción a puntuación real
+        jugadorLocalStats.puntosVida.OnValueChanged += OnVariableChanged;
+        jugadorLocalStats.puntosVidaMax.OnValueChanged += OnVariableChanged;
     }
 
     private void DesuscribirDeNetworkVariables()
@@ -80,8 +80,9 @@ public class GameHUDManager : MonoBehaviour
         jugadorLocalStats.oro.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.hierba.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.sabiduria.OnValueChanged -= OnVariableChanged;
-        jugadorLocalStats.puntos.OnValueChanged -= OnVariableChanged;
-        jugadorLocalStats.vidaActual.OnValueChanged -= OnVariableChanged;
+        jugadorLocalStats.puntuacion.OnValueChanged -= OnVariableChanged; // Desuscripción de puntuación real
+        jugadorLocalStats.puntosVida.OnValueChanged -= OnVariableChanged;
+        jugadorLocalStats.puntosVidaMax.OnValueChanged -= OnVariableChanged;
     }
 
     private void OnVariableChanged(int valorAnterior, int valorNuevo)
@@ -93,17 +94,17 @@ public class GameHUDManager : MonoBehaviour
     {
         if (jugadorLocalStats == null) return;
 
-        if (oroText != null) oroText.text = "Oro: " + jugadorLocalStats.oro.Value;
-        if (hierbaText != null) hierbaText.text = "Hierba: " + jugadorLocalStats.hierba.Value;
-        if (sabiduriaText != null) sabiduriaText.text = "Sabiduría: " + jugadorLocalStats.sabiduria.Value;
-        if (puntosText != null) puntosText.text = "Puntos: " + jugadorLocalStats.puntos.Value;
+        if (oroText != null) oroText.text = jugadorLocalStats.oro.Value.ToString();
+        if (hierbaText != null) hierbaText.text = jugadorLocalStats.hierba.Value.ToString();
+        if (sabiduriaText != null) sabiduriaText.text = jugadorLocalStats.sabiduria.Value.ToString();
+        if (puntosText != null) puntosText.text = jugadorLocalStats.puntuacion.Value.ToString(); // Muestra el valor real de puntuación
 
-        int vidaAct = jugadorLocalStats.vidaActual.Value;
+        int vidaAct = jugadorLocalStats.GetVidaActual();
         int vidaMax = jugadorLocalStats.GetVidaMaxima();
 
         if (vidaText != null)
         {
-            vidaText.text = $"Vida: {vidaAct} / {vidaMax}";
+            vidaText.text = $"{vidaAct} / {vidaMax}";
         }
 
         if (vidaSlider != null)
