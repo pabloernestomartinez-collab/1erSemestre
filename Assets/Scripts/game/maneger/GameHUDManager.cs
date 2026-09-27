@@ -15,16 +15,11 @@ public class GameHUDManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI sabiduriaText;
     [SerializeField] private TextMeshProUGUI puntosText;
 
-    [Header("Conteo de Armas")]
-    [SerializeField] private TextMeshProUGUI espadasText;
-    [SerializeField] private TextMeshProUGUI dagasText;
-
     [Header("UI de Vida del Player")]
     [SerializeField] private TextMeshProUGUI vidaText;
     [SerializeField] private Slider vidaSlider;
 
     private PlayerStats jugadorLocalStats;
-    private InventarioPlayer jugadorLocalInventario;
 
     private void Awake()
     {
@@ -54,18 +49,9 @@ public class GameHUDManager : MonoBehaviour
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
             {
                 var jugadorObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
-                if (jugadorObj != null)
+                if (jugadorObj != null && jugadorObj.TryGetComponent<PlayerStats>(out var stats))
                 {
-                    if (jugadorObj.TryGetComponent<PlayerStats>(out var stats))
-                    {
-                        jugadorLocalStats = stats;
-                    }
-
-                    if (jugadorObj.TryGetComponent<InventarioPlayer>(out var inv))
-                    {
-                        jugadorLocalInventario = inv;
-                        jugadorLocalInventario.OnInventarioCambiado += ActualizarPantallaVisual;
-                    }
+                    jugadorLocalStats = stats;
                 }
             }
             yield return new WaitForSeconds(0.1f);
@@ -112,8 +98,6 @@ public class GameHUDManager : MonoBehaviour
         if (sabiduriaText != null) sabiduriaText.text = "Sabiduría: " + jugadorLocalStats.sabiduria.Value;
         if (puntosText != null) puntosText.text = "Puntos: " + jugadorLocalStats.puntos.Value;
 
-        ActualizarConteoArmas();
-
         int vidaAct = jugadorLocalStats.vidaActual.Value;
         int vidaMax = jugadorLocalStats.GetVidaMaxima();
 
@@ -129,33 +113,6 @@ public class GameHUDManager : MonoBehaviour
         }
     }
 
-    private void ActualizarConteoArmas()
-    {
-        if (jugadorLocalInventario == null) return;
-
-        int cantidadEspadas = 0;
-        int cantidadDagas = 0;
-
-        foreach (itemsMenu item in jugadorLocalInventario.listaDeItems)
-        {
-            if (item == null) continue;
-
-            string nombre = item.nombreArma.ToLower();
-
-            if (nombre.Contains("espada"))
-            {
-                cantidadEspadas++;
-            }
-            else if (nombre.Contains("daga"))
-            {
-                cantidadDagas++;
-            }
-        }
-
-        if (espadasText != null) espadasText.text = "Espadas: " + cantidadEspadas;
-        if (dagasText != null) dagasText.text = "Dagas: " + cantidadDagas;
-    }
-
     private void OnDestroy()
     {
         DesuscribirDeNetworkVariables();
@@ -163,11 +120,6 @@ public class GameHUDManager : MonoBehaviour
         if (jugadorLocalStats != null)
         {
             jugadorLocalStats.OnStatsChanged -= ActualizarPantallaVisual;
-        }
-
-        if (jugadorLocalInventario != null)
-        {
-            jugadorLocalInventario.OnInventarioCambiado -= ActualizarPantallaVisual;
         }
 
         if (Instance == this)
