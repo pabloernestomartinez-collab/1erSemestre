@@ -64,17 +64,17 @@ public class ArmasHUDManager : MonoBehaviour
     {
         if (jugadorLocalStats == null) return;
 
-        // 1. Si la espada está equipada
+        //Si la espada está equipada
         if (jugadorLocalStats.tieneEspada.Value)
         {
             MostrarArma("Espada", spriteEspada, 10);
         }
-        // 2. Si la daga está equipada
+        //    Si la daga está equipada
         else if (jugadorLocalStats.tieneDaga.Value)
         {
             MostrarArma("Daga", spriteDaga, 5);
         }
-        // 3. Por defecto / Hueso
+        //  Por defecto / Hueso
         else if (jugadorLocalStats.tieneHueso.Value)
         {
             MostrarArma("Hueso", spriteHueso, 1);

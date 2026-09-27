@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3329252590519565345}
   - component: {fileID: 5191628685629489014}
   - component: {fileID: 5594058071706975500}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: cabeza
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3569596090574020835}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: arma
   m_TagString: Untagged
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
@@ -155,7 +155,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1249222204382939010}
   - component: {fileID: 4356242283151215101}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: deteccion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 9166636880694705163}
   - component: {fileID: 6521637018767811766}
   - component: {fileID: 988030129309624499}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: cuerpo
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 3600404925680928205}
   - component: {fileID: 2769852365550052573}
   - component: {fileID: 1203635792990562966}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 6496467401092808501}
   - component: {fileID: 5189758889424984543}
   - component: {fileID: 5172778732800981264}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: enemigo3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -138167,7 +138167,7 @@ GameObject:
   - component: {fileID: 2066411756}
   - component: {fileID: 2066411757}
   m_Layer: 5
-  m_Name: habilidadSlider
+  m_Name: BarraHabilidad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

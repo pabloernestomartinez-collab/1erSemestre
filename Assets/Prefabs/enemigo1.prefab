@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 684004137067695739}
   - component: {fileID: 807920697755709207}
   - component: {fileID: 7889401318793208305}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: cuerpo
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 5321529230032706870}
   - component: {fileID: 5861911629775557829}
   - component: {fileID: 5380437132647501790}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: cabeza
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9179044117216578480}
   - component: {fileID: 3181369482604692840}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: deteccion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -297,7 +297,7 @@ GameObject:
   - component: {fileID: 4619689805147865569}
   - component: {fileID: 1431286529255121197}
   - component: {fileID: 8329912483894328574}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: enemigo1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -481,7 +481,7 @@ GameObject:
   - component: {fileID: 1402686682210160911}
   - component: {fileID: 5241850074073772360}
   - component: {fileID: 440107237474303062}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
