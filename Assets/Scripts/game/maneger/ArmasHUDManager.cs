@@ -1,18 +1,23 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
 public class ArmasHUDManager : MonoBehaviour
 {
-    [Header("Conteo de Armas (UI)")]
-    [SerializeField] private TextMeshProUGUI espadasText;
-    [SerializeField] private TextMeshProUGUI dagasText;
-    [SerializeField] private TextMeshProUGUI huesosText;
+    [Header("UI del Arma Equipada")]
+    [SerializeField] private Image iconoArmaEquipada;
+    [SerializeField] private TextMeshProUGUI nombreArmaText;
+    [SerializeField] private TextMeshProUGUI danioArmaText; // Texto para el daño
+
+    [Header("Sprites de Armas")]
+    [SerializeField] private Sprite spriteHueso;
+    [SerializeField] private Sprite spriteDaga;
+    [SerializeField] private Sprite spriteEspada;
 
     private PlayerStats jugadorLocalStats;
-    private InventarioPlayer jugadorLocalInventario;
 
     private void Start()
     {
@@ -31,99 +36,92 @@ public class ArmasHUDManager : MonoBehaviour
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
             {
                 var jugadorObj = NetworkManager.Singleton.LocalClient?.PlayerObject;
-                if (jugadorObj != null)
+                if (jugadorObj != null && jugadorObj.TryGetComponent<PlayerStats>(out var stats))
                 {
-                    if (jugadorObj.TryGetComponent<PlayerStats>(out var stats))
-                    {
-                        jugadorLocalStats = stats;
-                    }
-
-                    if (jugadorObj.TryGetComponent<InventarioPlayer>(out var inv))
-                    {
-                        jugadorLocalInventario = inv;
-                        jugadorLocalInventario.OnInventarioCambiado += ActualizarConteoArmas;
-                    }
+                    jugadorLocalStats = stats;
                 }
             }
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Suscribir a los eventos de las NetworkVariables directas
-        jugadorLocalStats.cantidadEspadas.OnValueChanged += OnArmasChanged;
-        jugadorLocalStats.cantidadDagas.OnValueChanged += OnArmasChanged;
+        // Suscribir a los booleanos de armas
+        jugadorLocalStats.tieneHueso.OnValueChanged += OnArmaEquipadaChanged;
+        jugadorLocalStats.tieneDaga.OnValueChanged += OnArmaEquipadaChanged;
+        jugadorLocalStats.tieneEspada.OnValueChanged += OnArmaEquipadaChanged;
 
-        // Si tienes la variable en PlayerStats, la escuchamos directamente
-        if (jugadorLocalStats.cantidadHuesos != null)
-        {
-            jugadorLocalStats.cantidadHuesos.OnValueChanged += OnArmasChanged;
-        }
+        // Suscripción de respaldo
+        jugadorLocalStats.OnStatsChanged += ActualizarArmaEnHUD;
 
-        ActualizarConteoArmas();
+        ActualizarArmaEnHUD();
     }
 
-    private void OnArmasChanged(int valorAnterior, int valorNuevo)
+    private void OnArmaEquipadaChanged(bool valorAnterior, bool valorNuevo)
     {
-        ActualizarConteoArmas();
+        ActualizarArmaEnHUD();
     }
 
-    public void ActualizarConteoArmas()
+    public void ActualizarArmaEnHUD()
     {
-        int totalEspadas = 0;
-        int totalDagas = 0;
-        int totalHuesos = 0;
+        if (jugadorLocalStats == null) return;
 
-        // Opción A: Leer de PlayerStats
-        if (jugadorLocalStats != null)
+        // 1. Si la espada está equipada
+        if (jugadorLocalStats.tieneEspada.Value)
         {
-            totalEspadas = jugadorLocalStats.cantidadEspadas.Value;
-            totalDagas = jugadorLocalStats.cantidadDagas.Value;
-            if (jugadorLocalStats.cantidadHuesos != null)
-            {
-                totalHuesos = jugadorLocalStats.cantidadHuesos.Value;
-            }
+            MostrarArma("Espada", spriteEspada, 10);
+        }
+        // 2. Si la daga está equipada
+        else if (jugadorLocalStats.tieneDaga.Value)
+        {
+            MostrarArma("Daga", spriteDaga, 5);
+        }
+        // 3. Por defecto / Hueso
+        else if (jugadorLocalStats.tieneHueso.Value)
+        {
+            MostrarArma("Hueso", spriteHueso, 1);
+        }
+        else
+        {
+            if (iconoArmaEquipada != null) iconoArmaEquipada.gameObject.SetActive(false);
+            if (nombreArmaText != null) nombreArmaText.text = "Sin Arma";
+            if (danioArmaText != null) danioArmaText.text = "";
+        }
+    }
+
+    private void MostrarArma(string nombre, Sprite sprite, int danio)
+    {
+        if (nombreArmaText != null)
+        {
+            nombreArmaText.text = nombre;
         }
 
-        // Opción B: Si no se han seteado variables sincronizadas, verificar el inventario local, recomendacion de google
-        if (jugadorLocalInventario != null)
+        if (danioArmaText != null)
         {
-            int eCount = 0, dCount = 0, hCount = 0;
-
-            foreach (itemsMenu item in jugadorLocalInventario.listaDeItems)
-            {
-                if (item == null) continue;
-                string nombre = item.nombreArma.ToLower();
-                if (nombre.Contains("espada")) eCount++;
-                else if (nombre.Contains("daga")) dCount++;
-                else if (nombre.Contains("hueso")) hCount++;
-            }
-
-            // Usar el valor mayor entre Stats e Inventario
-            totalEspadas = Mathf.Max(totalEspadas, eCount);
-            totalDagas = Mathf.Max(totalDagas, dCount);
-            totalHuesos = Mathf.Max(totalHuesos, hCount);
+            danioArmaText.text = $"DAÑO {danio}";
         }
 
-        if (espadasText != null) espadasText.text = "Espadas: " + totalEspadas;
-        if (dagasText != null) dagasText.text = "Dagas: " + totalDagas;
-        if (huesosText != null) huesosText.text = "Huesos: " + totalHuesos;
+        if (iconoArmaEquipada != null)
+        {
+            if (sprite != null)
+            {
+                iconoArmaEquipada.sprite = sprite;
+                iconoArmaEquipada.gameObject.SetActive(true);
+            }
+            else
+            {
+                iconoArmaEquipada.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void OnDestroy()
     {
         if (jugadorLocalStats != null)
         {
-            jugadorLocalStats.cantidadEspadas.OnValueChanged -= OnArmasChanged;
-            jugadorLocalStats.cantidadDagas.OnValueChanged -= OnArmasChanged;
+            jugadorLocalStats.tieneHueso.OnValueChanged -= OnArmaEquipadaChanged;
+            jugadorLocalStats.tieneDaga.OnValueChanged -= OnArmaEquipadaChanged;
+            jugadorLocalStats.tieneEspada.OnValueChanged -= OnArmaEquipadaChanged;
 
-            if (jugadorLocalStats.cantidadHuesos != null)
-            {
-                jugadorLocalStats.cantidadHuesos.OnValueChanged -= OnArmasChanged;
-            }
-        }
-
-        if (jugadorLocalInventario != null)
-        {
-            jugadorLocalInventario.OnInventarioCambiado -= ActualizarConteoArmas;
+            jugadorLocalStats.OnStatsChanged -= ActualizarArmaEnHUD;
         }
     }
 }
