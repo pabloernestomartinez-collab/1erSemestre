@@ -111474,9 +111474,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4356242283151215101, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
-      propertyPath: m_Radius
-      value: 25
+    - target: {fileID: 4709424028168601311, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4709424028168601311, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5172778732800981264, guid: cfbbc44abfc59b4468a6ff55b184bddc, type: 3}
       propertyPath: 'Waypoints.Array.data[0]'
