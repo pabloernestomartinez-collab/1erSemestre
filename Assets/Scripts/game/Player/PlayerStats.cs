@@ -13,7 +13,7 @@ public class PlayerStats : NetworkBehaviour
     public NetworkVariable<int> oro = new NetworkVariable<int>(50, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<int> hierba = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<int> sabiduria = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    public NetworkVariable<int> puntuacion = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); // Separado de sabiduría
+    public NetworkVariable<int> puntuacion = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<int> danioMeleeJugador = new NetworkVariable<int>(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     [Header("Posesión de Armas (Booleanos)")]
@@ -31,11 +31,11 @@ public class PlayerStats : NetworkBehaviour
 
     // --- Propiedades de Compatibilidad Directa con GameHUDManager ---
     public NetworkVariable<int> vidaActual => puntosVida;
-    public NetworkVariable<int> puntos => puntuacion; // Ahora apunta a puntuacion, NO a sabiduria
+    public NetworkVariable<int> puntos => puntuacion;
 
     public override void OnNetworkSpawn()
     {
-        // Suscripción a eventos de estadísticas generales
+        // Suscripción a eventos de estadísticas generales (¡Mantenemos puntosVida aquí!)
         puntosVida.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         puntosVidaMax.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         oro.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
@@ -44,24 +44,20 @@ public class PlayerStats : NetworkBehaviour
         puntuacion.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         danioMeleeJugador.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
 
-        // Suscripción a eventos de posesión de armas
+        // Suscripción a eventos de armas
         tieneEspada.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         tieneDaga.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         tieneHueso.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
-
-        // Suscripción a eventos de conteo de armas
         cantidadEspadas.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         cantidadDagas.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         cantidadHuesos.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
 
-        // El servidor asigna los valores por defecto del Hueso al spawnear
         if (IsServer)
         {
             tieneHueso.Value = true;
             cantidadHuesos.Value = 1;
         }
 
-        // Si es el cliente dueño, agregar el Hueso al inventario local
         if (IsOwner && TryGetComponent<InventarioPlayer>(out var inventario))
         {
             itemsMenu huesoInicial = ScriptableObject.CreateInstance<itemsMenu>();
@@ -84,7 +80,6 @@ public class PlayerStats : NetworkBehaviour
         tieneEspada.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         tieneDaga.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         tieneHueso.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
-
         cantidadEspadas.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         cantidadDagas.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
         cantidadHuesos.OnValueChanged -= (oldVal, newVal) => OnStatsChanged?.Invoke();
@@ -94,19 +89,18 @@ public class PlayerStats : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Incrementa la puntuación (Score) del juego por sobrevivir
         if (puntosVida.Value > 0)
         {
             temporizadorPuntos += Time.deltaTime;
             if (temporizadorPuntos >= 1f)
             {
-                puntuacion.Value += 1; // Incrementa la puntuación por segundo, la Sabiduría se junta jugando
+                puntuacion.Value += 1;
                 temporizadorPuntos = 0f;
             }
         }
     }
 
-    // --- Métodos Getters para lectura desde UI ---
+    // --- Métodos Getters ---
     public int GetVidaActual() => puntosVida.Value;
     public int GetVidaMaxima() => puntosVidaMax.Value;
     public int GetOro() => oro.Value;
@@ -115,7 +109,7 @@ public class PlayerStats : NetworkBehaviour
     public int GetPuntuacion() => puntuacion.Value;
     public int GetDanioMelee() => danioMeleeJugador.Value;
 
-    // --- Métodos Requeridos por Enemigos y Proyectiles ---
+    // --- Métodos de Daño y Puntos ---
     public void RecibirDanio(int danio)
     {
         if (!IsServer) return;
@@ -128,7 +122,6 @@ public class PlayerStats : NetworkBehaviour
         puntuacion.Value += cantidad;
     }
 
-    // --- Métodos de Modificación en Servidor ---
     public void SumarOro(int cantidad)
     {
         if (!IsServer) return;
@@ -147,7 +140,7 @@ public class PlayerStats : NetworkBehaviour
         sabiduria.Value += cantidad;
     }
 
-    // --- RPCs de Compra y Crafteo ---
+    // --- RPCs ---
     [ServerRpc]
     public void CraftearPocionServerRpc(int costoHierba, int costoSabiduria, int curacionHP)
     {
@@ -172,23 +165,17 @@ public class PlayerStats : NetworkBehaviour
     [ServerRpc]
     public void ComprarArmaEspecificaServerRpc(string tipoArma, int precioOro, int danioExtra)
     {
-        if (oro.Value < precioOro)
-        {
-            return;
-        }
+        if (oro.Value < precioOro) return;
 
         if (tipoArma == "Daga")
         {
             if (tieneHueso.Value && !tieneDaga.Value)
             {
                 oro.Value -= precioOro;
-
                 tieneHueso.Value = false;
                 cantidadHuesos.Value = 0;
-
                 tieneDaga.Value = true;
                 cantidadDagas.Value = 1;
-
                 danioMeleeJugador.Value += danioExtra;
             }
         }
@@ -197,13 +184,10 @@ public class PlayerStats : NetworkBehaviour
             if (tieneDaga.Value && !tieneEspada.Value)
             {
                 oro.Value -= precioOro;
-
                 tieneDaga.Value = false;
                 cantidadDagas.Value = 0;
-
                 tieneEspada.Value = true;
                 cantidadEspadas.Value = 1;
-
                 danioMeleeJugador.Value += danioExtra;
             }
         }

@@ -422,6 +422,7 @@ GameObject:
   - component: {fileID: 7699580063419556990}
   - component: {fileID: 5944732833310202366}
   - component: {fileID: 2667467160650261927}
+  - component: {fileID: 6668805972135391110}
   m_Layer: 6
   m_Name: enemigo2
   m_TagString: Untagged
@@ -584,12 +585,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemy
   ShowTopMostFoldoutHeaderGroup: 1
   enemigosData: {fileID: 11400000, guid: 5ae765b620b94564e878978a67668eb7, type: 2}
-  vidaMaxima: 100
+  vidaMaxima: 1000
   vidaActual:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 100
+    m_InternalValue: 1000
   prefabProyectil: {fileID: 5314047251481029667, guid: fc525216c841d524d9d1e9b4e855fb3d, type: 3}
   puntoDisparo: {fileID: 4419154576734168312}
   senalVisualGolpe: {fileID: 7648834813828266582}
@@ -597,6 +598,20 @@ MonoBehaviour:
   rangoMelee: 2.2
   rangoDistancia: 15
   cooldownAtaque: 1.5
+--- !u!114 &6668805972135391110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5775010041132503760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 959fc81359b6cbe4d8c31a96054cf166, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarraVidaFlotante
+  ShowTopMostFoldoutHeaderGroup: 1
+  sliderVida: {fileID: 9039393592282529828}
 --- !u!1 &6293766384171451182
 GameObject:
   m_ObjectHideFlags: 0

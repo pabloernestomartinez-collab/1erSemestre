@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd982bc2766ec774b8855a9443197e8f, type: 3}
-  m_Name: Enemigo2
+  m_Name: Enemigo1
   m_EditorClassIdentifier: Assembly-CSharp::enemigosData
-  _EnemigoNombre: Enemigo2
-  _EnemigoDescripcion: tiene ataque a distancia
-  _EnemigoVelocidad: 8
-  _EnemigoAtaque: 10
-  _EnemigoDefensa: 26
-  _melee: 0
-  _distancia: 1
+  _EnemigoNombre: rata
+  _EnemigoDescripcion: "enemigo de mucha cantidad pero bajo da\xF1o"
+  _EnemigoVelocidad: 4
+  _EnemigoAtaque: 3
+  _EnemigoDefensa: 10
+  _melee: 1
+  _distancia: 0

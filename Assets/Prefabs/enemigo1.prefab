@@ -674,6 +674,7 @@ GameObject:
   - component: {fileID: 4619689805147865569}
   - component: {fileID: 1431286529255121197}
   - component: {fileID: 8329912483894328574}
+  - component: {fileID: 861059194612576819}
   m_Layer: 6
   m_Name: enemigo1
   m_TagString: Untagged
@@ -808,12 +809,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemy
   ShowTopMostFoldoutHeaderGroup: 1
   enemigosData: {fileID: 11400000, guid: 82b36ffb179b0c8489df630d545b44cf, type: 2}
-  vidaMaxima: 100
+  vidaMaxima: 1000
   vidaActual:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 100
+    m_InternalValue: 1000
   prefabProyectil: {fileID: 0}
   puntoDisparo: {fileID: 0}
   senalVisualGolpe: {fileID: 7198856571243021887}
@@ -848,6 +849,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &861059194612576819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5162640742459161906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 959fc81359b6cbe4d8c31a96054cf166, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarraVidaFlotante
+  ShowTopMostFoldoutHeaderGroup: 1
+  sliderVida: {fileID: 3628120863673689075}
 --- !u!1 &7198856571243021887
 GameObject:
   m_ObjectHideFlags: 0

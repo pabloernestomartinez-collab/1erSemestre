@@ -29,13 +29,15 @@ public class enemy : NetworkBehaviour
     private Transform jugadorObjetivo = null; // Guarda al jugador que está persiguiendo
     private float tiempoSiguienteAtaque = 0f;
     private bool estaAtacandoMelee = false;   // Previene iniciar ataques solapados
-    private bool estaMuerto = false;          // 🔥 Candado para evitar doble procesamiento de muerte
+    private bool estaMuerto = false;          // Candado para evitar doble procesamiento de muerte
+
+    public int GetVidaMaxima() => vidaMaxima;
 
     public override void OnNetworkSpawn()
     {
         agente = GetComponent<NavMeshAgent>();
 
-        // señal visual empieza apagada 
+        // Señal visual empieza apagada 
         if (senalVisualGolpe != null)
         {
             senalVisualGolpe.SetActive(false);
@@ -46,13 +48,13 @@ public class enemy : NetworkBehaviour
             agente.speed = enemigosData.EnemigoVelocidad;
         }
 
-        // inicializamos la vida 
+        // Inicializamos la vida en el Servidor
         if (IsServer)
         {
             vidaActual.Value = vidaMaxima;
         }
 
-        // NavMesh solo en el Servidor.
+        // NavMesh solo en el Servidor
         if (!IsServer && agente != null)
         {
             agente.enabled = false;
@@ -170,7 +172,7 @@ public class enemy : NetworkBehaviour
 
         vidaActual.Value -= danioFinal;
 
-        // 🔥 Verificación de Muerte
+        // Verificación de Muerte
         if (vidaActual.Value <= 0)
         {
             estaMuerto = true;
@@ -180,27 +182,24 @@ public class enemy : NetworkBehaviour
 
     private void ProcesarMuerte(GameObject jugadorAtacante)
     {
-        // 1. Otorgar Puntos al Asesino
+        // Otorgar Puntos al Asesino
         if (jugadorAtacante != null)
         {
             if (jugadorAtacante.TryGetComponent<PlayerStats>(out PlayerStats statsAsesino))
             {
-                // Si enemigosData tiene 'EnemigoPuntos' usa ese valor; de lo contrario calcula con Velocidad
                 int puntosAOtorgar = (enemigosData != null) ? Mathf.RoundToInt(enemigosData.EnemigoVelocidad * 10f) : 50;
                 statsAsesino.SumarPuntos(puntosAOtorgar);
-
-                Debug.Log($"💀 Enemigo eliminado. Jugador {statsAsesino.OwnerClientId} recibió {puntosAOtorgar} puntos.");
             }
         }
 
-        // 2. Detener NavMeshAgent para evitar errores
+        // Detener NavMeshAgent para evitar errores
         if (agente != null && agente.isOnNavMesh)
         {
             agente.isStopped = true;
             agente.enabled = false;
         }
 
-        // 3. Destruir en la red
+        // Destruir en la red
         if (NetworkObject != null && NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn();

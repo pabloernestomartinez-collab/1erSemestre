@@ -120,7 +120,7 @@ public class HabilidadEspecial : NetworkBehaviour
                 if (scriptEnemigo != null)
                 {
                     // Le infligimos 9999 de daño enviándole este gameObject como atacante
-                    scriptEnemigo.RecibirDanio(9999, gameObject);
+                    scriptEnemigo.RecibirDanio(50, gameObject);
                 }
             }
         }
