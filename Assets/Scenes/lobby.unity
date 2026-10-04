@@ -519,7 +519,7 @@ GameObject:
   - component: {fileID: 313082589}
   - component: {fileID: 313082588}
   m_Layer: 5
-  m_Name: instrucciones (1)
+  m_Name: controles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
