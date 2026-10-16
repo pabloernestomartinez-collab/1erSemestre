@@ -2,46 +2,56 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CharacterController))]
 public class MovimientoPlayer : NetworkBehaviour
 {
     [Header("Configuración de Movimiento")]
     [SerializeField] private float speed = 10f;
     [SerializeField] private float rotationSpeed = 150f;
+    [SerializeField] private float gravedad = -9.81f;
 
-    private Rigidbody rb;
+    private CharacterController controller;
+    private Vector2 inputMovimiento;
+    private float inputRotacion;
+    private float velocidadY = 0f;
 
     public override void OnNetworkSpawn()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        controller = GetComponent<CharacterController>();
+
+        // Si existe un Rigidbody en el Prefab por error, lo desactivamos para evitar interferencias
+        if (TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            rb.isKinematic = true;
+        }
     }
 
     void Update()
     {
         if (!IsOwner) return;
 
-        // Rotación con Q y E
-        RotarConTeclas();
-    }
+        // 1. CAPTURA DE INPUTS
+        CapturarEntradas();
 
-    void FixedUpdate()
-    {
-        if (!IsOwner) return;
-
+        // 2. MOVIMIENTO Y ROTACIÓN (Todo en Update con Time.deltaTime para fluidez perfecta)
+        RotarJugador();
         MoverJugador();
     }
 
-    private void MoverJugador()
+    private void CapturarEntradas()
     {
         float moveX = 0f;
         float moveZ = 0f;
+        inputRotacion = 0f;
 
-        // Lectura de teclado
-        if (Keyboard.current.wKey.isPressed) moveZ = 1f;
-        if (Keyboard.current.sKey.isPressed) moveZ = -1f;
-        //if (Keyboard.current.aKey.isPressed) moveX = -1f;
-        //if (Keyboard.current.dKey.isPressed) moveX = 1f;
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.wKey.isPressed) moveZ = 1f;
+            if (Keyboard.current.sKey.isPressed) moveZ = -1f;
+
+            if (Keyboard.current.aKey.isPressed) inputRotacion -= 1f;
+            if (Keyboard.current.dKey.isPressed) inputRotacion += 1f;
+        }
 
         // Soporte secundario para Gamepad
         if (Gamepad.current != null && moveX == 0f && moveZ == 0f)
@@ -51,22 +61,32 @@ public class MovimientoPlayer : NetworkBehaviour
             moveZ = leftStick.y;
         }
 
-        Vector3 moveDirection = (transform.forward * moveZ + transform.right * moveX).normalized;
-
-        // Aplicar velocidad al Rigidbody
-        rb.linearVelocity = new Vector3(moveDirection.x * speed, rb.linearVelocity.y, moveDirection.z * speed);
+        inputMovimiento = new Vector2(moveX, moveZ).normalized;
     }
 
-    private void RotarConTeclas()
+    private void MoverJugador()
     {
-        float rotacion = 0f;
-
-        if (Keyboard.current.aKey.isPressed) rotacion -= 1f; // Girar a la izquierda
-        if (Keyboard.current.dKey.isPressed) rotacion += 1f; // Girar a la derecha
-
-        if (rotacion != 0f)
+        // Aplicar gravedad manual para mantener el personaje pegado al suelo
+        if (controller.isGrounded && velocidadY < 0)
         {
-            transform.Rotate(Vector3.up, rotacion * rotationSpeed * Time.deltaTime);
+            velocidadY = -2f; // Pequeño empuje constante hacia abajo
+        }
+
+        velocidadY += gravedad * Time.deltaTime;
+
+        // Calcular dirección de movimiento según la orientación del jugador
+        Vector3 moveDirection = (transform.forward * inputMovimiento.y + transform.right * inputMovimiento.x);
+        Vector3 desplazamiento = (moveDirection * speed) + (Vector3.up * velocidadY);
+
+        // Mover con CharacterController
+        controller.Move(desplazamiento * Time.deltaTime);
+    }
+
+    private void RotarJugador()
+    {
+        if (Mathf.Abs(inputRotacion) > 0.01f)
+        {
+            transform.Rotate(Vector3.up, inputRotacion * rotationSpeed * Time.deltaTime);
         }
     }
 }
