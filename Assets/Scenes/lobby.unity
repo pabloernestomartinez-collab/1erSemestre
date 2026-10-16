@@ -2079,12 +2079,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "En un mundo amenazado por la oscuridad, solo un verdadero guerrero puede
-    llegar hasta el final.\n\nTu viaje comienza en las \xE1ridas arenas del desierto,
-    plagado de voraces ratas. Si logras sobrevivir, te adentrar\xE1s en las sombras
-    del bosque, donde acechan cazadores a distancia. Finalmente, en las profundidades
-    del castillo, te espera el combate definitivo contra el BOSS: un rival supremo
-    con el poder de atacar de cerca, lanzar proyectiles y teletransportarse.\n\n\xBFTienesel
+  m_text: "LUX UMBRA\n\nEn un mundo amenazado por la oscuridad, solo un verdadero
+    guerrero puede llegar hasta el final.\n\nTu viaje comienza en las \xE1ridas arenas
+    del desierto, plagado de voraces ratas. Si logras sobrevivir, te adentrar\xE1s
+    en las sombras del bosque, donde acechan cazadores a distancia. Finalmente, en
+    las profundidades del castillo, te espera el combate definitivo contra el BOSS:
+    un rival supremo con el poder de atacar de cerca, lanzar proyectiles y teletransportarse.\n\n\xBFTienesel
     valor para vencerlo y completar tu misi\xF3n?"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
