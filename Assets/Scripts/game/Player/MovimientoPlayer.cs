@@ -19,21 +19,17 @@ public class MovimientoPlayer : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
 
-        // Si existe un Rigidbody en el Prefab por error, lo desactivamos para evitar interferencias
-        if (TryGetComponent<Rigidbody>(out Rigidbody rb))
-        {
-            rb.isKinematic = true;
-        }
+        
     }
 
     void Update()
     {
         if (!IsOwner) return;
 
-        // 1. CAPTURA DE INPUTS
+        // CAPTURA DE INPUTS
         CapturarEntradas();
 
-        // 2. MOVIMIENTO Y ROTACIÓN (Todo en Update con Time.deltaTime para fluidez perfecta)
+        // MOVIMIENTO Y ROTACIÓN (Todo en Update con Time.deltaTime para fluidez perfecta)
         RotarJugador();
         MoverJugador();
     }
