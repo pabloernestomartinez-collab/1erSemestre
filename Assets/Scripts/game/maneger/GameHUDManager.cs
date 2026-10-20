@@ -9,6 +9,9 @@ public class GameHUDManager : MonoBehaviour
 {
     public static GameHUDManager Instance { get; private set; }
 
+    // Propiedad alias para compatibilidad si PlayerStats busca 'Instancia' en español
+    public static GameHUDManager Instancia => Instance;
+
     [Header("Textos del Canvas")]
     [SerializeField] private TextMeshProUGUI oroText;
     [SerializeField] private TextMeshProUGUI hierbaText;
@@ -18,6 +21,10 @@ public class GameHUDManager : MonoBehaviour
     [Header("UI de Vida del Player")]
     [SerializeField] private TextMeshProUGUI vidaText;
     [SerializeField] private Slider vidaSlider;
+
+    [Header("UI de Game Over")]
+    [SerializeField] private GameObject panelGameOver;
+    [SerializeField] private Button botonVolverAlMenu;
 
     private PlayerStats jugadorLocalStats;
 
@@ -29,6 +36,18 @@ public class GameHUDManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // Asegurarse de que el panel de Game Over comience desactivado
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(false);
+        }
+
+        // Asignar el listener al botón de volver al menú
+        if (botonVolverAlMenu != null)
+        {
+            botonVolverAlMenu.onClick.AddListener(VolverAlMenuPrincipal);
+        }
     }
 
     private void Start()
@@ -68,7 +87,7 @@ public class GameHUDManager : MonoBehaviour
         jugadorLocalStats.oro.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.hierba.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.sabiduria.OnValueChanged += OnVariableChanged;
-        jugadorLocalStats.puntuacion.OnValueChanged += OnVariableChanged; // Suscripción a puntuación real
+        jugadorLocalStats.puntuacion.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.puntosVida.OnValueChanged += OnVariableChanged;
         jugadorLocalStats.puntosVidaMax.OnValueChanged += OnVariableChanged;
     }
@@ -80,7 +99,7 @@ public class GameHUDManager : MonoBehaviour
         jugadorLocalStats.oro.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.hierba.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.sabiduria.OnValueChanged -= OnVariableChanged;
-        jugadorLocalStats.puntuacion.OnValueChanged -= OnVariableChanged; // Desuscripción de puntuación real
+        jugadorLocalStats.puntuacion.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.puntosVida.OnValueChanged -= OnVariableChanged;
         jugadorLocalStats.puntosVidaMax.OnValueChanged -= OnVariableChanged;
     }
@@ -97,7 +116,7 @@ public class GameHUDManager : MonoBehaviour
         if (oroText != null) oroText.text = jugadorLocalStats.oro.Value.ToString();
         if (hierbaText != null) hierbaText.text = jugadorLocalStats.hierba.Value.ToString();
         if (sabiduriaText != null) sabiduriaText.text = jugadorLocalStats.sabiduria.Value.ToString();
-        if (puntosText != null) puntosText.text = jugadorLocalStats.puntuacion.Value.ToString(); // Muestra el valor real de puntuación
+        if (puntosText != null) puntosText.text = jugadorLocalStats.puntuacion.Value.ToString();
 
         int vidaAct = jugadorLocalStats.GetVidaActual();
         int vidaMax = jugadorLocalStats.GetVidaMaxima();
@@ -112,6 +131,28 @@ public class GameHUDManager : MonoBehaviour
             vidaSlider.maxValue = vidaMax;
             vidaSlider.value = vidaAct;
         }
+    }
+
+    // --- LÓGICA DE GAME OVER Y NAVEGACIÓN ---
+
+    public void MostrarGameOver()
+    {
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(true);
+        }
+    }
+
+    public void VolverAlMenuPrincipal()
+    {
+        // 1. Cerrar de forma limpia la conexión de red
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        // 2. Cargar la escena del lobby/menú principal
+        SceneManager.LoadScene("lobby");
     }
 
     private void OnDestroy()

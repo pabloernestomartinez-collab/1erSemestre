@@ -28,6 +28,7 @@ public class PlayerStats : NetworkBehaviour
 
     // Temporizador de puntos por segundo
     private float temporizadorPuntos = 0f;
+    private bool estaMuerto = false;
 
     // --- Propiedades de Compatibilidad Directa con GameHUDManager ---
     public NetworkVariable<int> vidaActual => puntosVida;
@@ -35,7 +36,7 @@ public class PlayerStats : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Suscripción a eventos de estadísticas generales (¡Mantenemos puntosVida aquí!)
+        // Suscripción a eventos de estadísticas generales
         puntosVida.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         puntosVidaMax.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
         oro.OnValueChanged += (oldVal, newVal) => OnStatsChanged?.Invoke();
@@ -87,7 +88,7 @@ public class PlayerStats : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
 
         if (puntosVida.Value > 0)
         {
@@ -112,8 +113,33 @@ public class PlayerStats : NetworkBehaviour
     // --- Métodos de Daño y Puntos ---
     public void RecibirDanio(int danio)
     {
-        if (!IsServer) return;
+        if (!IsServer || estaMuerto) return;
+
         puntosVida.Value = Mathf.Max(0, puntosVida.Value - danio);
+
+        // 💀 Verificación de Muerte
+        if (puntosVida.Value <= 0)
+        {
+            estaMuerto = true;
+            ProcesarMuerteClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void ProcesarMuerteClientRpc()
+    {
+        // 1. Desactivar componentes de movimiento y ataque para congelar al jugador
+        if (TryGetComponent<MovimientoPlayer>(out var movimiento)) movimiento.enabled = false;
+        if (TryGetComponent<PlayerAttack>(out var ataque)) ataque.enabled = false;
+
+        // 2. Si este personaje pertenece a la pantalla local, mostrar la pantalla de Game Over
+        if (IsOwner)
+        {
+            if (GameHUDManager.Instancia != null)
+            {
+                GameHUDManager.Instancia.MostrarGameOver();
+            }
+        }
     }
 
     public void SumarPuntos(int cantidad)
