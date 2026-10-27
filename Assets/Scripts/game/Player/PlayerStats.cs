@@ -117,7 +117,7 @@ public class PlayerStats : NetworkBehaviour
 
         puntosVida.Value = Mathf.Max(0, puntosVida.Value - danio);
 
-        // 💀 Verificación de Muerte
+        // Verificación de Muerte
         if (puntosVida.Value <= 0)
         {
             estaMuerto = true;
@@ -128,11 +128,11 @@ public class PlayerStats : NetworkBehaviour
     [ClientRpc]
     private void ProcesarMuerteClientRpc()
     {
-        // 1. Desactivar componentes de movimiento y ataque para congelar al jugador
+        // Desactivar componentes de movimiento y ataque para congelar al jugador
         if (TryGetComponent<MovimientoPlayer>(out var movimiento)) movimiento.enabled = false;
         if (TryGetComponent<PlayerAttack>(out var ataque)) ataque.enabled = false;
 
-        // 2. Si este personaje pertenece a la pantalla local, mostrar la pantalla de Game Over
+        // Si este personaje pertenece a la pantalla local, mostrar la pantalla de Game Over
         if (IsOwner)
         {
             if (GameHUDManager.Instancia != null)

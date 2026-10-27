@@ -26,10 +26,8 @@ public class MovimientoPlayer : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        // CAPTURA DE INPUTS
         CapturarEntradas();
 
-        // MOVIMIENTO Y ROTACIÓN (Todo en Update con Time.deltaTime para fluidez perfecta)
         RotarJugador();
         MoverJugador();
     }
@@ -62,7 +60,6 @@ public class MovimientoPlayer : NetworkBehaviour
 
     private void MoverJugador()
     {
-        // Aplicar gravedad manual para mantener el personaje pegado al suelo
         if (controller.isGrounded && velocidadY < 0)
         {
             velocidadY = -2f; // Pequeño empuje constante hacia abajo
@@ -74,7 +71,6 @@ public class MovimientoPlayer : NetworkBehaviour
         Vector3 moveDirection = (transform.forward * inputMovimiento.y + transform.right * inputMovimiento.x);
         Vector3 desplazamiento = (moveDirection * speed) + (Vector3.up * velocidadY);
 
-        // Mover con CharacterController
         controller.Move(desplazamiento * Time.deltaTime);
     }
 

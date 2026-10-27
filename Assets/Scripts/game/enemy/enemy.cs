@@ -8,6 +8,9 @@ public class enemy : NetworkBehaviour
     [Header("Configuración Base")]
     [SerializeField] private enemigosData enemigosData;
 
+    [Header("Tipo de Enemigo")]
+    [SerializeField] private bool esBoss = false; // Marcar en TRUE solo en el Prefab del Boss Final
+
     [Header("Vida del Enemigo (Netcode)")]
     [SerializeField] private int vidaMaxima = 100;
     public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
@@ -192,6 +195,11 @@ public class enemy : NetworkBehaviour
             }
         }
 
+        if (esBoss)
+        {
+            NotificarVictoriaClientRpc();
+        }
+
         // Detener NavMeshAgent para evitar errores
         if (agente != null && agente.isOnNavMesh)
         {
@@ -203,6 +211,24 @@ public class enemy : NetworkBehaviour
         if (NetworkObject != null && NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn();
+        }
+    }
+
+    [ClientRpc]
+    private void NotificarVictoriaClientRpc()
+    {
+        // Congelar controles del jugador local
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.LocalClient?.PlayerObject != null)
+        {
+            var playerObj = NetworkManager.Singleton.LocalClient.PlayerObject;
+            if (playerObj.TryGetComponent<MovimientoPlayer>(out var mov)) mov.enabled = false;
+            if (playerObj.TryGetComponent<PlayerAttack>(out var atk)) atk.enabled = false;
+        }
+
+        // Disparar la pantalla de Victoria en la UI
+        if (GameHUDManager.Instance != null)
+        {
+            GameHUDManager.Instance.MostrarPantallaVictoria();
         }
     }
 

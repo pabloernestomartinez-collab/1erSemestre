@@ -9,22 +9,28 @@ public class GameHUDManager : MonoBehaviour
 {
     public static GameHUDManager Instance { get; private set; }
 
-    // Propiedad alias para compatibilidad si PlayerStats busca 'Instancia' en español
+    // Propiedad alias para compatibilidad
     public static GameHUDManager Instancia => Instance;
 
     [Header("Textos del Canvas")]
     [SerializeField] private TextMeshProUGUI oroText;
     [SerializeField] private TextMeshProUGUI hierbaText;
     [SerializeField] private TextMeshProUGUI sabiduriaText;
-    [SerializeField] private TextMeshProUGUI puntosText; // Muestra la Puntuación/Score del jugador
+    [SerializeField] private TextMeshProUGUI puntosText; // Score del jugador durante la partida
 
     [Header("UI de Vida del Player")]
     [SerializeField] private TextMeshProUGUI vidaText;
     [SerializeField] private Slider vidaSlider;
 
-    [Header("UI de Game Over")]
+    [Header("UI de Game Over (Derrota)")]
     [SerializeField] private GameObject panelGameOver;
-    [SerializeField] private Button botonVolverAlMenu;
+    [SerializeField] private TextMeshProUGUI puntuacionGameOverText;
+    [SerializeField] private Button botonVolverGameOver;
+
+    [Header("UI de Victoria (Boss Derrotado)")]
+    [SerializeField] private GameObject panelVictoria;
+    [SerializeField] private TextMeshProUGUI puntuacionVictoriaText;
+    [SerializeField] private Button botonVolverVictoria;
 
     private PlayerStats jugadorLocalStats;
 
@@ -37,16 +43,19 @@ public class GameHUDManager : MonoBehaviour
         }
         Instance = this;
 
-        // Asegurarse de que el panel de Game Over comience desactivado
-        if (panelGameOver != null)
+        // Ocultar paneles de fin de partida al iniciar
+        if (panelGameOver != null) panelGameOver.SetActive(false);
+        if (panelVictoria != null) panelVictoria.SetActive(false);
+
+        // Asignar los listeners de los botones
+        if (botonVolverGameOver != null)
         {
-            panelGameOver.SetActive(false);
+            botonVolverGameOver.onClick.AddListener(VolverAlMenuPrincipal);
         }
 
-        // Asignar el listener al botón de volver al menú
-        if (botonVolverAlMenu != null)
+        if (botonVolverVictoria != null)
         {
-            botonVolverAlMenu.onClick.AddListener(VolverAlMenuPrincipal);
+            botonVolverVictoria.onClick.AddListener(VolverAlMenuPrincipal);
         }
     }
 
@@ -133,25 +142,41 @@ public class GameHUDManager : MonoBehaviour
         }
     }
 
-    // --- LÓGICA DE GAME OVER Y NAVEGACIÓN ---
+    // --- PANTALLAS DE FIN DE PARTIDA ---
 
     public void MostrarGameOver()
     {
         if (panelGameOver != null)
         {
+            if (jugadorLocalStats != null && puntuacionGameOverText != null)
+            {
+                puntuacionGameOverText.text = $"Puntuación Final: {jugadorLocalStats.GetPuntuacion()}";
+            }
             panelGameOver.SetActive(true);
+        }
+    }
+
+    public void MostrarPantallaVictoria()
+    {
+        if (panelVictoria != null)
+        {
+            if (jugadorLocalStats != null && puntuacionVictoriaText != null)
+            {
+                puntuacionVictoriaText.text = $"Puntuación Final: {jugadorLocalStats.GetPuntuacion()}";
+            }
+            panelVictoria.SetActive(true);
         }
     }
 
     public void VolverAlMenuPrincipal()
     {
-        // 1. Cerrar de forma limpia la conexión de red
+        // 1. Desconectar de la red de forma limpia
         if (NetworkManager.Singleton != null)
         {
             NetworkManager.Singleton.Shutdown();
         }
 
-        // 2. Cargar la escena del lobby/menú principal
+        // 2. Cargar la escena del lobby
         SceneManager.LoadScene("lobby");
     }
 
