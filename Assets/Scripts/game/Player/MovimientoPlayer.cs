@@ -3,34 +3,30 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Animator))]
 public class MovimientoPlayer : NetworkBehaviour
 {
     [Header("Configuración de Movimiento")]
-    [SerializeField] private float speed = 10f;
+    [SerializeField] private float speed = 8f;
     [SerializeField] private float rotationSpeed = 150f;
     [SerializeField] private float gravedad = -9.81f;
 
     private CharacterController controller;
-    private Vector2 inputMovimiento;
-    private float inputRotacion;
-    private float velocidadY = 0f;
-
     private Animator animator;
-    private bool isMoving;
-    private bool isAttack;
 
-    private void Start()
-    {
-        controller = GetComponent<CharacterController>(); // agregados del video de luis canary
-        animator = GetComponent<Animator>(); // agregados del video de luis canary
-
-    }
+    private float inputAvance;  // W / S
+    private float inputRotacion; // A / D
+    private float velocidadY = 0f;
 
     public override void OnNetworkSpawn()
     {
         controller = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
 
-        
+        if (TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            rb.isKinematic = true;
+        }
     }
 
     void Update()
@@ -38,58 +34,42 @@ public class MovimientoPlayer : NetworkBehaviour
         if (!IsOwner) return;
 
         CapturarEntradas();
-
         RotarJugador();
         MoverJugador();
+        ActualizarAnimaciones();
     }
 
     private void CapturarEntradas()
     {
-        float moveX = 0f;
-        float moveZ = 0f;
+        inputAvance = 0f;
         inputRotacion = 0f;
 
         if (Keyboard.current != null)
         {
-            if (Keyboard.current.wKey.isPressed) moveZ = 1f;
-            if (Keyboard.current.sKey.isPressed) moveZ = -1f;
+            // Avance hacia adelante y atrás (W / S)
+            if (Keyboard.current.wKey.isPressed) inputAvance += 1f;
+            if (Keyboard.current.sKey.isPressed) inputAvance -= 1f;
 
+            // Rotación izquierda y derecha (A / D)
             if (Keyboard.current.aKey.isPressed) inputRotacion -= 1f;
             if (Keyboard.current.dKey.isPressed) inputRotacion += 1f;
         }
-
-        // Soporte secundario para Gamepad
-        if (Gamepad.current != null && moveX == 0f && moveZ == 0f)
-        {
-            Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
-            moveX = leftStick.x;
-            moveZ = leftStick.y;
-        }
-
-        inputMovimiento = new Vector2(moveX, moveZ).normalized;
     }
 
     private void MoverJugador()
     {
         if (controller.isGrounded && velocidadY < 0)
         {
-            velocidadY = -2f; // Pequeño empuje constante hacia abajo
+            velocidadY = -2f; // Mantener pegado al suelo
         }
 
         velocidadY += gravedad * Time.deltaTime;
 
-        // Calcular dirección de movimiento según la orientación del jugador
-        Vector3 moveDirection = (transform.forward * inputMovimiento.y + transform.right * inputMovimiento.x);
+        // Avanzar/Retroceder en la dirección hacia la que mira el jugador
+        Vector3 moveDirection = transform.forward * inputAvance;
         Vector3 desplazamiento = (moveDirection * speed) + (Vector3.up * velocidadY);
 
         controller.Move(desplazamiento * Time.deltaTime);
-
-
-        
-        animator.SetBool("IsMoving", isMoving);   // agregados del video de luis canary
-        animator.SetBool("IsAttack", isAttack);   // agregados del video de luis canary
-
-
     }
 
     private void RotarJugador()
@@ -98,5 +78,15 @@ public class MovimientoPlayer : NetworkBehaviour
         {
             transform.Rotate(Vector3.up, inputRotacion * rotationSpeed * Time.deltaTime);
         }
+    }
+
+    private void ActualizarAnimaciones()
+    {
+        if (animator == null) return;
+
+        // Se considera en movimiento si avanza con W/S o gira con A/D
+        bool enMovimiento = Mathf.Abs(inputAvance) > 0.01f || Mathf.Abs(inputRotacion) > 0.01f;
+
+        animator.SetBool("IsMoving", enMovimiento);
     }
 }
