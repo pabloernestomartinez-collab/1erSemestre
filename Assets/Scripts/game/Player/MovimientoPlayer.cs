@@ -15,6 +15,17 @@ public class MovimientoPlayer : NetworkBehaviour
     private float inputRotacion;
     private float velocidadY = 0f;
 
+    private Animator animator;
+    private bool isMoving;
+    private bool isAttack;
+
+    private void Start()
+    {
+        controller = GetComponent<CharacterController>(); // agregados del video de luis canary
+        animator = GetComponent<Animator>(); // agregados del video de luis canary
+
+    }
+
     public override void OnNetworkSpawn()
     {
         controller = GetComponent<CharacterController>();
@@ -72,6 +83,13 @@ public class MovimientoPlayer : NetworkBehaviour
         Vector3 desplazamiento = (moveDirection * speed) + (Vector3.up * velocidadY);
 
         controller.Move(desplazamiento * Time.deltaTime);
+
+
+        
+        animator.SetBool("IsMoving", isMoving);   // agregados del video de luis canary
+        animator.SetBool("IsAttack", isAttack);   // agregados del video de luis canary
+
+
     }
 
     private void RotarJugador()
