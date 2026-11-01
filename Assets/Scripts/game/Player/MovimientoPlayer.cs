@@ -7,22 +7,24 @@ using UnityEngine.InputSystem;
 public class MovimientoPlayer : NetworkBehaviour
 {
     [Header("Configuración de Movimiento")]
-    [SerializeField] private float speed = 8f;
+    [SerializeField] private float speed = 10f;
     [SerializeField] private float rotationSpeed = 150f;
     [SerializeField] private float gravedad = -9.81f;
 
     private CharacterController controller;
     private Animator animator;
 
-    private float inputAvance;  // W / S
-    private float inputRotacion; // A / D
+    private Vector2 inputMovimiento;
+    private float inputRotacion;
     private float velocidadY = 0f;
 
     public override void OnNetworkSpawn()
     {
+        // Inicialización segura para Netcode
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
 
+        // Si por error hay un Rigidbody residual, lo hacemos cinemático
         if (TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
             rb.isKinematic = true;
@@ -41,19 +43,28 @@ public class MovimientoPlayer : NetworkBehaviour
 
     private void CapturarEntradas()
     {
-        inputAvance = 0f;
+        float moveX = 0f;
+        float moveZ = 0f;
         inputRotacion = 0f;
 
         if (Keyboard.current != null)
         {
-            // Avance hacia adelante y atrás (W / S)
-            if (Keyboard.current.wKey.isPressed) inputAvance += 1f;
-            if (Keyboard.current.sKey.isPressed) inputAvance -= 1f;
+            if (Keyboard.current.wKey.isPressed) moveZ = 1f;
+            if (Keyboard.current.sKey.isPressed) moveZ = -1f;
 
-            // Rotación izquierda y derecha (A / D)
             if (Keyboard.current.aKey.isPressed) inputRotacion -= 1f;
             if (Keyboard.current.dKey.isPressed) inputRotacion += 1f;
         }
+
+        // Soporte secundario para Gamepad
+        if (Gamepad.current != null && moveX == 0f && moveZ == 0f)
+        {
+            Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
+            moveX = leftStick.x;
+            moveZ = leftStick.y;
+        }
+
+        inputMovimiento = new Vector2(moveX, moveZ).normalized;
     }
 
     private void MoverJugador()
@@ -65,8 +76,8 @@ public class MovimientoPlayer : NetworkBehaviour
 
         velocidadY += gravedad * Time.deltaTime;
 
-        // Avanzar/Retroceder en la dirección hacia la que mira el jugador
-        Vector3 moveDirection = transform.forward * inputAvance;
+        // Dirección local según la rotación actual
+        Vector3 moveDirection = (transform.forward * inputMovimiento.y + transform.right * inputMovimiento.x);
         Vector3 desplazamiento = (moveDirection * speed) + (Vector3.up * velocidadY);
 
         controller.Move(desplazamiento * Time.deltaTime);
@@ -84,8 +95,8 @@ public class MovimientoPlayer : NetworkBehaviour
     {
         if (animator == null) return;
 
-        // Se considera en movimiento si avanza con W/S o gira con A/D
-        bool enMovimiento = Mathf.Abs(inputAvance) > 0.01f || Mathf.Abs(inputRotacion) > 0.01f;
+        // Se considera en movimiento si hay input direccional o rotación activa
+        bool enMovimiento = inputMovimiento.sqrMagnitude > 0.01f || Mathf.Abs(inputRotacion) > 0.01f;
 
         animator.SetBool("IsMoving", enMovimiento);
     }

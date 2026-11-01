@@ -1,7 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem; // Aseguramos la librería del Input System
+using UnityEngine.InputSystem;
 
 public class PlayerAttack : NetworkBehaviour
 {
@@ -10,18 +11,24 @@ public class PlayerAttack : NetworkBehaviour
     [SerializeField] private float cooldownAtaque = 0.6f;   // Tiempo entre ataques
     [SerializeField] private Transform puntoAtaque;         // Objeto vacío al frente del jugador
 
+    [Header("Parámetro del Animator")]
+    [SerializeField] private string nombreBoolAtaque = "IsAttack"; // Nombre exacto de tu variable bool en el Animator
+
     [Header("Señal Visual de Ataque")]
     [SerializeField] private GameObject senalVisualGolpe;
-    [SerializeField] private float duracionSenalVisual = 0.15f; // Cuánto tiempo se queda prendido en pantalla
+    [SerializeField] private float duracionSenalVisual = 0.15f;
 
     private float tiempoSiguienteAtaque = 0f;
     private PlayerStats misStats;
+    private Animator animator;
 
     public override void OnNetworkSpawn()
     {
         misStats = GetComponent<PlayerStats>();
 
-        // Aseguramos que la señal empiece apagada en todas las pantallas
+        // Busca el Animator en este objeto o en los objetos hijos (Mesh)
+        animator = GetComponentInChildren<Animator>();
+
         if (senalVisualGolpe != null)
         {
             senalVisualGolpe.SetActive(false);
@@ -32,24 +39,38 @@ public class PlayerAttack : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        //  Se reemplazó el clic del mouse por la tecla Espacio (spaceKey)
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && Time.time >= tiempoSiguienteAtaque)
         {
             tiempoSiguienteAtaque = Time.time + cooldownAtaque;
 
             int danioAInfligir = misStats != null ? misStats.GetDanioMelee() : 10;
 
-            SolicitarAtaqueServerRpc(puntoAtaque.position, danioAInfligir);
+            // 1. Activar animación de inmediato en el cliente local para respuesta instantánea
+            ActivarAnimacionAtaque(true);
+
+            // 2. Solicitar al servidor aplicar daño y sincronizar con los demás jugadores
+            SolicitarAtaqueServerRpc(puntoAtaque != null ? puntoAtaque.position : transform.position, danioAInfligir);
         }
     }
 
-    // El Cliente le envía al Servidor los datos exactos del golpe
+    private void ActivarAnimacionAtaque(bool estado)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(nombreBoolAtaque, estado);
+        }
+    }
+
     [ServerRpc]
     private void SolicitarAtaqueServerRpc(Vector3 posicionDelGolpe, int danio)
     {
+        // Notificar a los demás clientes que reproduzcan la animación
+        ReproducirAnimacionAtaqueClientRpc(true);
+
         ControlarVisualAtaqueClientRpc(true);
 
         Collider[] enemigosGolpeados = Physics.OverlapSphere(posicionDelGolpe, rangoAtaque);
+        HashSet<enemy> enemigosProcesados = new HashSet<enemy>();
 
         foreach (Collider col in enemigosGolpeados)
         {
@@ -57,20 +78,46 @@ public class PlayerAttack : NetworkBehaviour
             {
                 enemy scriptEnemigo = col.GetComponentInParent<enemy>();
 
-                if (scriptEnemigo != null)
+                if (scriptEnemigo != null && !enemigosProcesados.Contains(scriptEnemigo))
                 {
+                    enemigosProcesados.Add(scriptEnemigo);
                     scriptEnemigo.RecibirDanio(danio, gameObject);
                 }
             }
         }
 
-        StartCoroutine(ApagarSenalVisualDespuesDeTiempo());
+        StartCoroutine(ApagarEfectosYAtaque());
     }
 
-    private IEnumerator ApagarSenalVisualDespuesDeTiempo()
+    [ClientRpc]
+    private void ReproducirAnimacionAtaqueClientRpc(bool activar)
+    {
+        // El dueño ya activó la animación localmente en Update()
+        if (IsOwner) return;
+
+        ActivarAnimacionAtaque(activar);
+    }
+
+    private IEnumerator ApagarEfectosYAtaque()
     {
         yield return new WaitForSeconds(duracionSenalVisual);
-        ControlarVisualAtaqueClientRpc(false); // Le avisa a todos que se apague
+        ControlarVisualAtaqueClientRpc(false);
+
+        // Esperar el resto del cooldown antes de apagar el booleano
+        float tiempoRestante = cooldownAtaque - duracionSenalVisual;
+        if (tiempoRestante > 0)
+        {
+            yield return new WaitForSeconds(tiempoRestante);
+        }
+
+        // Apagar el bool de ataque en todos los clientes
+        ResetearBoolAtaqueClientRpc();
+    }
+
+    [ClientRpc]
+    private void ResetearBoolAtaqueClientRpc()
+    {
+        ActivarAnimacionAtaque(false);
     }
 
     [ClientRpc]
@@ -82,7 +129,6 @@ public class PlayerAttack : NetworkBehaviour
         }
     }
 
-    // Dibuja una esfera roja en el editor para que puedas calibrar el rango del golpe a ojo
     private void OnDrawGizmosSelected()
     {
         if (puntoAtaque == null) return;
