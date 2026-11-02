@@ -1253,7 +1253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   ShowTopMostFoldoutHeaderGroup: 1
-  rangoAtaque: 2.5
+  rangoAtaque: 3.5
   cooldownAtaque: 0.6
   puntoAtaque: {fileID: 6245668341676609829}
   nombreBoolAtaque: IsAttack
