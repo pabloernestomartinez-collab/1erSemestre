@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1838247237
+  GlobalObjectIdHash: 1595878601
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -166,10 +166,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.024299998
-  m_Height: 0.048599996
+  m_Radius: 0.1
+  m_Height: 0.2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0.00011529525, y: 0.0009702286, z: -0.0016394377}
 --- !u!114 &-4300606181571770168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,6 +185,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   tipoDeItem: 0
   cantidadAOtorgar: 1
+  datosArma: {fileID: 0}
 --- !u!114 &-7703455450300634878
 MonoBehaviour:
   m_ObjectHideFlags: 0
