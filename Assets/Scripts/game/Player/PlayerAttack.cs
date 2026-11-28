@@ -7,12 +7,17 @@ using UnityEngine.InputSystem;
 public class PlayerAttack : NetworkBehaviour
 {
     [Header("Configuración del Ataque")]
-    [SerializeField] private float rangoAtaque = 2.5f;     // Qué tan lejos llega el golpe
-    [SerializeField] private float cooldownAtaque = 0.6f;   // Tiempo entre ataques
-    [SerializeField] private Transform puntoAtaque;         // Objeto vacío al frente del jugador
+    [SerializeField] private float rangoAtaque = 2.5f;
+    [SerializeField] private float cooldownAtaque = 0.6f;
+    [SerializeField] private Transform puntoAtaque;
+
+    [Header("Giro de 360° al Atacar")]
+    [SerializeField] private Transform modeloVisual;          // Opcional: asigna el hijo del modelo 3D (si queda vacío usa el Animator)
+    [SerializeField] private float duracionGiro360 = 0.5f;
+    [SerializeField] private bool girarHaciaLaDerecha = true;
 
     [Header("Parámetro del Animator")]
-    [SerializeField] private string nombreBoolAtaque = "IsAttack"; // Nombre exacto de tu variable bool en el Animator
+    [SerializeField] private string nombreBoolAtaque = "IsAttack";
 
     [Header("Señal Visual de Ataque")]
     [SerializeField] private GameObject senalVisualGolpe;
@@ -21,13 +26,20 @@ public class PlayerAttack : NetworkBehaviour
     private float tiempoSiguienteAtaque = 0f;
     private PlayerStats misStats;
     private Animator animator;
+    private Coroutine corrutinaGiro;
+
+    public bool EstaGirando => corrutinaGiro != null;
 
     public override void OnNetworkSpawn()
     {
         misStats = GetComponent<PlayerStats>();
-
-        // Busca el Animator en este objeto o en los objetos hijos (Mesh)
         animator = GetComponentInChildren<Animator>();
+
+        // Si no se asignó manualmente en el Inspector, usa el transform del modelo animado
+        if (modeloVisual == null && animator != null)
+        {
+            modeloVisual = animator.transform;
+        }
 
         if (senalVisualGolpe != null)
         {
@@ -39,18 +51,63 @@ public class PlayerAttack : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && Time.time >= tiempoSiguienteAtaque)
+        bool presionoEspacio = Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
+        bool presionoClicDerecho = Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
+
+        if ((presionoEspacio || presionoClicDerecho) && Time.time >= tiempoSiguienteAtaque)
         {
-            tiempoSiguienteAtaque = Time.time + cooldownAtaque;
-
-            int danioAInfligir = misStats != null ? misStats.GetDanioMelee() : 10;
-
-            // 1. Activar animación de inmediato en el cliente local para respuesta instantánea
-            ActivarAnimacionAtaque(true);
-
-            // 2. Solicitar al servidor aplicar daño y sincronizar con los demás jugadores
-            SolicitarAtaqueServerRpc(puntoAtaque != null ? puntoAtaque.position : transform.position, danioAInfligir);
+            EjecutarAtaque();
         }
+    }
+
+    private void EjecutarAtaque()
+    {
+        tiempoSiguienteAtaque = Time.time + cooldownAtaque;
+
+        int danioAInfligir = misStats != null ? misStats.GetDanioMelee() : 10;
+
+        ActivarAnimacionAtaque(true);
+        IniciarGiro360();
+
+        SolicitarAtaqueServerRpc(puntoAtaque != null ? puntoAtaque.position : transform.position, danioAInfligir);
+    }
+
+    private void IniciarGiro360()
+    {
+        if (modeloVisual == null) return;
+
+        if (corrutinaGiro != null)
+        {
+            StopCoroutine(corrutinaGiro);
+            modeloVisual.localRotation = Quaternion.identity; // Asegura que vuelva a su frente original
+        }
+        corrutinaGiro = StartCoroutine(Girar360DuranteAtaque());
+    }
+
+    private IEnumerator Girar360DuranteAtaque()
+    {
+        float tiempoTranscurrido = 0f;
+        float gradosTotales = girarHaciaLaDerecha ? 360f : -360f;
+        float velocidadAngular = gradosTotales / duracionGiro360;
+
+        while (tiempoTranscurrido < duracionGiro360)
+        {
+            float delta = Time.deltaTime;
+            if (tiempoTranscurrido + delta > duracionGiro360)
+            {
+                delta = duracionGiro360 - tiempoTranscurrido;
+            }
+
+            // Rota únicamente el modelo hijo en su eje local Y sin afectar la raíz ni la cámara
+            modeloVisual.Rotate(Vector3.up, velocidadAngular * delta, Space.Self);
+
+            tiempoTranscurrido += Time.deltaTime;
+            yield return null;
+        }
+
+        // Restaura exactamente la orientación frontal original al terminar la vuelta
+        modeloVisual.localRotation = Quaternion.identity;
+        corrutinaGiro = null;
     }
 
     private void ActivarAnimacionAtaque(bool estado)
@@ -64,9 +121,7 @@ public class PlayerAttack : NetworkBehaviour
     [ServerRpc]
     private void SolicitarAtaqueServerRpc(Vector3 posicionDelGolpe, int danio)
     {
-        // Notificar a los demás clientes que reproduzcan la animación
         ReproducirAnimacionAtaqueClientRpc(true);
-
         ControlarVisualAtaqueClientRpc(true);
 
         Collider[] enemigosGolpeados = Physics.OverlapSphere(posicionDelGolpe, rangoAtaque);
@@ -92,10 +147,13 @@ public class PlayerAttack : NetworkBehaviour
     [ClientRpc]
     private void ReproducirAnimacionAtaqueClientRpc(bool activar)
     {
-        // El dueño ya activó la animación localmente en Update()
         if (IsOwner) return;
 
         ActivarAnimacionAtaque(activar);
+        if (activar)
+        {
+            IniciarGiro360();
+        }
     }
 
     private IEnumerator ApagarEfectosYAtaque()
@@ -103,14 +161,12 @@ public class PlayerAttack : NetworkBehaviour
         yield return new WaitForSeconds(duracionSenalVisual);
         ControlarVisualAtaqueClientRpc(false);
 
-        // Esperar el resto del cooldown antes de apagar el booleano
         float tiempoRestante = cooldownAtaque - duracionSenalVisual;
         if (tiempoRestante > 0)
         {
             yield return new WaitForSeconds(tiempoRestante);
         }
 
-        // Apagar el bool de ataque en todos los clientes
         ResetearBoolAtaqueClientRpc();
     }
 

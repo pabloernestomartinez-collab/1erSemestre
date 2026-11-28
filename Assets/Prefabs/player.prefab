@@ -1256,6 +1256,9 @@ MonoBehaviour:
   rangoAtaque: 4
   cooldownAtaque: 0.6
   puntoAtaque: {fileID: 6245668341676609829}
+  modeloVisual: {fileID: 0}
+  duracionGiro360: 1.5
+  girarHaciaLaDerecha: 0
   nombreBoolAtaque: IsAttack
   senalVisualGolpe: {fileID: 3727248468159495892}
   duracionSenalVisual: 1.5

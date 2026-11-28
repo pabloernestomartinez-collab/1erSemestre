@@ -15,6 +15,10 @@ public class enemy : NetworkBehaviour
     [SerializeField] private int vidaMaxima = 100;
     public NetworkVariable<int> vidaActual = new NetworkVariable<int>(100);
 
+    [Header("Animación de Muerte (Caída)")]
+    [SerializeField] private float duracionCaida = 0.4f;               // Tiempo que tarda en caer 90° de costado
+    [SerializeField] private float tiempoEnElSueloAntesDespawn = 0.8f; // Tiempo que queda tirado antes de desaparecer
+
     [Header("Referencias de Ataque a Distancia")]
     [SerializeField] private GameObject prefabProyectil;
     [SerializeField] private Transform puntoDisparo;    // arma del enemigo
@@ -29,10 +33,10 @@ public class enemy : NetworkBehaviour
     [SerializeField] private float cooldownAtaque = 1.5f; // Tiempo de espera entre golpes
 
     private NavMeshAgent agente;
-    private Transform jugadorObjetivo = null; // Guarda al jugador que está persiguiendo
+    private Transform jugadorObjetivo = null;
     private float tiempoSiguienteAtaque = 0f;
-    private bool estaAtacandoMelee = false;   // Previene iniciar ataques solapados
-    private bool estaMuerto = false;          // Candado para evitar doble procesamiento de muerte
+    private bool estaAtacandoMelee = false;
+    private bool estaMuerto = false;
 
     public int GetVidaMaxima() => vidaMaxima;
 
@@ -40,7 +44,6 @@ public class enemy : NetworkBehaviour
     {
         agente = GetComponent<NavMeshAgent>();
 
-        // Señal visual empieza apagada 
         if (senalVisualGolpe != null)
         {
             senalVisualGolpe.SetActive(false);
@@ -51,13 +54,11 @@ public class enemy : NetworkBehaviour
             agente.speed = enemigosData.EnemigoVelocidad;
         }
 
-        // Inicializamos la vida en el Servidor
         if (IsServer)
         {
             vidaActual.Value = vidaMaxima;
         }
 
-        // NavMesh solo en el Servidor
         if (!IsServer && agente != null)
         {
             agente.enabled = false;
@@ -70,21 +71,18 @@ public class enemy : NetworkBehaviour
 
         if (jugadorObjetivo == null || agente == null || !agente.enabled || !agente.isOnNavMesh) return;
 
-        // Si está preparando el golpe melee, detenemos el movimiento
         if (estaAtacandoMelee) return;
 
-        agente.SetDestination(jugadorObjetivo.position); // Persecución
+        agente.SetDestination(jugadorObjetivo.position);
 
         float distanciaAlJugador = Vector3.Distance(transform.position, jugadorObjetivo.position);
 
         if (Time.time >= tiempoSiguienteAtaque)
         {
-            // Intentar Ataque Cuerpo a Cuerpo
             if (enemigosData.Emelee && distanciaAlJugador <= rangoMelee)
             {
                 StartCoroutine(SecuenciaAtaqueMelee());
             }
-            // Intentar Ataque a Distancia
             else if (enemigosData.Distancia && distanciaAlJugador <= rangoDistancia && distanciaAlJugador > rangoMelee)
             {
                 EjecutarAtaqueADistancia();
@@ -122,7 +120,7 @@ public class enemy : NetworkBehaviour
             }
         }
 
-        if (agente != null && agente.isOnNavMesh)
+        if (agente != null && agente.isOnNavMesh && !estaMuerto)
         {
             agente.isStopped = false;
         }
@@ -175,7 +173,6 @@ public class enemy : NetworkBehaviour
 
         vidaActual.Value -= danioFinal;
 
-        // Verificación de Muerte
         if (vidaActual.Value <= 0)
         {
             estaMuerto = true;
@@ -200,12 +197,24 @@ public class enemy : NetworkBehaviour
             NotificarVictoriaClientRpc();
         }
 
-        // Detener NavMeshAgent para evitar errores
-        if (agente != null && agente.isOnNavMesh)
+        // Detener NavMeshAgent para liberar la rotación del objeto
+        if (agente != null)
         {
-            agente.isStopped = true;
+            if (agente.isOnNavMesh) agente.isStopped = true;
             agente.enabled = false;
         }
+
+        // Iniciar la secuencia de caída de 90° antes de hacer Despawn
+        StartCoroutine(SecuenciaCaidaYDespawnServidor());
+    }
+
+    private IEnumerator SecuenciaCaidaYDespawnServidor()
+    {
+        // Avisar a todos los clientes (incluido el Host) que reproduzcan la caída visual
+        EjecutarCaidaMuerteClientRpc();
+
+        // Esperar el tiempo de caída + el tiempo en el suelo
+        yield return new WaitForSeconds(duracionCaida + tiempoEnElSueloAntesDespawn);
 
         // Destruir en la red
         if (NetworkObject != null && NetworkObject.IsSpawned)
@@ -215,9 +224,56 @@ public class enemy : NetworkBehaviour
     }
 
     [ClientRpc]
+    private void EjecutarCaidaMuerteClientRpc()
+    {
+        // Desactivar colliders para que el cadáver no bloquee al jugador ni reciba más golpes
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+
+        // Apagar señal de ataque si había quedado encendida al morir
+        if (senalVisualGolpe != null)
+        {
+            senalVisualGolpe.SetActive(false);
+        }
+
+        // Si tiene Animator, lo pausamos para que la animación de caminar no pelee contra la rotación de caída
+        Animator anim = GetComponentInChildren<Animator>();
+        if (anim != null)
+        {
+            anim.enabled = false;
+        }
+
+        StartCoroutine(AnimarRotacionCaida());
+    }
+
+    private IEnumerator AnimarRotacionCaida()
+    {
+        Quaternion rotacionInicial = transform.rotation;
+        // Rotar 90 grados en el eje Z local (caída de costado)
+        Quaternion rotacionFinal = rotacionInicial * Quaternion.Euler(0f, 0f, 90f);
+
+        float tiempoTranscurrido = 0f;
+
+        while (tiempoTranscurrido < duracionCaida)
+        {
+            tiempoTranscurrido += Time.deltaTime;
+            float progreso = Mathf.Clamp01(tiempoTranscurrido / duracionCaida);
+
+            // Curva acelerada al final para simular gravedad al caer
+            float curvaCaida = progreso * progreso;
+            transform.rotation = Quaternion.Slerp(rotacionInicial, rotacionFinal, curvaCaida);
+
+            yield return null;
+        }
+
+        transform.rotation = rotacionFinal;
+    }
+
+    [ClientRpc]
     private void NotificarVictoriaClientRpc()
     {
-        // Congelar controles del jugador local
         if (NetworkManager.Singleton != null && NetworkManager.Singleton.LocalClient?.PlayerObject != null)
         {
             var playerObj = NetworkManager.Singleton.LocalClient.PlayerObject;
@@ -225,7 +281,6 @@ public class enemy : NetworkBehaviour
             if (playerObj.TryGetComponent<PlayerAttack>(out var atk)) atk.enabled = false;
         }
 
-        // Disparar la pantalla de Victoria en la UI
         if (GameHUDManager.Instance != null)
         {
             GameHUDManager.Instance.MostrarPantallaVictoria();
